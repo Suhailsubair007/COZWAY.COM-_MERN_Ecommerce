@@ -1,20 +1,50 @@
 import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import axiosInstance from '../../config/axiosConfig'
 import { Label } from '@/components/ui/label'
 import { EyeIcon, EyeOffIcon } from 'lucide-react'
+import { Toaster } from '@/components/ui/sonner'
+import { toast } from 'sonner'
 import { useNavigate } from 'react-router-dom'
 
 export default function Login () {
-  const navigate = useNavigate()
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
 
-  function handlesignupnavigate () {
+  const LoginData = {
+    email,
+    password
+  }
+
+  const navigate = useNavigate()
+
+  const handlesignupnavigate = () => {
     navigate('/signup')
+  }
+  const handleLogin = async () => {
+    try {
+      const responce = await axiosInstance.post('/users/login', LoginData, {
+        withCredentials: true
+      })
+      console.log(responce)
+
+      if (responce.status === 200) {
+        navigate('/landing')
+        toast('OTP resent to your email.')
+      } else {
+        alert('Failed to resend OTP.')
+      }
+      console.log(responce.data)
+    } catch (err) {
+      console.log(err)
+    }
   }
 
   return (
     <div className='flex flex-col items-center justify-center min-h-screen p-4 bg-background'>
+      <Toaster position='top-center' />
       <div className='w-full max-w-md space-y-8'>
         <div className='text-center'>
           <h1 className='text-2xl font-bold'>cozway.com</h1>
@@ -26,6 +56,7 @@ export default function Login () {
             <Input
               id='email'
               type='email'
+              onChange={e => setEmail(e.target.value)}
               placeholder='helloworld@gmail.com'
               required
             />
@@ -36,6 +67,7 @@ export default function Login () {
               <Input
                 id='password'
                 type={showPassword ? 'text' : 'password'}
+                onChange={e => setPassword(e.target.value)}
                 placeholder='Password'
                 required
               />
@@ -60,7 +92,7 @@ export default function Login () {
               Forgot password?
             </a>
           </div>
-          <Button type='submit' className='w-full'>
+          <Button onClick={handleLogin} type='submit' className='w-full'>
             Log in
           </Button>
         </form>

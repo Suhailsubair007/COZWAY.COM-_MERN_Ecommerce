@@ -3,6 +3,8 @@ import { BrowserRouter as Router, Route, Routes } from 'react-router-dom'
 import Signup from './pages/login/Signup'
 import Login from './pages/login/Login'
 import Otpsignin from './pages/login/Otpsignin'
+import { Toaster } from "@/components/ui/sonner"
+import Landing from './pages/login/Landing'
 
 const App = () => {
   return (
@@ -13,8 +15,10 @@ const App = () => {
           <Route path='/login' element={<Login />} />
           <Route path='/signup' element={<Signup />} />
           <Route path='/otpsignin' element={<Otpsignin />} />
+          <Route path='/landing' element={<Landing />} />
         </Routes>
       </div>
+      <Toaster position="bottom-center" />
     </Router>
   )
 }

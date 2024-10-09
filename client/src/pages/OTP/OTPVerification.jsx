@@ -8,9 +8,9 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 
-export function OTPVerification({ isOpen, onClose, onVerify, email }) {
+export function OTPVerification({ isOpen, onClose, onVerify, email, resendOtp }) { // Accept resendOtp prop
   const [otp, setOtp] = useState(['', '', '', '', '']);
-  const [timer, setTimer] = useState(20);
+  const [timer, setTimer] = useState(120); // 2 minutes
 
   useEffect(() => {
     let interval;
@@ -27,19 +27,33 @@ export function OTPVerification({ isOpen, onClose, onVerify, email }) {
       const newOtp = [...otp];
       newOtp[index] = value;
       setOtp(newOtp);
-      if (value !== '' && index < 4) {
+      if (value !== '' && index < otp.length - 1) {
         document.getElementById(`otp-${index + 1}`)?.focus();
       }
     }
   };
 
   const handleVerify = () => {
-    onVerify(otp.join(''));
+    const enteredOtp = otp.join('');
+    if (enteredOtp.length === otp.length) {
+      onVerify(enteredOtp);
+    } else {
+      alert('Please enter all OTP digits.');
+    }
   };
 
   const handleResend = () => {
-    setTimer(20);
-    // Add logic to resend OTP
+    setTimer(120); // Reset timer to 2 minutes
+    setOtp(['', '', '', '', '']); // Clear OTP inputs
+    resendOtp(); // Call the resendOtp function passed as prop
+  };
+
+  const formatTime = (seconds) => {
+    const min = Math.floor(seconds / 60)
+      .toString()
+      .padStart(2, '0');
+    const sec = (seconds % 60).toString().padStart(2, '0');
+    return `${min}:${sec}`;
   };
 
   return (
@@ -67,9 +81,11 @@ export function OTPVerification({ isOpen, onClose, onVerify, email }) {
         </div>
         <div className="text-center mb-4">
           {timer > 0 ? (
-            <p>Send code again {timer.toString().padStart(2, '0')}:{timer.toString().padStart(2, '0')}</p>
+            <p>Send code again in {formatTime(timer)}</p>
           ) : (
-            <Button variant="link" onClick={handleResend}>Resend</Button>
+            <Button variant="link" onClick={handleResend}>
+              Resend
+            </Button>
           )}
         </div>
         <Button onClick={handleVerify} className="w-full">
