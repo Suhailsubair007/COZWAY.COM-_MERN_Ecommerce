@@ -2,6 +2,8 @@ const User = require("../model/User");
 const bcrypt = require("bcrypt");
 const otpGenarator = require('otp-generator');
 const OTP = require('../model/otpModel')
+const { OAuth2Client } = require('google-auth-library');
+const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID); ('google-auth-library');
 
 
 const securePassword = async (password) => {
@@ -72,6 +74,7 @@ const sendOTP = async (req, res) => {
             message: 'OTP sent successfully',
             otp,
         });
+        console.log(res.data)
     } catch (error) {
         console.log(error.message);
         return res.status(500).json({ success: false, error: error.message });
@@ -91,16 +94,15 @@ const login = async (req, res) => {
             return res.status(401).json({ success: false, message: "Invalid credentials" });
         }
         const PasswordMatching = await bcrypt.compare(password, finduser.password);
+        console.log(PasswordMatching)
         if (PasswordMatching) {
-            return res.status(200).json({
+            res.status(200).json({
                 success: true,
                 message: "User logged in successfully...",
-                user: {
-                    name: finduser.name,
-                    email: finduser.email,
-                    _id: finduser._id
-                },
-            });         
+                name: finduser.name,
+                email: finduser.email,
+                _id: finduser._id
+            });
 
         } else {
             return res.status(401).json({ success: false, message: "Invalid credentials" });
@@ -111,6 +113,45 @@ const login = async (req, res) => {
     }
 }
 
+const googleSignIn = async (req, res) => {
+    console.log(req.body);
+    
+    // Destructure 'email', 'name', and 'googleId' directly from 'req.body'
+    const { email, name, sub: googleId } = req.body;
+
+    try {
+        // Check if the user already exists in the database
+        let user = await User.findOne({ email });
+        
+        if (!user) {
+            // Create a new user if not found
+            user = new User({
+                name,
+                email,
+                googleId,
+                createdAt: new Date(),
+            });
+
+            await user.save();
+        }
+
+        // Respond with success and user details
+        return res.status(200).json({
+            message: 'User successfully signed in',
+            user: {
+                name: user.name,
+                email: user.email,
+                id: user._id,
+            },
+        });
+
+    } catch (error) {
+        console.error('Error during Google sign-in:', error);
+        return res.status(500).json({ message: 'Failed to authenticate Google user' });
+    }
+};
+
+
 
 
 
@@ -118,4 +159,5 @@ module.exports = {
     registerUser,
     sendOTP,
     login,
+    googleSignIn,
 };

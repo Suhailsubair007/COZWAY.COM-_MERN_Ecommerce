@@ -1,18 +1,17 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import axiosInstance from '../../config/axiosConfig'
-import { Toaster } from "@/components/ui/sonner"
-import { toast } from "sonner"
+import { Toaster } from '@/components/ui/sonner'
+import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { EyeIcon, EyeOffIcon } from 'lucide-react'
 import { OTPVerification } from '../OTP/OTPVerification'
 import { useNavigate } from 'react-router-dom'
-
+import { GoogleLogin } from '@react-oauth/google'
+import { jwtDecode } from 'jwt-decode'
 
 export default function SignUp () {
-
-
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
   const [isOTPDialogOpen, setIsOTPDialogOpen] = useState(false)
@@ -22,7 +21,31 @@ export default function SignUp () {
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
   const [loading, setLoading] = useState(false)
-  const navigate = useNavigate();
+  const [googleSignupData, setGoogleSignupData] = useState('')
+  const navigate = useNavigate()
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      if (googleSignupData) {
+        try {
+          const response = await axiosInstance.post(
+            '/users/auth/google-signup',
+            googleSignupData,
+            {
+              headers: {
+                'Content-Type': 'application/json'
+              }
+            }
+          )
+          console.log(response.data)
+        } catch (error) {
+          console.error('Error signing in with Google:', error)
+        }
+      }
+    }
+
+    fetchUser()
+  }, [googleSignupData])
 
   const handleSignUp = async e => {
     e.preventDefault()
@@ -45,20 +68,19 @@ export default function SignUp () {
       console.log(response.data)
       if (response.status === 200) {
         setIsOTPDialogOpen(true)
-        toast("OTP sent to your email.")
+        toast('OTP sent to your email.')
       } else {
         alert('Failed to send OTP.')
       }
     } catch (error) {
       console.error('Error sending OTP:', error)
-      toast("Error sending OTP. Please try again later.")
+      toast('Error sending OTP. Please try again later.')
     } finally {
       setLoading(false)
     }
   }
 
   const handleOTPVerify = async otp => {
-
     const signUpWithOtpData = {
       name,
       email,
@@ -79,16 +101,14 @@ export default function SignUp () {
       console.log(response.data)
 
       if (response.status === 201) {
-        
         navigate('/login')
-        toast("Signup successful! Please log in.")
+        toast('Signup successful! Please log in.')
       } else {
         alert('Invalid OTP or failed to signup.')
       }
     } catch (error) {
       console.error('Error verifying OTP:', error)
-      toast("Error verifying OTP. Please try again.")
-      
+      toast('Error verifying OTP. Please try again.')
     } finally {
       setLoading(false)
     }
@@ -120,12 +140,13 @@ export default function SignUp () {
     }
   }
 
-  const handleloginnavigate = ()  =>{
+  const handleloginnavigate = () => {
     navigate('/login')
   }
+
   return (
     <div className='flex flex-col items-center justify-center min-h-screen p-4 bg-background'>
-      <Toaster position="top-center" />
+      <Toaster position='top-center' />
       <div className='w-full max-w-md space-y-8'>
         <div className='text-center'>
           <h1 className='text-2xl font-bold'>cozway.com</h1>
@@ -214,7 +235,11 @@ export default function SignUp () {
           </div>
           <div className='text-sm text-center'>
             Already have an account?{' '}
-            <a onClick={handleloginnavigate} href='#' className='font-medium text-primary hover:underline'>
+            <a
+              onClick={handleloginnavigate}
+              href='#'
+              className='font-medium text-primary hover:underline'
+            >
               Log in
             </a>
           </div>
@@ -228,30 +253,25 @@ export default function SignUp () {
             <span className='w-full border-t' />
           </div>
           <div className='relative flex justify-center text-xs uppercase'>
-            <span className='bg-background px-2 text-muted-foreground'>
+            <span className='bg-background px-2 text-muted-foreground pb-6'>
               Or Register with
             </span>
           </div>
         </div>
-        <Button variant='outline' className='w-full'>
-          <svg
-            className='mr-2 h-4 w-4'
-            aria-hidden='true'
-            focusable='false'
-            data-prefix='fab'
-            data-icon='google'
-            role='img'
-            xmlns='http://www.w3.org/2000/svg'
-            viewBox='0 0 488 512'
-          >
-            <path
-              fill='currentColor'
-              d='M488 261.8C488 403.3 391.1 504 248 504 110.8 504 0 393.2 0 256S110.8 8 248 8c66.8 0 123 24.5 166.3 64.9l-67.5 64.9C258.5 52.6 94.3 116.6 94.3 256c0 86.5 69.1 156.6 153.7 156.6 98.2 0 135-70.4 140.8-106.9H248v-85.3h236.1c2.3 12.7 3.9 24.9 3.9 41.4z'
-            ></path>
-          </svg>
-          Google
-        </Button>
       </div>
+      <GoogleLogin
+        onSuccess={credentialResponse => {
+          const credentialResponseData = jwtDecode(
+            credentialResponse.credential
+          )
+
+          console.log(credentialResponseData)
+          setGoogleSignupData(credentialResponseData)
+        }}
+        onError={() => {
+          console.log('Login Failed')
+        }}
+      />
       <OTPVerification
         isOpen={isOTPDialogOpen}
         onClose={() => setIsOTPDialogOpen(false)}

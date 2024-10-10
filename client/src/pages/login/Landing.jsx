@@ -1,8 +1,11 @@
 import React from 'react'
+import Footer from '@/ReuseComponets/Footer'
 
 const Landing = () => {
   return (
-    <div>Landing</div>
+    <div>
+      <Footer />
+    </div>
   )
 }
 
