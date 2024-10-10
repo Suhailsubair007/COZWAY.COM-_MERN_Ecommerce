@@ -1,4 +1,4 @@
-import { useState , useEffect} from 'react'
+import { useState, useEffect } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import axiosInstance from '../../config/axiosConfig'
@@ -14,7 +14,7 @@ export default function Login () {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
-  const [googleData, SetGoogleData] = useState('');
+  const [googleData, SetGoogleData] = useState('')
 
   const LoginData = {
     email,
@@ -22,8 +22,6 @@ export default function Login () {
   }
 
   const navigate = useNavigate()
-
-
 
   // useEffect(() => {
   //   const fetchUser = async () => {
@@ -48,8 +46,27 @@ export default function Login () {
   //   fetchUser()
   // }, [googleData])
 
+  const handleGoogleLogin = async credentialResponse => {
+    const credentialResponseData = jwtDecode(credentialResponse.credential)
 
-
+    try {
+      const response = await axiosInstance.post(
+        '/users/auth/google-login',
+        credentialResponseData,
+        {
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        }
+      )
+      console.log(response.data)
+      toast('Google Login successful!')
+      navigate('/landing')
+    } catch (error) {
+      console.error('Error logging in with Google:', error)
+      toast('Error logging in with Google. Please try again.')
+    }
+  }
 
   const handlesignupnavigate = () => {
     navigate('/signup')
@@ -153,14 +170,7 @@ export default function Login () {
         </div>
       </div>
       <GoogleLogin
-        onSuccess={credentialResponse => {
-          const credentialResponseData = jwtDecode(
-            credentialResponse.credential
-          )
-
-          console.log(credentialResponseData)
-          SetGoogleData(credentialResponseData)
-        }}
+        onSuccess={handleGoogleLogin}
         onError={() => {
           console.log('Login Failed')
         }}

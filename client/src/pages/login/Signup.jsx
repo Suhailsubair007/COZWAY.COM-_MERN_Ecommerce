@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import axiosInstance from '../../config/axiosConfig'
 import { Toaster } from '@/components/ui/sonner'
 import { toast } from 'sonner'
@@ -21,31 +21,7 @@ export default function SignUp () {
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
   const [loading, setLoading] = useState(false)
-  const [googleSignupData, setGoogleSignupData] = useState('')
   const navigate = useNavigate()
-
-  useEffect(() => {
-    const fetchUser = async () => {
-      if (googleSignupData) {
-        try {
-          const response = await axiosInstance.post(
-            '/users/auth/google-signup',
-            googleSignupData,
-            {
-              headers: {
-                'Content-Type': 'application/json'
-              }
-            }
-          )
-          console.log(response.data)
-        } catch (error) {
-          console.error('Error signing in with Google:', error)
-        }
-      }
-    }
-
-    fetchUser()
-  }, [googleSignupData])
 
   const handleSignUp = async e => {
     e.preventDefault()
@@ -144,6 +120,29 @@ export default function SignUp () {
     navigate('/login')
   }
 
+  const handleGoogleSignup = async credentialResponse => {
+    const credentialResponseData = jwtDecode(credentialResponse.credential)
+    console.log(credentialResponseData)
+
+    try {
+      const response = await axiosInstance.post(
+        '/users/auth/google-signup',
+        credentialResponseData,
+        {
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        }
+      )
+      console.log(response.data)
+      toast('Google Signup successful!')
+      navigate('/landing');
+    } catch (error) {
+      console.error('Error signing in with Google:', error)
+      toast('Error signing in with Google. Please try again.')
+    }
+  }
+
   return (
     <div className='flex flex-col items-center justify-center min-h-screen p-4 bg-background'>
       <Toaster position='top-center' />
@@ -171,7 +170,7 @@ export default function SignUp () {
               placeholder='Email'
               required
               value={email}
-              onChange={e => setEmail(e.target.value)} // Set the email state
+              onChange={e => setEmail(e.target.value)}
             />
           </div>
           <div className='space-y-1'>
@@ -260,14 +259,7 @@ export default function SignUp () {
         </div>
       </div>
       <GoogleLogin
-        onSuccess={credentialResponse => {
-          const credentialResponseData = jwtDecode(
-            credentialResponse.credential
-          )
-
-          console.log(credentialResponseData)
-          setGoogleSignupData(credentialResponseData)
-        }}
+        onSuccess={handleGoogleSignup}
         onError={() => {
           console.log('Login Failed')
         }}
@@ -276,8 +268,9 @@ export default function SignUp () {
         isOpen={isOTPDialogOpen}
         onClose={() => setIsOTPDialogOpen(false)}
         onVerify={handleOTPVerify}
-        email={email} // Pass the email to the OTPVerification component
-        resendOtp={resendOtp} // Pass the resendOtp function
+        email={email}
+        resendOTP={resendOtp}
+        loading={loading}
       />
     </div>
   )

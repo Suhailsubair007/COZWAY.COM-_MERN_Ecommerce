@@ -115,14 +115,14 @@ const login = async (req, res) => {
 
 const googleSignIn = async (req, res) => {
     console.log(req.body);
-    
+
     // Destructure 'email', 'name', and 'googleId' directly from 'req.body'
     const { email, name, sub: googleId } = req.body;
 
     try {
         // Check if the user already exists in the database
         let user = await User.findOne({ email });
-        
+
         if (!user) {
             // Create a new user if not found
             user = new User({
@@ -152,6 +152,28 @@ const googleSignIn = async (req, res) => {
 };
 
 
+const googleLoginUser = async (req, res) => {
+    const { email, name } = req.body;
+
+    try {
+        let user = await User.findOne({ email });
+
+        if (!user) {
+            user = new User({
+                email,
+                name,
+                googleId: req.body.sub,
+            });
+            await user.save();
+        }
+        return res.status(200).json({ sucess: true, message: 'Jayy jawann rakshapettu' });
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ message: 'Server error' });
+    }
+};
+
+
 
 
 
@@ -160,4 +182,5 @@ module.exports = {
     sendOTP,
     login,
     googleSignIn,
+    googleLoginUser,
 };
