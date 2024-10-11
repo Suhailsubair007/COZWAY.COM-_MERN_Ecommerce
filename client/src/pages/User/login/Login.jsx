@@ -1,10 +1,9 @@
 import { useState, useEffect } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import axiosInstance from '../../config/axiosConfig'
+import axiosInstance from '../../../config/axiosConfig'
 import { Label } from '@/components/ui/label'
 import { EyeIcon, EyeOffIcon } from 'lucide-react'
-import { Toaster } from '@/components/ui/sonner'
 import { toast } from 'sonner'
 import { useNavigate } from 'react-router-dom'
 import { GoogleLogin } from '@react-oauth/google'
@@ -22,29 +21,6 @@ export default function Login () {
   }
 
   const navigate = useNavigate()
-
-  // useEffect(() => {
-  //   const fetchUser = async () => {
-  //     if (googleData) {
-  //       try {
-  //         const response = await axiosInstance.post(
-  //           '/users/auth/google-signup',
-  //           googleData,
-  //           {
-  //             headers: {
-  //               'Content-Type': 'application/json'
-  //             }
-  //           }
-  //         )
-  //         console.log(response.data)
-  //       } catch (error) {
-  //         console.error('Error signing in with Google:', error)
-  //       }
-  //     }
-  //   }
-
-  //   fetchUser()
-  // }, [googleData])
 
   const handleGoogleLogin = async credentialResponse => {
     const credentialResponseData = jwtDecode(credentialResponse.credential)
@@ -84,7 +60,7 @@ export default function Login () {
 
       if (response.status === 200) {
         navigate('/landing')
-        toast('OTP resent to your email.')
+        toast('Login sucess!!!')
       } else {
         console.log('Unexpected response:', response)
         alert('Failed to login.')
@@ -96,7 +72,6 @@ export default function Login () {
 
   return (
     <div className='flex flex-col items-center justify-center min-h-screen p-4 bg-background'>
-      <Toaster position='top-center' />
       <div className='w-full max-w-md space-y-8'>
         <div className='text-center'>
           <h1 className='text-2xl font-bold'>cozway.com</h1>
@@ -163,7 +138,7 @@ export default function Login () {
             <span className='w-full border-t' />
           </div>
           <div className='relative flex justify-center text-xs uppercase'>
-            <span className='bg-background px-2 text-muted-foreground'>
+            <span className='bg-background px-2 pb-6 text-muted-foreground'>
               Or Log in with
             </span>
           </div>

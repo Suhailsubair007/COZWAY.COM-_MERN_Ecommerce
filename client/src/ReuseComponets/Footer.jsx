@@ -1,16 +1,14 @@
-import React from 'react'
 import { Button } from '@/components/ui/button'
-
 
 const Footer = () => {
   return (
     <div>
-      <section class='py-10 bg-gray-50 sm:pt-16 lg:pt-24'>
-        <div class='px-4 mx-auto sm:px-6 lg:px-8 max-w-7xl'>
+      <section class='py-5 bg-gray-300 sm:pt-16 lg:pt-18'>
+        <div class='px-4 mx-auto sm:px-6 lg:px-8  max-w-7xl'>
           <div class='grid grid-cols-2 md:col-span-3 lg:grid-cols-6 gap-y-16 gap-x-12'>
             <div class='col-span-2 md:col-span-3 lg:col-span-2 lg:pr-8'>
               <img
-                class='w-auto h-9'
+                class='w-auto h-6'
                 src='https://res.cloudinary.com/dupo7yv88/image/upload/v1728535931/logo-no-background_dx8qjo.png'
                 alt=''
               />
@@ -222,9 +220,9 @@ const Footer = () => {
 
                 <button
                   type='submit'
-                  class='inline-flex items-center justify-center px-6 py-4 mt-3 font-semibold text-white transition-all duration-200 bg-blue-600 rounded-md hover:bg-blue-700 focus:bg-blue-700'
+                  className='inline-flex items-center justify-center px-4 py-2 mt-3 font-semibold text-white transition-all duration-200 bg-black rounded-md hover:bg-blue-700 focus:bg-black-100'
                 >
-                  Subscribe
+                  Submit
                 </button>
               </form>
             </div>
@@ -232,7 +230,7 @@ const Footer = () => {
 
           <hr class='mt-16 mb-10 border-gray-200' />
 
-          <p class='text-sm text-center text-gray-600'>
+          <p class='text-sm text-center text-gray-800'>
             © Copyright 2021, All Rights Reserved by Postcraft
           </p>
         </div>

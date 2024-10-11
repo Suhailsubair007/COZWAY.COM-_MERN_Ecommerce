@@ -116,15 +116,13 @@ const login = async (req, res) => {
 const googleSignIn = async (req, res) => {
     console.log(req.body);
 
-    // Destructure 'email', 'name', and 'googleId' directly from 'req.body'
     const { email, name, sub: googleId } = req.body;
 
     try {
-        // Check if the user already exists in the database
         let user = await User.findOne({ email });
 
         if (!user) {
-            // Create a new user if not found
+
             user = new User({
                 name,
                 email,
@@ -135,7 +133,6 @@ const googleSignIn = async (req, res) => {
             await user.save();
         }
 
-        // Respond with success and user details
         return res.status(200).json({
             message: 'User successfully signed in',
             user: {

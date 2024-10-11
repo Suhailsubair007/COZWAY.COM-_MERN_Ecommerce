@@ -1,12 +1,11 @@
 import { useState } from 'react'
-import axiosInstance from '../../config/axiosConfig'
-import { Toaster } from '@/components/ui/sonner'
+import axiosInstance from '../../../config/axiosConfig'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { EyeIcon, EyeOffIcon } from 'lucide-react'
-import { OTPVerification } from '../OTP/OTPVerification'
+import { OTPVerification } from './OTPVerification'
 import { useNavigate } from 'react-router-dom'
 import { GoogleLogin } from '@react-oauth/google'
 import { jwtDecode } from 'jwt-decode'
@@ -136,7 +135,7 @@ export default function SignUp () {
       )
       console.log(response.data)
       toast('Google Signup successful!')
-      navigate('/landing');
+      navigate('/landing')
     } catch (error) {
       console.error('Error signing in with Google:', error)
       toast('Error signing in with Google. Please try again.')
@@ -145,7 +144,6 @@ export default function SignUp () {
 
   return (
     <div className='flex flex-col items-center justify-center min-h-screen p-4 bg-background'>
-      <Toaster position='top-center' />
       <div className='w-full max-w-md space-y-8'>
         <div className='text-center'>
           <h1 className='text-2xl font-bold'>cozway.com</h1>
@@ -275,3 +273,4 @@ export default function SignUp () {
     </div>
   )
 }
+
