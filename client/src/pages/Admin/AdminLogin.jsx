@@ -1,4 +1,5 @@
 import React, { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -9,13 +10,15 @@ const AdminLogin = () => {
   const [password, setPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
 
+  const navigate = useNavigate()
+
   const handleLogin = e => {
     e.preventDefault()
     // Handle login logic here
   }
 
   const handlesignupnavigate = () => {
-    // Handle sign-up navigation logic here
+    navigate('admin/dashboard')
   }
 
   return (
@@ -69,11 +72,10 @@ const AdminLogin = () => {
           </div>
 
           {/* Log in Button */}
-          <Button type='submit' className='w-full'>
+          <Button type='submit' className='w-full' onClick={handlesignupnavigate}>
             Log in
           </Button>
         </form>
-
       </div>
     </div>
   )

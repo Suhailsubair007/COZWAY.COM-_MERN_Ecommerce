@@ -97,11 +97,13 @@ export default function SignUp () {
       password
     }
 
+    console.log(signUpData)
     try {
       setLoading(true)
       const response = await axiosInstance.post('/users/send-otp', signUpData, {
         withCredentials: true
       })
+      console.log(response.data)
       if (response.status === 200) {
         toast('OTP resent to your email.')
       } else {
@@ -267,10 +269,8 @@ export default function SignUp () {
         onClose={() => setIsOTPDialogOpen(false)}
         onVerify={handleOTPVerify}
         email={email}
-        resendOTP={resendOtp}
-        loading={loading}
+        resendOtp={resendOtp} // Passing the resendOtp function as a prop
       />
     </div>
   )
 }
-

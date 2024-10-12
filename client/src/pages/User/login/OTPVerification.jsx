@@ -8,7 +8,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 
-export function OTPVerification({ isOpen, onClose, onVerify, email, resendOtp }) { // Accept resendOtp prop
+export function OTPVerification({ isOpen, onClose, onVerify, email, resendOtp }) { 
   const [otp, setOtp] = useState(['', '', '', '', '']);
   const [timer, setTimer] = useState(120); // 2 minutes
 
@@ -43,8 +43,8 @@ export function OTPVerification({ isOpen, onClose, onVerify, email, resendOtp })
   };
 
   const handleResend = () => {
-    setTimer(120); // Reset timer to 2 minutes
-    setOtp(['', '', '', '', '']); // Clear OTP inputs
+    setTimer(120); 
+    setOtp(['', '', '', '', '']); 
     resendOtp(); // Call the resendOtp function passed as prop
   };
 
