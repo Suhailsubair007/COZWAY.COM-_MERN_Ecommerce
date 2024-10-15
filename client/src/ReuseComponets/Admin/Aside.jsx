@@ -15,7 +15,7 @@ import {
 const Aside = () => {
   return (
     <div>
-      <aside className='w-64 bg-white shadow-md'>
+      <aside className='w-64 h-full bg-white shadow-md'>
         <div className='pl-10 p-4 border-b'>
           <img
             src='https://res.cloudinary.com/dupo7yv88/image/upload/v1728535931/logo-no-background_dx8qjo.png'

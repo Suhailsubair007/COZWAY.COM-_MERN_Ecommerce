@@ -1,4 +1,6 @@
 import { useState } from 'react'
+import { Formik, Form, Field, ErrorMessage } from 'formik'
+import * as Yup from 'yup'
 import axiosInstance from '../../../config/axiosConfig'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
@@ -10,25 +12,33 @@ import { useNavigate } from 'react-router-dom'
 import { GoogleLogin } from '@react-oauth/google'
 import { jwtDecode } from 'jwt-decode'
 
+const validationSchema = Yup.object({
+  name: Yup.string()
+    .required('Full name is required')
+    .min(2, 'Full name must be at least 2 characters'),
+  email: Yup.string()
+    .email('Invalid email address')
+    .required('Email is required'),
+  phone: Yup.string()
+    .matches(/^\d{10}$/, 'Phone number must be 10 digits')
+    .required('Mobile Number is required'),
+  password: Yup.string()
+    .required('Password is required')
+    .min(6, 'Password must be at least 6 characters'),
+  confirmPassword: Yup.string()
+    .oneOf([Yup.ref('password'), null], 'Passwords must match')
+    .required('Confirm password is required')
+})
+
 export default function SignUp () {
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
   const [isOTPDialogOpen, setIsOTPDialogOpen] = useState(false)
-  const [email, setEmail] = useState('')
-  const [name, setName] = useState('')
-  const [phone, setPhone] = useState('')
-  const [password, setPassword] = useState('')
-  const [confirmPassword, setConfirmPassword] = useState('')
   const [loading, setLoading] = useState(false)
   const navigate = useNavigate()
 
-  const handleSignUp = async e => {
-    e.preventDefault()
-
-    if (password !== confirmPassword) {
-      alert('Passwords do not match')
-      return
-    }
+  const handleSignUp = async (values, { setSubmitting }) => {
+    const { name, email, phone, password } = values
 
     const signUpData = {
       name,
@@ -41,6 +51,7 @@ export default function SignUp () {
       setLoading(true)
       const response = await axiosInstance.post('/users/send-otp', signUpData)
       console.log(response.data)
+
       if (response.status === 200) {
         setIsOTPDialogOpen(true)
         toast('OTP sent to your email.')
@@ -48,14 +59,20 @@ export default function SignUp () {
         alert('Failed to send OTP.')
       }
     } catch (error) {
-      console.error('Error sending OTP:', error)
-      toast('Error sending OTP. Please try again later.')
+      if (error.response && error.response.status === 409) {
+        toast('Email ID already exists!')
+      } else {
+        console.error('Error sending OTP:', error)
+        toast('Error sending OTP. Please try again later.')
+      }
     } finally {
       setLoading(false)
+      setSubmitting(false)
     }
   }
 
-  const handleOTPVerify = async otp => {
+  const handleOTPVerify = async (otp, values) => {
+    const { name, email, phone, password } = values
     const signUpWithOtpData = {
       name,
       email,
@@ -89,7 +106,9 @@ export default function SignUp () {
     }
   }
 
-  const resendOtp = async () => {
+  const resendOtp = async values => {
+    const { name, email, phone, password } = values
+
     const signUpData = {
       name,
       email,
@@ -117,7 +136,7 @@ export default function SignUp () {
     }
   }
 
-  const handleloginnavigate = () => {
+  const handleLoginNavigate = () => {
     navigate('/login')
   }
 
@@ -151,101 +170,159 @@ export default function SignUp () {
           <h1 className='text-2xl font-bold'>cozway.com</h1>
           <h2 className='text-3xl font-bold mt-6 mb-6'>Sign up</h2>
         </div>
-        <form className='space-y-4' onSubmit={handleSignUp}>
-          <div className='space-y-1'>
-            <Label htmlFor='fullName'>Full name</Label>
-            <Input
-              id='fullName'
-              placeholder='Full name'
-              required
-              value={name}
-              onChange={e => setName(e.target.value)}
-            />
-          </div>
-          <div className='space-y-1'>
-            <Label htmlFor='email'>Email</Label>
-            <Input
-              id='email'
-              type='email'
-              placeholder='Email'
-              required
-              value={email}
-              onChange={e => setEmail(e.target.value)}
-            />
-          </div>
-          <div className='space-y-1'>
-            <Label htmlFor='mobileNumber'>Mobile Number</Label>
-            <Input
-              id='phone'
-              type='tel'
-              placeholder='Mobile Number'
-              required
-              value={phone}
-              onChange={e => setPhone(e.target.value)}
-            />
-          </div>
-          <div className='space-y-1'>
-            <Label htmlFor='password'>Password</Label>
-            <div className='relative'>
-              <Input
-                id='password'
-                type={showPassword ? 'text' : 'password'}
-                placeholder='Password'
-                required
-                value={password}
-                onChange={e => setPassword(e.target.value)}
-              />
-              <button
-                type='button'
-                className='absolute inset-y-0 right-0 pr-3 flex items-center'
-                onClick={() => setShowPassword(!showPassword)}
+        <Formik
+          initialValues={{
+            name: '',
+            email: '',
+            phone: '',
+            password: '',
+            confirmPassword: ''
+          }}
+          validationSchema={validationSchema}
+          onSubmit={handleSignUp}
+        >
+          {({ isSubmitting, values }) => (
+            <Form className='space-y-4'>
+              <div className='space-y-1'>
+                <Label htmlFor='name'>Full name</Label>
+                <Field
+                  as={Input}
+                  id='name'
+                  name='name'
+                  placeholder='Full name'
+                  required
+                />
+                <ErrorMessage
+                  name='name'
+                  component='div'
+                  className='text-red-500 text-sm'
+                />
+              </div>
+              <div className='space-y-1'>
+                <Label htmlFor='email'>Email</Label>
+                <Field
+                  as={Input}
+                  id='email'
+                  name='email'
+                  type='email'
+                  placeholder='Email'
+                  required
+                />
+                <ErrorMessage
+                  name='email'
+                  component='div'
+                  className='text-red-500 text-sm'
+                />
+              </div>
+              <div className='space-y-1'>
+                <Label htmlFor='phone'>Mobile Number</Label>
+                <Field
+                  as={Input}
+                  id='phone'
+                  name='phone'
+                  type='tel'
+                  placeholder='Mobile Number'
+                  onKeyPress={e => {
+                    // Allow only digits
+                    if (!/[0-9]/.test(e.key)) {
+                      e.preventDefault()
+                    }
+                  }}
+                  required
+                />
+                <ErrorMessage
+                  name='phone'
+                  component='div'
+                  className='text-red-500 text-sm'
+                />
+              </div>
+
+              <div className='space-y-1'>
+                <Label htmlFor='password'>Password</Label>
+                <div className='relative'>
+                  <Field
+                    as={Input}
+                    id='password'
+                    name='password'
+                    type={showPassword ? 'text' : 'password'}
+                    placeholder='Password'
+                    required
+                  />
+                  <button
+                    type='button'
+                    className='absolute inset-y-0 right-0 pr-3 flex items-center'
+                    onClick={() => setShowPassword(!showPassword)}
+                  >
+                    {showPassword ? (
+                      <EyeOffIcon className='h-4 w-4 text-gray-400' />
+                    ) : (
+                      <EyeIcon className='h-4 w-4 text-gray-400' />
+                    )}
+                  </button>
+                </div>
+                <ErrorMessage
+                  name='password'
+                  component='div'
+                  className='text-red-500 text-sm'
+                />
+              </div>
+              <div className='space-y-2'>
+                <Label htmlFor='confirmPassword'>Confirm password</Label>
+                <div className='relative'>
+                  <Field
+                    as={Input}
+                    id='confirmPassword'
+                    name='confirmPassword'
+                    type={showConfirmPassword ? 'text' : 'password'}
+                    placeholder='Confirm password'
+                    required
+                  />
+                  <button
+                    type='button'
+                    className='absolute inset-y-0 right-0 pr-3 flex items-center'
+                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                  >
+                    {showConfirmPassword ? (
+                      <EyeOffIcon className='h-4 w-4 text-gray-400' />
+                    ) : (
+                      <EyeIcon className='h-4 w-4 text-gray-400' />
+                    )}
+                  </button>
+                </div>
+                <ErrorMessage
+                  name='confirmPassword'
+                  component='div'
+                  className='text-red-500 text-sm'
+                />
+              </div>
+              <div className='text-sm text-center'>
+                Already have an account?{' '}
+                <button
+                  type='button'
+                  onClick={handleLoginNavigate}
+                  className='font-medium text-primary hover:underline'
+                >
+                  Log in
+                </button>
+              </div>
+              <Button
+                type='submit'
+                className='w-full'
+                disabled={loading || isSubmitting}
               >
-                {showPassword ? (
-                  <EyeOffIcon className='h-4 w-4 text-gray-400' />
-                ) : (
-                  <EyeIcon className='h-4 w-4 text-gray-400' />
-                )}
-              </button>
-            </div>
-          </div>
-          <div className='space-y-2'>
-            <Label htmlFor='confirmPassword'>Confirm password</Label>
-            <div className='relative'>
-              <Input
-                id='confirmPassword'
-                type={showConfirmPassword ? 'text' : 'password'}
-                placeholder='Confirm password'
-                required
-                value={confirmPassword}
-                onChange={e => setConfirmPassword(e.target.value)}
+                {loading || isSubmitting ? 'Sending OTP...' : 'Sign Up'}
+              </Button>
+
+              <OTPVerification
+                isOpen={isOTPDialogOpen}
+                onClose={() => setIsOTPDialogOpen(false)}
+                onVerify={otp => handleOTPVerify(otp, values)}
+                email={values.email}
+                resendOtp={() => resendOtp(values)}
               />
-              <button
-                type='button'
-                className='absolute inset-y-0 right-0 pr-3 flex items-center'
-                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-              >
-                {showConfirmPassword ? (
-                  <EyeOffIcon className='h-4 w-4 text-gray-400' />
-                ) : (
-                  <EyeIcon className='h-4 w-4 text-gray-400' />
-                )}
-              </button>
-            </div>
-          </div>
-          <div className='text-sm text-center'>
-            Already have an account?{' '}
-            <a
-              onClick={handleloginnavigate}
-              href='#'
-              className='font-medium text-primary hover:underline'
-            >
-              Log in
-            </a>
-          </div>
-          <Button type='submit' className='w-full' disabled={loading}>
-            {loading ? 'Sending OTP...' : 'Sign Up'}
-          </Button>
-        </form>
+            </Form>
+          )}
+        </Formik>
 
         <div className='relative'>
           <div className='absolute inset-0 flex items-center'>
@@ -263,13 +340,6 @@ export default function SignUp () {
         onError={() => {
           console.log('Login Failed')
         }}
-      />
-      <OTPVerification
-        isOpen={isOTPDialogOpen}
-        onClose={() => setIsOTPDialogOpen(false)}
-        onVerify={handleOTPVerify}
-        email={email}
-        resendOtp={resendOtp} // Passing the resendOtp function as a prop
       />
     </div>
   )

@@ -48,6 +48,8 @@ export default function AddProduct () {
     fetchCategories()
   }, [])
 
+
+
   // Handle input changes for the fields
   const handleChange = e => {
     const { name, value } = e.target
@@ -67,6 +69,8 @@ export default function AddProduct () {
     })
   }
 
+
+
   // Handle image file selection and cropping
   const handleImageChange = (index, event) => {
     const file = event.target.files[0]
@@ -77,9 +81,12 @@ export default function AddProduct () {
   }
 
 
+
   const onCropComplete = useCallback((croppedArea, croppedAreaPixels) => {
     setCroppedAreaPixels(croppedAreaPixels)
   }, [])
+
+
 
   // Handle the cropping and store the result in the images array
   const saveCroppedImage = async () => {
@@ -167,7 +174,7 @@ export default function AddProduct () {
   }
 
   return (
-    <div className="flex h-screen bg-gray-100">
+    <div className=" flex bg-gray-100">
       <main className="flex-1 p-8 overflow-y-auto">
         <div className="mb-8">
           <h2 className="text-3xl font-bold">Add Product</h2>

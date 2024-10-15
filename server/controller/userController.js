@@ -50,7 +50,7 @@ const sendOTP = async (req, res) => {
         const userPresent = await User.findOne({ email });
 
         if (userPresent) {
-            return res.status(401).json({
+            return res.status(409).json({
                 sucess: false,
                 message: 'User alredy registered..',
             });
