@@ -65,7 +65,7 @@ const EditCategory = () => {
     <div className='flex flex-col lg:flex-row min-h-screen bg-gray-100'>
 
       <main className='flex-1 p-6'>
-        <h2 className='text-xl font-semibold mb-6'>Edit Category</h2>
+        <h2 className='text-xl font-semibold mb-6'>Edit Category..................</h2>
         <div className='mb-10'>
           <form
             onSubmit={handleUpdateCategory}

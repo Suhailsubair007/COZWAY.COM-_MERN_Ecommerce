@@ -4,7 +4,7 @@ import AdminDashbord from '../pages/Admin/AdminDasboard'
 import AdminLogin from '../pages/Admin/AdminLogin'
 import AddCategory from '../pages/Admin/AddCategory'
 import AddProduct from '../pages/Admin/AddProduct'
-import Product from '@/pages/Admin/Product'
+import Product from '../pages/Admin/Product'
 import EditCategory from '../pages/Admin/EditCategory'
 import Aside from '@/ReuseComponets/Admin/Aside'
 

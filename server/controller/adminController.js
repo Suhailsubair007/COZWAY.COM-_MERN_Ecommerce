@@ -155,6 +155,54 @@ const addProduct = async (req, res) => {
 };
 
 
+const getProduct = async (req, res) => {
+    try {
+        // Fetch products and populate the category name
+        const products = await Product.find({}).populate('category', 'name');
+
+        // Map through products to include populated category name
+        const formattedProducts = products.map(product => ({
+            ...product.toObject(), // Convert the Mongoose document to a plain JavaScript object
+            category: product.category.name, // Replace the category ID with the category name
+        }));
+
+        // Send the formatted response
+        res.status(200).json(formattedProducts);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Server error' });
+    }
+};
+
+
+const updateProductStatus = async (req, res) => {
+    try {
+        const { id } = req.params;
+        console.log("Product ID:", id);
+
+        const { is_active } = req.body;
+        console.log("is_active:", is_active);  // Ensure this is being received correctly
+
+        // Update the product status
+        const updateStatus = await Product.findByIdAndUpdate(
+            id,
+            { is_active },
+            { new: true }
+        );
+
+        if (!updateStatus) {
+            return res.status(404).json({ message: 'Product not found' });
+        }
+
+        res.status(200).json(updateStatus);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Error updating product status' });
+    }
+};
+
+
+
 
 
 module.exports = {
@@ -164,4 +212,6 @@ module.exports = {
     fetchCategoryById,
     updateCategoryStatus,
     addProduct,
+    getProduct,
+    updateProductStatus,
 };
