@@ -28,6 +28,7 @@
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-dropzone": "^14.2.9",
+    "react-easy-crop": "^5.1.0",
     "react-hot-toast": "^2.4.1",
     "react-image-crop": "^11.0.7",
     "react-router-dom": "^6.26.2",

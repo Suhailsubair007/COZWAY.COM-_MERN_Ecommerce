@@ -7,6 +7,7 @@ import AddProduct from '../pages/Admin/AddProduct'
 import Product from '../pages/Admin/Product'
 import EditCategory from '../pages/Admin/EditCategory'
 import Aside from '@/ReuseComponets/Admin/Aside'
+import ImageUploadTest from '@/pages/Admin/ImageTest'
 
 const AdminRoute = () => {
   return (
@@ -20,6 +21,7 @@ const AdminRoute = () => {
           <Route path='/product/add' element={<AddProduct />} />
           <Route path='/product' element={<Product />} />
           <Route path='/categories/edit/:categoryId' element={<EditCategory />} />
+          <Route path='/test' element={<ImageUploadTest />} />
         </Routes>
       </main>
       <Toaster position='bottom-center' />

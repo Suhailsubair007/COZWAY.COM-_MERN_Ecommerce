@@ -1,10 +1,9 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect } from 'react'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import axiosInstance from '@/config/axiosConfig'
-import Cropper from 'react-easy-crop'
 import {
   Select,
   SelectContent,
@@ -12,10 +11,10 @@ import {
   SelectTrigger,
   SelectValue
 } from '@/components/ui/select'
-import { getCroppedImg } from '../../config/cropImage'  // Import your cropping function
 import axios from 'axios'
 
 export default function AddProduct () {
+  // State to manage the product form fields
   const [product, setProduct] = useState({
     name: '',
     description: '',
@@ -25,16 +24,13 @@ export default function AddProduct () {
     sleeve: '',
     sizes: { S: '', M: '', L: '', XL: '', XXL: '' },
     totalStock: '',
-    images: Array(5).fill(null)  // Array to hold cropped images
+    images: Array(5).fill(null) 
   })
 
+  // State to store fetched categories
   const [categories, setCategories] = useState([])
-  const [selectedImageIndex, setSelectedImageIndex] = useState(null) // Track which image is being cropped
-  const [image, setImage] = useState(null)  // Image for cropping
-  const [crop, setCrop] = useState({ x: 0, y: 0 })
-  const [zoom, setZoom] = useState(1)
-  const [croppedAreaPixels, setCroppedAreaPixels] = useState(null)
 
+  // Fetch categories on component mount
   useEffect(() => {
     const fetchCategories = async () => {
       try {
@@ -57,6 +53,7 @@ export default function AddProduct () {
     })
   }
 
+  // Handle changes for sizes
   const handleSizeChange = (size, value) => {
     setProduct({
       ...product,
@@ -67,40 +64,20 @@ export default function AddProduct () {
     })
   }
 
-  // Handle image file selection and cropping
+  // Handle file uploads for each image
   const handleImageChange = (index, event) => {
     const file = event.target.files[0]
     if (file) {
-      setImage(URL.createObjectURL(file)) // Show the cropping UI for the selected image
-      setSelectedImageIndex(index) // Track the index of the image being cropped
-    }
-  }
-
-
-  const onCropComplete = useCallback((croppedArea, croppedAreaPixels) => {
-    setCroppedAreaPixels(croppedAreaPixels)
-  }, [])
-
-  // Handle the cropping and store the result in the images array
-  const saveCroppedImage = async () => {
-    try {
-      const croppedImageBlob = await getCroppedImg(image, croppedAreaPixels)
-      const croppedImageURL = URL.createObjectURL(croppedImageBlob)
-      
       const newImages = [...product.images]
-      newImages[selectedImageIndex] = croppedImageBlob // Store the cropped image blob
-      
+      newImages[index] = file
       setProduct({ ...product, images: newImages })
-      setImage(null) // Reset cropping UI after saving the cropped image
-      setSelectedImageIndex(null)
-    } catch (error) {
-      console.error('Error cropping image:', error)
     }
   }
 
+  // Function to upload images to Cloudinary and get URLs
   const uploadImagesToCloudinary = async () => {
     const uploadPromises = product.images.map(async file => {
-      if (!file) return null
+      if (!file) return null; // Skip if there's no file
 
       const formData = new FormData()
       formData.append('file', file)
@@ -121,11 +98,18 @@ export default function AddProduct () {
     return await Promise.all(uploadPromises)
   }
 
+  // Submit form data to the backend
   const handleSubmit = async e => {
     e.preventDefault()
-
     const {
-      name, description, price, category, fit, sleeve, sizes, totalStock
+      name,
+      description,
+      price,
+      category,
+      fit,
+      sleeve,
+      sizes,
+      totalStock
     } = product
 
     const sizeArray = Object.entries(sizes).map(([size, stock]) => ({
@@ -133,6 +117,7 @@ export default function AddProduct () {
       stock: Number(stock)
     }))
 
+    // Upload images and get URLs
     const imageUrls = await uploadImagesToCloudinary()
     const filteredImages = imageUrls.filter(url => url !== null)
 
@@ -150,11 +135,15 @@ export default function AddProduct () {
       sleeve,
       sizes: sizeArray,
       totalStock: Number(totalStock),
-      images: filteredImages 
+      images: filteredImages // Attach uploaded image URLs
     }
 
     try {
-      const response = await axiosInstance.post('/admin/add_product', newProduct)
+      const response = await axiosInstance.post(
+        '/admin/add_product',
+        newProduct
+      )
+
       if (response.status === 201) {
         toast('Product added successfully!')
       } else {
@@ -167,176 +156,148 @@ export default function AddProduct () {
   }
 
   return (
-    <div className="flex h-screen bg-gray-100">
-      <main className="flex-1 p-8 overflow-y-auto">
-        <div className="mb-8">
-          <h2 className="text-3xl font-bold">Add Product</h2>
-          <p className="text-gray-500">Dashboard &gt; product &gt; add</p>
+    <div className='flex h-screen bg-gray-100'>
+      <main className='flex-1 p-8 overflow-y-auto'>
+        <div className='mb-8'>
+          <h2 className='text-3xl font-bold'>Add Product</h2>
+          <p className='text-gray-500'>Dashboard &gt; product &gt; add</p>
         </div>
-  
+
         <form onSubmit={handleSubmit}>
-          <div className="bg-white shadow-md rounded-lg p-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className='bg-white shadow-md rounded-lg p-6'>
+            <div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
+              {/* Image Upload Sections */}
               {Array.from({ length: 5 }, (_, index) => (
-                <div key={index} className="space-y-4">
-                  <label className="block text-sm font-medium text-gray-700">
+                <div key={index} className='space-y-4'>
+                  <label className='block text-sm font-medium text-gray-700'>
                     Upload Image {index + 1}
                   </label>
                   <input
-                    type="file"
-                    accept="image/*"
-                    onChange={(e) => handleImageChange(index, e)}
-                    className="border border-gray-300 rounded-md p-2 w-full"
+                    type='file'
+                    accept='image/*'
+                    onChange={e => handleImageChange(index, e)}
+                    className='border border-gray-300 rounded-md p-2 w-full'
                   />
                   {product.images[index] && (
                     <img
                       src={URL.createObjectURL(product.images[index])}
                       alt={`preview-${index}`}
-                      className="w-20 h-20 object-cover"
+                      className='w-20 h-20 object-cover'
                     />
                   )}
                 </div>
               ))}
             </div>
-  
+
             {/* Product Details Section */}
-            <div className="space-y-4 mt-6">
+            <div className='space-y-4 mt-6'>
               <Input
-                placeholder="Type name here..."
-                label="Product Name"
-                name="name"
+                placeholder='Type name here...'
+                label='Product Name'
+                name='name'
                 value={product.name}
                 onChange={handleChange}
               />
-  
+
               <Textarea
-                placeholder="Type description here..."
-                label="Description"
-                name="description"
+                placeholder='Type description here...'
+                label='Description'
+                name='description'
                 value={product.description}
                 onChange={handleChange}
               />
-  
+
               <Input
-                placeholder="₹ 1399"
-                label="Price"
-                name="price"
+                placeholder='₹ 1399'
+                label='Price'
+                name='price'
                 value={product.price}
                 onChange={handleChange}
               />
             </div>
-  
-            <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="space-y-4">
+
+            {/* Category, Fit Type, Sleeve, Size, and Stock Quantity */}
+            <div className='mt-6 grid grid-cols-1 md:grid-cols-2 gap-6'>
+              <div className='space-y-4'>
                 <Select
-                  onValueChange={(value) =>
+                  onValueChange={value =>
                     setProduct({ ...product, category: value })
                   }
                 >
                   <SelectTrigger>
-                    <SelectValue placeholder="Select category" />
+                    <SelectValue placeholder='Select category' />
                   </SelectTrigger>
                   <SelectContent>
-                    {categories.map((category) => (
+                    {categories.map(category => (
                       <SelectItem key={category._id} value={category._id}>
                         {category.name}
                       </SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
-  
+
                 <Select
-                  onValueChange={(value) =>
+                  onValueChange={value =>
                     setProduct({ ...product, fit: value })
                   }
                 >
                   <SelectTrigger>
-                    <SelectValue placeholder="Select Fit Type" />
+                    <SelectValue placeholder='Select Fit Type' />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="regular">Regular Fit</SelectItem>
-                    <SelectItem value="slim">Slim Fit</SelectItem>
-                    <SelectItem value="loose">Loose Fit</SelectItem>
+                    <SelectItem value='regular'>Regular Fit</SelectItem>
+                    <SelectItem value='slim'>Slim Fit</SelectItem>
+                    <SelectItem value='loose'>Loose Fit</SelectItem>
                   </SelectContent>
                 </Select>
-  
+
                 <Select
-                  onValueChange={(value) =>
+                  onValueChange={value =>
                     setProduct({ ...product, sleeve: value })
                   }
                 >
                   <SelectTrigger>
-                    <SelectValue placeholder="Select Sleeve" />
+                    <SelectValue placeholder='Select Sleeve' />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="full">Full Sleeve</SelectItem>
-                    <SelectItem value="half">Half Sleeve</SelectItem>
-                    <SelectItem value="sleeveless">Elbow Sleeve</SelectItem>
+                    <SelectItem value='full'>Full Sleeve</SelectItem>
+                    <SelectItem value='half'>Half Sleeve</SelectItem>
+                    <SelectItem value='sleeveless'>Sleeveless</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
-  
-              <div className="space-y-4">
-                <div className="grid grid-cols-4 gap-4">
-                  {["S", "M", "L", "XL", "XXL"].map((size) => (
-                    <div key={size} className="flex items-center space-x-2">
+
+              {/* Size and Stock Quantity */}
+              <div className='space-y-4'>
+                <div className='grid grid-cols-4 gap-4'>
+                  {['S', 'M', 'L', 'XL', 'XXL'].map(size => (
+                    <div key={size} className='flex items-center space-x-2'>
                       <span>{size}</span>
                       <Input
-                        placeholder="10"
+                        placeholder='10'
                         value={product.sizes[size]}
-                        onChange={(e) =>
-                          handleSizeChange(size, e.target.value)
-                        }
+                        onChange={e => handleSizeChange(size, e.target.value)}
                       />
                     </div>
                   ))}
                 </div>
+
                 <Input
-                  placeholder="Total Stock"
-                  label="Total Stock Quantity"
-                  name="totalStock"
+                  placeholder='Total Stock'
+                  label='Total Stock Quantity'
+                  name='totalStock'
                   value={product.totalStock}
                   onChange={handleChange}
                 />
               </div>
             </div>
-  
-            <Button type="submit" className="mt-6">
+
+            <Button type='submit' className='mt-6'>
               Add Product
             </Button>
           </div>
         </form>
-  
-        {/* Cropping Modal */}
-        {image && (
-          <div className="modal">
-            <div className="modal-content">
-              <h3>Crop Image</h3>
-              <div
-                className="crop-container"
-                style={{
-                  width: "100%",
-                  height: "400px",
-                  position: "relative",
-                }}
-              >
-                <Cropper
-                  image={image}
-                  crop={crop}
-                  zoom={zoom}
-                  aspect={2 / 3}
-                  onCropChange={setCrop}
-                  onZoomChange={setZoom}
-                  onCropComplete={onCropComplete}
-                />
-              </div>
-              <Button onClick={saveCroppedImage} className="mt-4">
-                Save Cropped Image
-              </Button>
-            </div>
-          </div>
-        )}
       </main>
     </div>
-  );
+  )
 }
