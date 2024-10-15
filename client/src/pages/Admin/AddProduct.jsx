@@ -1,6 +1,9 @@
+import { useState, useEffect } from 'react'
+import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
+import axiosInstance from '@/config/axiosConfig'
 import {
   Select,
   SelectContent,
@@ -8,63 +11,152 @@ import {
   SelectTrigger,
   SelectValue
 } from '@/components/ui/select'
-import {
-  Upload,
-  LayoutDashboard,
-  Layers,
-  ShoppingBag,
-  Users,
-  ShoppingCart,
-  ImageIcon,
-  Ticket,
-  Settings,
-  LogOut
-} from 'lucide-react'
+import axios from 'axios'
 
 export default function AddProduct () {
+  // State to manage the product form fields
+  const [product, setProduct] = useState({
+    name: '',
+    description: '',
+    price: '',
+    category: '',
+    fit: '',
+    sleeve: '',
+    sizes: { S: '', M: '', L: '', XL: '', XXL: '' },
+    totalStock: '',
+    images: Array(5).fill(null) // Initialize with 5 null values
+  })
 
+  // State to store fetched categories
+  const [categories, setCategories] = useState([])
 
+  // Fetch categories on component mount
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const response = await axiosInstance.get('/admin/categories')
+        setCategories(response.data)
+      } catch (error) {
+        console.error('Error fetching categories:', error)
+        toast('Failed to load categories')
+      }
+    }
+    fetchCategories()
+  }, [])
 
-
-  const handleSubmit = ()=>{
-    
+  // Handle input changes for the fields
+  const handleChange = e => {
+    const { name, value } = e.target
+    setProduct({
+      ...product,
+      [name]: value
+    })
   }
+
+  // Handle changes for sizes
+  const handleSizeChange = (size, value) => {
+    setProduct({
+      ...product,
+      sizes: {
+        ...product.sizes,
+        [size]: value
+      }
+    })
+  }
+
+  // Handle file uploads for each image
+  const handleImageChange = (index, event) => {
+    const file = event.target.files[0]
+    if (file) {
+      const newImages = [...product.images]
+      newImages[index] = file
+      setProduct({ ...product, images: newImages })
+    }
+  }
+
+  // Function to upload images to Cloudinary and get URLs
+  const uploadImagesToCloudinary = async () => {
+    const uploadPromises = product.images.map(async file => {
+      if (!file) return null; // Skip if there's no file
+
+      const formData = new FormData()
+      formData.append('file', file)
+      formData.append('upload_preset', 'cozway') 
+
+      try {
+        const response = await axios.post(
+          'https://api.cloudinary.com/v1_1/dupo7yv88/image/upload',
+          formData
+        )
+        return response.data.secure_url
+      } catch (error) {
+        console.error('Error uploading image:', error)
+        return null
+      }
+    })
+
+    return await Promise.all(uploadPromises)
+  }
+
+  // Submit form data to the backend
+  const handleSubmit = async e => {
+    e.preventDefault()
+    const {
+      name,
+      description,
+      price,
+      category,
+      fit,
+      sleeve,
+      sizes,
+      totalStock
+    } = product
+
+    const sizeArray = Object.entries(sizes).map(([size, stock]) => ({
+      size,
+      stock: Number(stock)
+    }))
+
+    // Upload images and get URLs
+    const imageUrls = await uploadImagesToCloudinary()
+    const filteredImages = imageUrls.filter(url => url !== null)
+
+    if (filteredImages.length === 0) {
+      toast('Error uploading images')
+      return
+    }
+
+    const newProduct = {
+      name,
+      description,
+      price: Number(price),
+      category,
+      fit,
+      sleeve,
+      sizes: sizeArray,
+      totalStock: Number(totalStock),
+      images: filteredImages // Attach uploaded image URLs
+    }
+
+    try {
+      const response = await axiosInstance.post(
+        '/admin/add_product',
+        newProduct
+      )
+
+      if (response.status === 201) {
+        toast('Product added successfully!')
+      } else {
+        toast('Failed to add product.')
+      }
+    } catch (error) {
+      console.error('Error:', error)
+      toast('Error adding product.')
+    }
+  }
+
   return (
     <div className='flex h-screen bg-gray-100'>
-      {/* Sidebar */}
-      <aside className='w-64 bg-white shadow-md'>
-        <div className='pl-10 p-4 border-b'>
-          <img
-            src='https://res.cloudinary.com/dupo7yv88/image/upload/v1728535931/logo-no-background_dx8qjo.png'
-            alt=''
-            className='w-32 h-auto'
-          />
-        </div>
-
-        <nav className='p-4'>
-          <ul className='space-y-2'>
-            {[
-              { icon: <LayoutDashboard size={20} />, label: 'Dashboard' },
-              { icon: <Layers size={20} />, label: 'Category' },
-              { icon: <ShoppingBag size={20} />, label: 'Products' },
-              { icon: <Users size={20} />, label: 'Customers' },
-              { icon: <ShoppingCart size={20} />, label: 'Orders' },
-              { icon: <ImageIcon size={20} />, label: 'Banner' },
-              { icon: <Ticket size={20} />, label: 'Coupon' },
-              { icon: <Settings size={20} />, label: 'Settings' },
-              { icon: <LogOut size={20} />, label: 'Logout' }
-            ].map((item, index) => (
-              <li key={index}>
-                <Button variant='ghost' className='w-full justify-start'>
-                  {item.icon}
-                  <span className='ml-2'>{item.label}</span>
-                </Button>
-              </li>
-            ))}
-          </ul>
-        </nav>
-      </aside>
-      {/* Main Content */}
       <main className='flex-1 p-8 overflow-y-auto'>
         <div className='mb-8'>
           <h2 className='text-3xl font-bold'>Add Product</h2>
@@ -72,60 +164,83 @@ export default function AddProduct () {
         </div>
 
         <form onSubmit={handleSubmit}>
-          {/* Product Form */}
           <div className='bg-white shadow-md rounded-lg p-6'>
             <div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
-              {/* Image Upload Section */}
-              <div className='space-y-4'>
-                <div className='border-2 border-dashed border-gray-300 rounded-lg p-4 text-center'>
-                  <Upload className='mx-auto h-12 w-12 text-gray-400' />
-                  <p className='mt-1 text-sm text-gray-600'>Browse Image</p>
+              {/* Image Upload Sections */}
+              {Array.from({ length: 5 }, (_, index) => (
+                <div key={index} className='space-y-4'>
+                  <label className='block text-sm font-medium text-gray-700'>
+                    Upload Image {index + 1}
+                  </label>
+                  <input
+                    type='file'
+                    accept='image/*'
+                    onChange={e => handleImageChange(index, e)}
+                    className='border border-gray-300 rounded-md p-2 w-full'
+                  />
+                  {product.images[index] && (
+                    <img
+                      src={URL.createObjectURL(product.images[index])}
+                      alt={`preview-${index}`}
+                      className='w-20 h-20 object-cover'
+                    />
+                  )}
                 </div>
-                <div className='grid grid-cols-2 gap-4'>
-                  {[1, 2, 3, 4].map(item => (
-                    <div
-                      key={item}
-                      className='border-2 border-dashed border-gray-300 rounded-lg p-4 text-center'
-                    >
-                      <Upload className='mx-auto h-6 w-6 text-gray-400' />
-                      <p className='mt-1 text-xs text-gray-600'>Browse Image</p>
-                    </div>
-                  ))}
-                </div>
-              </div>
+              ))}
+            </div>
 
-              {/* Product Details Section */}
-              <div className='space-y-4'>
-                {/* Product Name */}
-                <Input placeholder='Type name here...' label='Product Name' />
+            {/* Product Details Section */}
+            <div className='space-y-4 mt-6'>
+              <Input
+                placeholder='Type name here...'
+                label='Product Name'
+                name='name'
+                value={product.name}
+                onChange={handleChange}
+              />
 
-                {/* Description */}
-                <Textarea
-                  placeholder='Type description here...'
-                  label='Description'
-                />
+              <Textarea
+                placeholder='Type description here...'
+                label='Description'
+                name='description'
+                value={product.description}
+                onChange={handleChange}
+              />
 
-                {/* Price */}
-                <Input placeholder='₹ 1399' label='Price' />
-              </div>
+              <Input
+                placeholder='₹ 1399'
+                label='Price'
+                name='price'
+                value={product.price}
+                onChange={handleChange}
+              />
             </div>
 
             {/* Category, Fit Type, Sleeve, Size, and Stock Quantity */}
             <div className='mt-6 grid grid-cols-1 md:grid-cols-2 gap-6'>
-              {/* Select Category, Fit Type, Sleeve */}
               <div className='space-y-4'>
-                <Select>
+                <Select
+                  onValueChange={value =>
+                    setProduct({ ...product, category: value })
+                  }
+                >
                   <SelectTrigger>
                     <SelectValue placeholder='Select category' />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value='casual'>Casual</SelectItem>
-                    <SelectItem value='formal'>Formal</SelectItem>
-                    <SelectItem value='partywear'>Party Wear</SelectItem>
+                    {categories.map(category => (
+                      <SelectItem key={category._id} value={category._id}>
+                        {category.name}
+                      </SelectItem>
+                    ))}
                   </SelectContent>
                 </Select>
 
-                <Select>
+                <Select
+                  onValueChange={value =>
+                    setProduct({ ...product, fit: value })
+                  }
+                >
                   <SelectTrigger>
                     <SelectValue placeholder='Select Fit Type' />
                   </SelectTrigger>
@@ -136,7 +251,11 @@ export default function AddProduct () {
                   </SelectContent>
                 </Select>
 
-                <Select>
+                <Select
+                  onValueChange={value =>
+                    setProduct({ ...product, sleeve: value })
+                  }
+                >
                   <SelectTrigger>
                     <SelectValue placeholder='Select Sleeve' />
                   </SelectTrigger>
@@ -154,21 +273,28 @@ export default function AddProduct () {
                   {['S', 'M', 'L', 'XL', 'XXL'].map(size => (
                     <div key={size} className='flex items-center space-x-2'>
                       <span>{size}</span>
-                      <Input placeholder='10' className='w-[60px]' />
+                      <Input
+                        placeholder='10'
+                        value={product.sizes[size]}
+                        onChange={e => handleSizeChange(size, e.target.value)}
+                      />
                     </div>
                   ))}
                 </div>
-                <Input placeholder='Stock Quantity' label='Stock Quantity' />
+
+                <Input
+                  placeholder='Total Stock'
+                  label='Total Stock Quantity'
+                  name='totalStock'
+                  value={product.totalStock}
+                  onChange={handleChange}
+                />
               </div>
             </div>
 
-            {/* Action Buttons */}
-            <div className='mt-6 flex justify-end space-x-4'>
-              <Button type='button' variant='outline'>
-                Cancel
-              </Button>
-              <Button type='submit'>Add Product</Button>
-            </div>
+            <Button type='submit' className='mt-6'>
+              Add Product
+            </Button>
           </div>
         </form>
       </main>

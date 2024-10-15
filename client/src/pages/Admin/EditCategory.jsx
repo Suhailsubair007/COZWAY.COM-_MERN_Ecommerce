@@ -1,20 +1,8 @@
-import { Button } from '@/components/ui/button'
 import { useState, useEffect } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { toast } from 'sonner'
 import axiosInstance from '../../config/axiosConfig'
 
-import {
-  LayoutDashboard,
-  Layers,
-  ShoppingBag,
-  Users,
-  ShoppingCart,
-  ImageIcon,
-  Ticket,
-  Settings,
-  LogOut
-} from 'lucide-react'
 
 const EditCategory = () => {
   const [name, setName] = useState('')
@@ -75,79 +63,6 @@ const EditCategory = () => {
   }
   return (
     <div className='flex flex-col lg:flex-row min-h-screen bg-gray-100'>
-      {/* Sidebar */}
-      <aside className='w-64 bg-white shadow-md'>
-        <div className='pl-10 p-4 border-b'>
-          <img
-            src='https://res.cloudinary.com/dupo7yv88/image/upload/v1728535931/logo-no-background_dx8qjo.png'
-            alt='Logo'
-            className='w-32 h-auto'
-          />
-        </div>
-
-        <nav className='p-4'>
-          <ul className='space-y-2'>
-            {[
-              {
-                icon: <LayoutDashboard size={20} />,
-                label: 'Dashboard',
-                path: '/admin/dashboard'
-              },
-              {
-                icon: <Layers size={20} />,
-                label: 'Category',
-                path: '/admin/categories'
-              },
-              {
-                icon: <ShoppingBag size={20} />,
-                label: 'Products',
-                path: '/admin/products'
-              },
-              {
-                icon: <Users size={20} />,
-                label: 'Customers',
-                path: '/admin/customers'
-              },
-              {
-                icon: <ShoppingCart size={20} />,
-                label: 'Orders',
-                path: '/admin/orders'
-              },
-              {
-                icon: <ImageIcon size={20} />,
-                label: 'Banner',
-                path: '/admin/banners'
-              },
-              {
-                icon: <Ticket size={20} />,
-                label: 'Coupon',
-                path: '/admin/coupons'
-              },
-              {
-                icon: <Settings size={20} />,
-                label: 'Settings',
-                path: '/admin/settings'
-              },
-              {
-                icon: <LogOut size={20} />,
-                label: 'Logout',
-                path: '/admin/logout'
-              }
-            ].map((item, index) => (
-              <li key={index}>
-                <Button
-                  variant='ghost'
-                  className='w-full justify-start'
-                  onClick={() => navigate(item.path)}
-                >
-                  {item.icon}
-                  <span className='ml-2'>{item.label}</span>
-                </Button>
-              </li>
-            ))}
-          </ul>
-        </nav>
-      </aside>
 
       <main className='flex-1 p-6'>
         <h2 className='text-xl font-semibold mb-6'>Edit Category</h2>

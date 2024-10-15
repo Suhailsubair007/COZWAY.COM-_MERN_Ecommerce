@@ -1,4 +1,3 @@
-// import React from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import shirtImg from '../../assets/image/shiert.webp'
@@ -12,15 +11,6 @@ import {
   TableRow
 } from '@/components/ui/table'
 import {
-  LayoutDashboard,
-  Layers,
-  ShoppingBag,
-  Users,
-  ShoppingCart,
-  Image,
-  Ticket,
-  Settings,
-  LogOut,
   Pencil,
   Trash2,
   ChevronRight
@@ -75,45 +65,11 @@ export default function ProductManagement () {
   const navigate = useNavigate()
 
   const handleProductNavigate = () => {
-    navigate('/admin/dashboard/product/addproduct')
+    navigate('/admin/product/add')
   }
 
   return (
     <div className='flex h-screen bg-gray-100'>
-      {/* Sidebar */}
-      <aside className='w-64 bg-white shadow-md'>
-        <div className='pl-10 p-4 border-b'>
-          <img
-            src='https://res.cloudinary.com/dupo7yv88/image/upload/v1728535931/logo-no-background_dx8qjo.png'
-            alt=''
-            className='w-32 h-auto'
-          />
-        </div>
-        <nav className='p-4'>
-          <ul className='space-y-2'>
-            {[
-              { icon: <LayoutDashboard size={20} />, label: 'Dashboard' },
-              { icon: <Layers size={20} />, label: 'Category' },
-              { icon: <ShoppingBag size={20} />, label: 'Products' },
-              { icon: <Users size={20} />, label: 'Customers' },
-              { icon: <ShoppingCart size={20} />, label: 'Orders' },
-              { icon: <Image size={20} />, label: 'Banner' },
-              { icon: <Ticket size={20} />, label: 'Coupon' },
-              { icon: <Settings size={20} />, label: 'Settings' },
-              { icon: <LogOut size={20} />, label: 'Logout' }
-            ].map((item, index) => (
-              <li key={index}>
-                <Button variant='ghost' className='w-full justify-start'>
-                  {item.icon}
-                  <span className='ml-2'>{item.label}</span>
-                </Button>
-              </li>
-            ))}
-          </ul>
-        </nav>
-      </aside>
-
-      {/* Main Content */}
       <main className='flex-1 p-8 overflow-y-auto'>
         <div className='flex justify-between items-center mb-8'>
           <div>

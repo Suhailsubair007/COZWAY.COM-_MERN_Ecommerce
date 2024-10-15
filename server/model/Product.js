@@ -42,10 +42,10 @@ const productSchema = new mongoose.Schema({
             required: true,
         },
     ],
-    createdAt: {
-        type: Date,
-        default: Date.now,
+    ia_active:{
+        type:Boolean,
+        default:true,
     },
-});
+}, { timestamps: true });
 
 module.exports = mongoose.model('Product', productSchema);

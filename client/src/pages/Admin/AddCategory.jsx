@@ -1,38 +1,30 @@
-import { Button } from '@/components/ui/button'
 import { Switch } from '@/components/ui/switch'
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { toast } from 'sonner'
 import axiosInstance from '../../config/axiosConfig'
 
-import {
-  LayoutDashboard,
-  Layers,
-  ShoppingBag,
-  Users,
-  ShoppingCart,
-  ImageIcon,
-  Ticket,
-  Settings,
-  LogOut
-} from 'lucide-react'
-
 const CategoryComponent = () => {
   const [name, setName] = useState('')
   const [description, setDescription] = useState('')
-  const [categories, setCategories] = useState([])
   const [list, SetList] = useState([])
   const navigate = useNavigate()
 
   useEffect(() => {
     const fetchCategory = async () => {
-      const categories = await axiosInstance.get('/admin/categories')
-      SetList(categories.data)
-      console.log(SetList)
+      try {
+        const categories = await axiosInstance.get('/admin/categories')
+        console.log(categories.data)  
+        SetList(categories.data)
+        console.log(list)  
+      } catch (error) {
+        console.error('Error fetching categories:', error)
+      }
     }
-
+  
     fetchCategory()
-  }, [])
+  }, []) 
+  
 
   const handleAddCategory = async e => {
     e.preventDefault()
@@ -63,12 +55,11 @@ const CategoryComponent = () => {
     try {
       const updatedStatus = !category.is_active
 
-      // Send the update request to backend
       await axiosInstance.patch(`/admin/categories/${category._id}`, {
         is_active: updatedStatus
       })
 
-      // Update the local state to reflect the change in UI
+
       SetList(prev =>
         prev.map(cat =>
           cat._id === category._id
@@ -85,40 +76,6 @@ const CategoryComponent = () => {
 
   return (
     <div className='flex flex-col lg:flex-row min-h-screen bg-gray-100'>
-      {/* Sidebar */}
-      <aside className='w-64 bg-white shadow-md'>
-        <div className='pl-10 p-4 border-b'>
-          <img
-            src='https://res.cloudinary.com/dupo7yv88/image/upload/v1728535931/logo-no-background_dx8qjo.png'
-            alt='Logo'
-            className='w-32 h-auto'
-          />
-        </div>
-
-        <nav className='p-4'>
-          <ul className='space-y-2'>
-            {[
-              { icon: <LayoutDashboard size={20} />, label: 'Dashboard' },
-              { icon: <Layers size={20} />, label: 'Category' },
-              { icon: <ShoppingBag size={20} />, label: 'Products' },
-              { icon: <Users size={20} />, label: 'Customers' },
-              { icon: <ShoppingCart size={20} />, label: 'Orders' },
-              { icon: <ImageIcon size={20} />, label: 'Banner' },
-              { icon: <Ticket size={20} />, label: 'Coupon' },
-              { icon: <Settings size={20} />, label: 'Settings' },
-              { icon: <LogOut size={20} />, label: 'Logout' }
-            ].map((item, index) => (
-              <li key={index}>
-                <Button variant='ghost' className='w-full justify-start'>
-                  {item.icon}
-                  <span className='ml-2'>{item.label}</span>
-                </Button>
-              </li>
-            ))}
-          </ul>
-        </nav>
-      </aside>
-
       {/* Main Content */}
       <main className='flex-1 p-6'>
         <h2 className='text-xl font-semibold mb-6'>Add Category</h2>
@@ -151,7 +108,7 @@ const CategoryComponent = () => {
                 onChange={e => setDescription(e.target.value)}
                 placeholder='Enter Category Description'
                 className='w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500'
-                rows='6'
+                rows={6}
                 required // Optional: Make the field required
               />
             </div>

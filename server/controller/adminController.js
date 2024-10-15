@@ -1,6 +1,7 @@
 const User = require("../model/User");
 const Category = require('../model/Category');
 const bcrypt = require("bcrypt");
+const Product = require('../model/Product')
 
 
 
@@ -116,6 +117,45 @@ const updateCategoryStatus = async (req, res) => {
 
 
 
+const addProduct = async (req, res) => {
+    try {
+        const { name, description, price, category, fit, sleeve, sizes, totalStock, images } = req.body;
+        if (!name || !description || !price || !category || !fit || !sleeve || !sizes || !totalStock || !images) {
+            return res.status(400).json({ message: 'All fields are required.' });
+        }
+
+        const existingCategory = await Category.findById(category);
+        if (!existingCategory) {
+            return res.status(400).json({ message: 'Category not found.' });
+        }
+
+        const newProduct = new Product({
+            name,
+            description,
+            price,
+            category,
+            fit,
+            sleeve,
+            sizes,
+            totalStock,
+            images,
+        });
+        console.log(newProduct);
+
+        const savedProduct = await newProduct.save();
+        res.status(201).json({
+            message: 'Product added successfully!',
+            product: savedProduct,
+        });
+
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Server error. Please try again later.' });
+    }
+};
+
+
+
 
 module.exports = {
     addCategory,
@@ -123,4 +163,5 @@ module.exports = {
     getCategories,
     fetchCategoryById,
     updateCategoryStatus,
+    addProduct,
 };

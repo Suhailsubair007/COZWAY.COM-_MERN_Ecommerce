@@ -24,7 +24,7 @@ const AdminLogin = () => {
   return (
     <div className='flex flex-col items-center justify-center min-h-screen p-4 bg-background'>
       <div className='w-full max-w-md space-y-8'>
-        {/* Logo and Header */}
+
         <div className='text-center'>
           <h1 className='text-2xl font-bold'>cozway.com</h1>
           <h2 className='text-3xl font-bold mt-6 mb-6'>Log in</h2>

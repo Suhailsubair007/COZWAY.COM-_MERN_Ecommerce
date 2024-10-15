@@ -1,6 +1,6 @@
-import React from 'react';
+
 import { Bar, BarChart, ResponsiveContainer, XAxis, YAxis } from 'recharts';
-import { ArrowRight, Bell, ChevronDown, Menu, Search, User } from 'lucide-react';
+import { Bell, Menu, Search, User } from 'lucide-react';
 
 export default function Component() {
   const chartData = [
@@ -20,27 +20,6 @@ export default function Component() {
 
   return (
     <div className="flex h-screen bg-gray-100">
-      {/* Sidebar */}
-      <aside className="hidden w-64 bg-white p-4 shadow-md lg:block">
-        <div className="mb-8 flex items-center">
-          <div className="mr-2 h-8 w-8 rounded-full bg-blue-500" />
-          <h1 className="text-xl font-bold">Dashboard</h1>
-        </div>
-        <nav>
-          <a href="#" className="mb-2 flex items-center rounded-lg bg-blue-100 p-2 text-blue-600">
-            <div className="mr-2 h-4 w-4 rounded-full bg-blue-600" />
-            Dashboard
-          </a>
-          {['Product', 'Customers', 'Income', 'Promote', 'Help'].map((item) => (
-            <a key={item} href="#" className="mb-2 flex items-center rounded-lg p-2 text-gray-600 hover:bg-gray-100">
-              <div className="mr-2 h-4 w-4 rounded-full bg-gray-400" />
-              {item}
-            </a>
-          ))}
-        </nav>
-      </aside>
-
-      {/* Main Content */}
       <main className="flex-1 overflow-y-auto p-4">
         {/* Header */}
         <header className="mb-4 flex items-center justify-between">
