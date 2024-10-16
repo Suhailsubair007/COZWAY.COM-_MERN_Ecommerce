@@ -64,7 +64,7 @@ const updateCategory = async (req, res) => {
 
 const getCategories = async (req, res) => {
     try {
-        const categories = await Category.find({}, '_id name description is_active');
+        const categories = await Category.find({ is_active: true }, '_id name description is_active');
         res.status(200).json(categories);
     } catch (error) {
         console.error(error);
@@ -119,15 +119,18 @@ const updateCategoryStatus = async (req, res) => {
 
 const addProduct = async (req, res) => {
     try {
-        const { name, description, price, category, fit, sleeve, sizes, totalStock, images } = req.body;
-        if (!name || !description || !price || !category || !fit || !sleeve || !sizes || !totalStock || !images) {
+        const { name, description, price, category, fit, sleeve, sizes, images } = req.body;
+        if (!name || !description || !price || !category || !fit || !sleeve || !sizes || !images) {
             return res.status(400).json({ message: 'All fields are required.' });
         }
+        const totalStock = sizes.reduce((total, size) => total + size.stock, 0);
 
         const existingCategory = await Category.findById(category);
         if (!existingCategory) {
             return res.status(400).json({ message: 'Category not found.' });
         }
+
+
 
         const newProduct = new Product({
             name,
@@ -157,10 +160,9 @@ const addProduct = async (req, res) => {
 
 const getProduct = async (req, res) => {
     try {
-        // Fetch products and populate the category name
+
         const products = await Product.find({}).populate('category', 'name');
 
-        // Map through products to include populated category name
         const formattedProducts = products.map(product => ({
             ...product.toObject(), // Convert the Mongoose document to a plain JavaScript object
             category: product.category.name, // Replace the category ID with the category name
@@ -181,9 +183,7 @@ const updateProductStatus = async (req, res) => {
         console.log("Product ID:", id);
 
         const { is_active } = req.body;
-        console.log("is_active:", is_active);  // Ensure this is being received correctly
-
-        // Update the product status
+        console.log("is_active:", is_active);
         const updateStatus = await Product.findByIdAndUpdate(
             id,
             { is_active },
@@ -203,6 +203,113 @@ const updateProductStatus = async (req, res) => {
 
 
 
+const updateProduct = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { name, description, price, category, fit, sleeve, sizes, totalStock, images } = req.body;
+
+        if (!id) {
+            return res.status(400).json({ message: 'Product ID is required.' });
+        }
+
+
+        const existingProduct = await Product.findById(id);
+        if (!existingProduct) {
+            return res.status(404).json({ message: 'Product not found.' });
+        }
+
+
+        if (category) {
+            const existingCategory = await Category.findById(category);
+            if (!existingCategory) {
+                return res.status(400).json({ message: 'Category not found.' });
+            }
+        }
+
+        existingProduct.name = name || existingProduct.name;
+        existingProduct.description = description || existingProduct.description;
+        existingProduct.price = price || existingProduct.price;
+        existingProduct.category = category || existingProduct.category;
+        existingProduct.fit = fit || existingProduct.fit;
+        existingProduct.sleeve = sleeve || existingProduct.sleeve;
+        existingProduct.sizes = sizes || existingProduct.sizes;
+        existingProduct.totalStock = totalStock || existingProduct.totalStock;
+        existingProduct.images = images || existingProduct.images;
+
+
+        const updatedProduct = await existingProduct.save();
+
+        res.status(200).json({
+            message: 'Product updated successfully!',
+            product: updatedProduct,
+        });
+
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Server error. Please try again later.' });
+    }
+};
+
+
+const getCoutomers = async (req, res) => {
+    try {
+        const users = await User.find({});
+        if (users) {
+            res.status(200).json({
+                users
+
+            });
+            console.log(users)
+        }
+    } catch (error) {
+        console.log("error", error);
+        res.status(500).json({ success: false, message: "Server error" });
+    }
+};
+
+
+const updateCoustomerStatus = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { is_blocked } = req.body;
+        console.log(is_blocked)
+        console.log(id)
+
+        const updateStats = await User.findByIdAndUpdate(id, { is_blocked }, { new: true })
+        console.log(updateStats);
+        if (!updateStats) {
+            return res.status(404).json({ message: 'Product not found..' });
+        }
+
+        res.status(200).json(updateStats);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Error updating category status' });
+    }
+
+}
+
+
+const fetchProductById = async (req, res) => {
+    const { id } = req.params;
+
+    console.log(id)
+
+    try {
+        const product = await Product.findById(id).populate('category');
+
+        if (!product) {
+            return res.status(404).json({ message: 'Product not found' });
+        }
+
+        res.status(200).json(product);
+    } catch (error) {
+        console.error('Error fetching category:', error);
+        res.status(500).json({ message: 'Server error. Please try again later.' });
+    }
+};
+
+
 
 
 module.exports = {
@@ -214,4 +321,11 @@ module.exports = {
     addProduct,
     getProduct,
     updateProductStatus,
+    updateProduct,
+    getCoutomers,
+    updateCoustomerStatus,
+    fetchProductById,
 };
+
+
+

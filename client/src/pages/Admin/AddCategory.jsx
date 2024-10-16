@@ -16,14 +16,14 @@ const CategoryComponent = () => {
         const categories = await axiosInstance.get('/admin/categories')
         console.log(categories.data)  
         SetList(categories.data)
-        console.log(list)  
+        // console.log(list)  
       } catch (error) {
         console.error('Error fetching categories:', error)
       }
     }
   
     fetchCategory()
-  }, []) 
+  },[]) 
   
 
   const handleAddCategory = async e => {
@@ -35,7 +35,7 @@ const CategoryComponent = () => {
         description
       })
       console.log(response)
-
+    
       if (response.status === 201) {
         toast('Category added successfully!')
 
@@ -67,7 +67,7 @@ const CategoryComponent = () => {
             : cat
         )
       )
-
+      console.log(`Category ${category.name} status changed to ${updatedStatus}`);
       toast(`Category ${updatedStatus ? 'listed' : 'unlisted'} successfully!`)
     } catch (error) {
       toast('Failed to update category status.')
@@ -126,7 +126,6 @@ const CategoryComponent = () => {
           <table className='min-w-full bg-white'>
             <thead>
               <tr>
-                <th className='py-2 px-4 text-left'>ID</th>
                 <th className='py-2 px-4 text-left'>Category Name</th>
                 <th className='py-2 px-4 text-left'>Category Description</th>
                 <th className='py-2 px-4 text-left'>List/Unlist</th>
@@ -136,7 +135,6 @@ const CategoryComponent = () => {
             <tbody>
               {list.map(category => (
                 <tr key={category._id}>
-                  <td className='border-t py-2 px-4'>{category._id}</td>
                   <td className='border-t py-2 px-4'>{category.name}</td>
                   <td className='border-t py-2 px-4'>{category.description}</td>
                   <td className='border-t py-2 px-4'>

@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import axiosInstance from "@/config/axiosConfig";
-import {useNavigate} from 'react-router-dom'
+import { useNavigate } from "react-router-dom";
+import { toast } from "sonner";
 
 import {
   Table,
@@ -47,17 +48,16 @@ const Product = () => {
 
   const handleEditProduct = (productId) => {
     console.log(`Editing product with ID: ${productId}`);
+    navigate(`/admin/product/edit/${productId}`);
     // Add your edit logic here
   };
 
   const handleToggleProductListing = async (productId, currentStatus) => {
     try {
-      // Toggle the current status
       const updatedStatus = !currentStatus;
 
-      // Send a PATCH request to update the product's is_active status
       await axiosInstance.patch(`/admin/get_product/${productId}`, {
-        is_active: updatedStatus, // Correct field name (is_active)
+        is_active: updatedStatus,
       });
 
       // Update the local state to reflect the change
@@ -68,10 +68,10 @@ const Product = () => {
             : product
         )
       );
-
       console.log(
-        `Toggled listing for product ${productId}. New status: ${updatedStatus}`
+        `Product ${productId} is now ${updatedStatus ? "listed" : "unlisted"}`
       );
+      toast(`Product ${updatedStatus ? "listed" : "unlisted"} successfully!`);
     } catch (error) {
       console.error("Error updating product listing:", error);
     }
@@ -79,13 +79,14 @@ const Product = () => {
   const handleSearch = () => {};
 
   const handleAddNewProduct = () => {
-    navigate('/admin/product/add')
+    navigate("/admin/product/add");
   };
 
   return (
-    <div className="flex flex-col lg:flex-row min-h-screen bg-gray-100">
-      <div className="container mx-auto py-10">
+    <div className="flex h-screen bg-gray-100">
+      <div className="flex-1 overflow-y-auto p-4">
         <main className="flex-1 p-6">
+          <h2 className="text-xl font-semibold mb-6">Product Management</h2>
           <div className="flex items-center justify-between mb-6">
             {/* Search bar */}
             <input
@@ -103,8 +104,6 @@ const Product = () => {
               Add New Product
             </Button>
           </div>
-
-          <h2 className="text-xl font-semibold mb-6">Product Management</h2>
 
           <Table>
             <TableHeader>
