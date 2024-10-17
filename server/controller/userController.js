@@ -4,6 +4,8 @@ const otpGenarator = require('otp-generator');
 const OTP = require('../model/otpModel')
 const { OAuth2Client } = require('google-auth-library');
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID); ('google-auth-library');
+const genarateAccesTocken = require('../utils/genarateAccesTocken')
+const genarateRefreshTocken = require('../utils/genarateRefreshTocken')
 
 
 const securePassword = async (password) => {
@@ -96,6 +98,8 @@ const login = async (req, res) => {
         const PasswordMatching = await bcrypt.compare(password, finduser.password);
         console.log(PasswordMatching)
         if (PasswordMatching) {
+            genarateAccesTocken(res, finduser._id);
+            genarateRefreshTocken(res, finduser._id);
             res.status(200).json({
                 success: true,
                 message: "User logged in successfully...",

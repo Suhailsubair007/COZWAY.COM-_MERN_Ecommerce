@@ -10,10 +10,13 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@heroicons/react": "^2.1.5",
     "@radix-ui/react-alert-dialog": "^1.1.2",
+    "@radix-ui/react-checkbox": "^1.1.2",
     "@radix-ui/react-dialog": "^1.1.2",
     "@radix-ui/react-label": "^2.1.0",
     "@radix-ui/react-select": "^2.1.2",
+    "@radix-ui/react-separator": "^1.1.0",
     "@radix-ui/react-slider": "^1.2.1",
     "@radix-ui/react-slot": "^1.1.0",
     "@radix-ui/react-switch": "^1.1.1",
@@ -24,6 +27,7 @@
     "clsx": "^2.1.1",
     "embla-carousel-react": "^8.3.0",
     "formik": "^2.4.6",
+    "framer-motion": "^11.11.9",
     "jwt-decode": "^4.0.0",
     "lucide-react": "^0.449.0",
     "next-themes": "^0.3.0",

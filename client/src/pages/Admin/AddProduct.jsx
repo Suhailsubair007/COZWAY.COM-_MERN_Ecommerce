@@ -18,8 +18,10 @@ import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
 import { X, Upload, Save } from "lucide-react";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 export default function AddProduct() {
+  const navigate = useNavigate();
   const [product, setProduct] = useState({
     name: "",
     description: "",
@@ -158,6 +160,7 @@ export default function AddProduct() {
         newProduct
       );
       if (response.status === 201) {
+        navigate('/admin/product')
         toast("Product added successfully!");
       } else {
         toast("Failed to add product.");

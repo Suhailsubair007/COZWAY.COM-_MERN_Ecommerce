@@ -75,9 +75,9 @@ const CategoryComponent = () => {
   }
 
   return (
-    <div className='flex flex-col lg:flex-row min-h-screen bg-gray-100'>
+    <div className='flex h-screen bg-gray-100'>
       {/* Main Content */}
-      <main className='flex-1 p-6'>
+      <main className='flex-1 overflow-y-auto p-4'>
         <h2 className='text-xl font-semibold mb-6'>Add Category</h2>
 
         {/* Form */}
