@@ -16,7 +16,6 @@ const Landing = () => {
         <NewArrivals />
         <TopSelling />
       </div>
-
       <Footer />
     </div>
   );

@@ -5,19 +5,55 @@ import { Toaster } from "@/components/ui/sonner";
 import Landing from "../pages/User/HomePage/Landing";
 import PurchasePage from "@/pages/User/HomePage/PurchasePage";
 import MainShoppingPage from "@/pages/User/HomePage/MainShoppingPage";
-
+import UserLoginProtect from "./Protected_Routing/UserLoginProtect";
+import UserPrivate from "./Protected_Routing/UserPrivate";
 
 const UserRoute = () => {
   return (
     <div>
       <Routes>
-        <Route path="/" element={<Login />} />
-        <Route path="/login" element={<Login />} />
+        <Route path="/" element={<Landing />} />
+        <Route
+          path="/login"
+          element={
+            <UserLoginProtect>
+              <Login />
+            </UserLoginProtect>
+          }
+        />
         <Route path="/signup" element={<Signup />} />
-        <Route path="/home" element={<Landing />} />
-        <Route path="/product" element={<PurchasePage />} />
-        <Route path="/shop" element={<MainShoppingPage />} />
+
+        {/* Protect the home route */}
+        <Route
+          path="/home"
+          element={
+            <UserPrivate>
+              <Landing />
+              </UserPrivate>
+          }
+        />
+
+        {/* Protect the product route */}
+        <Route
+          path="/product"
+          element={
+            <UserPrivate>
+              <PurchasePage />
+            </UserPrivate>
+          }
+        />
+
+        {/* Protect the shop route */}
+        <Route
+          path="/shop"
+          element={
+            <UserPrivate>
+              <MainShoppingPage />
+            </UserPrivate>
+          }
+        />
       </Routes>
+
       <Toaster position="bottom-center" />
     </div>
   );

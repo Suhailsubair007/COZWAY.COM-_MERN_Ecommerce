@@ -3,9 +3,14 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Menu, Search, User } from "lucide-react";
+import {Link , Navigate} from 'react-router-dom'
+import { useSelector } from "react-redux";
 
 const Header = () => {
   const [isSearchVisible, setSearchVisible] = useState(false);
+  const userInfo = useSelector((state) => state.user.userData);
+  console.log(userInfo);
+  
 
   const toggleSearch = () => {
     setSearchVisible(!isSearchVisible);
@@ -82,8 +87,9 @@ const Header = () => {
 
             {/* Login Button - Hidden on mobile */}
 
-            <Button className="hidden md:inline-flex">Login</Button>
-
+            <Link to="/login">
+              <Button className="hidden md:inline-flex">Login</Button>
+            </Link>
             {/* Mobile Menu */}
             <Sheet>
               <SheetTrigger asChild>

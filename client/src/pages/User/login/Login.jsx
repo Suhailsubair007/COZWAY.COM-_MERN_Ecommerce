@@ -8,7 +8,7 @@ import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
 import { GoogleLogin } from "@react-oauth/google";
 import { jwtDecode } from "jwt-decode";
-import { setUserInfo } from "../../../redux/UserSlice";
+import { setUserDetails } from "../../../redux/UserSlice";
 import { useDispatch } from "react-redux";
 
 export default function Login() {
@@ -39,6 +39,7 @@ export default function Login() {
         }
       );
       console.log(response.data);
+      dispatch(setUserDetails(response.data.user));
       toast("Google Login successful!");
       navigate("/home");
     } catch (error) {
@@ -62,7 +63,9 @@ export default function Login() {
       console.log("Login response:", response);
 
       if (response.status === 200) {
-        dispatch(setUserInfo({ user: response.data }));
+        const userData = response.data.user;
+        localStorage.setItem("userData", JSON.stringify(userData));
+        dispatch(setUserDetails(response.data.user));
         navigate("/home");
         toast("Login sucess!!!");
       } else {

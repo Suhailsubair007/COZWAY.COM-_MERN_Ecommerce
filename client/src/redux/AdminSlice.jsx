@@ -6,20 +6,21 @@ const initialState = {
     : null,
 };
 
-const AdminSlice = createSlice({
+const adminSlice = createSlice({
   name: "admin",
   initialState,
   reducers: {
-    setAdminInfo: (state, action) => {
+    setAdminDetails: (state, action) => {
       state.adminInfo = action.payload;
       localStorage.setItem("adminInfo", JSON.stringify(action.payload));
     },
-    adminLogout: (state) => {
+    logoutAdmin: (state) => {
       state.adminInfo = null;
       localStorage.removeItem("adminInfo");
     },
   },
 });
 
-export const { setAdminInfo, adminLogout } = AdminSlice.actions;
-export default AdminSlice.reducer;
+export const { setAdminDetails, logoutAdmin } = adminSlice.actions;
+
+export default adminSlice.reducer;

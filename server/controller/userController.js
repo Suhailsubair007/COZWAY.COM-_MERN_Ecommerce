@@ -104,9 +104,10 @@ const login = async (req, res) => {
             res.status(200).json({
                 success: true,
                 message: "User logged in successfully...",
-                name: finduser.name,
-                email: finduser.email,
-                _id: finduser._id
+                user: {
+                    name: finduser.name,
+                    email: finduser.email,
+                }
             });
 
         } else {
@@ -168,7 +169,13 @@ const googleLoginUser = async (req, res) => {
             });
             await user.save();
         }
-        return res.status(200).json({ sucess: true, message: 'Jayy jawann rakshapettu' });
+        return res.status(200).json({
+            sucess: true, message: 'Jayy jawann rakshapettu', user: {
+                name: user.name,
+                email: user.email,
+                id: user._id,
+            },
+        });
     } catch (error) {
         console.error(error);
         return res.status(500).json({ message: 'Server error' });
