@@ -3,9 +3,9 @@ import Signup from "../pages/User/login/Signup";
 import Login from "../pages/User/login/Login";
 import { Toaster } from "@/components/ui/sonner";
 import Landing from "../pages/User/HomePage/Landing";
-// import ProductDetail from '@/ReuseComponets/User/Purchase
 import PurchasePage from "@/pages/User/HomePage/PurchasePage";
-import ShoppingPage from "@/pages/User/HomePage/Shop";
+import MainShoppingPage from "@/pages/User/HomePage/MainShoppingPage";
+
 
 const UserRoute = () => {
   return (
@@ -16,7 +16,7 @@ const UserRoute = () => {
         <Route path="/signup" element={<Signup />} />
         <Route path="/home" element={<Landing />} />
         <Route path="/product" element={<PurchasePage />} />
-        <Route path="/shop" element={<ShoppingPage />} />
+        <Route path="/shop" element={<MainShoppingPage />} />
       </Routes>
       <Toaster position="bottom-center" />
     </div>

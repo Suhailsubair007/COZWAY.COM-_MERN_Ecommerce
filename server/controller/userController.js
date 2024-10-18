@@ -2,6 +2,7 @@ const User = require("../model/User");
 const bcrypt = require("bcrypt");
 const otpGenarator = require('otp-generator');
 const OTP = require('../model/otpModel')
+const Product = require('../model/Product')
 const { OAuth2Client } = require('google-auth-library');
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID); ('google-auth-library');
 const genarateAccesTocken = require('../utils/genarateAccesTocken')
@@ -175,6 +176,18 @@ const googleLoginUser = async (req, res) => {
 };
 
 
+const fetchLatestProduct = async (req, res) => {
+    try {
+
+        const products = await Product.find({ is_active: true }).sort({ createdAt: -1 });
+
+        res.status(200).json(products);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Server error' });
+    }
+};
+
 
 
 
@@ -184,4 +197,5 @@ module.exports = {
     login,
     googleSignIn,
     googleLoginUser,
+    fetchLatestProduct,
 };

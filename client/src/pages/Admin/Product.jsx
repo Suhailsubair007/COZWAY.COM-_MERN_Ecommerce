@@ -45,6 +45,14 @@ const Product = () => {
 
     fetchProduct();
   }, []);
+  
+
+  const truncateDescription = (description, maxLength = 100) => {
+    if (description.length > maxLength) {
+      return description.slice(0, maxLength) + "...";
+    }
+    return description;
+  };
 
   const handleEditProduct = (productId) => {
     console.log(`Editing product with ID: ${productId}`);
@@ -126,7 +134,7 @@ const Product = () => {
                       <div>
                         <h3 className="font-bold">{product.name}</h3>
                         <p className="text-sm text-gray-500">
-                          {product.description}
+                          {truncateDescription(product.description)}
                         </p>
                       </div>
                     </div>

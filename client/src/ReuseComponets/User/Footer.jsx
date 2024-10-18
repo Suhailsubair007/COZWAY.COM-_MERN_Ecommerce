@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button'
 const Footer = () => {
   return (
     <div>
-      <section class='py-5 bg-gray-300 sm:pt-16 lg:pt-18'>
+      <section class='py-5 bg-gray-600 sm:pt-10 lg:pt-12'>
         <div class='px-4 mx-auto sm:px-6 lg:px-8  max-w-7xl'>
           <div class='grid grid-cols-2 md:col-span-3 lg:grid-cols-6 gap-y-16 gap-x-12'>
             <div class='col-span-2 md:col-span-3 lg:col-span-2 lg:pr-8'>
@@ -214,7 +214,7 @@ const Footer = () => {
                     name='email'
                     id='email'
                     placeholder='Enter your email'
-                    class='block w-full p-4 text-black placeholder-gray-500 transition-all duration-200 bg-white border border-gray-200 rounded-md focus:outline-none focus:border-blue-600 caret-blue-600'
+                    class='block w-full h-12 p-4 text-black placeholder-gray-500 transition-all duration-200 bg-white border border-gray-200 rounded-md focus:outline-none focus:border-blue-600 caret-blue-600'
                   />
                 </div>
 

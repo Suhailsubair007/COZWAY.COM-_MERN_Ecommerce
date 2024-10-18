@@ -8,12 +8,15 @@ import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
 import { GoogleLogin } from "@react-oauth/google";
 import { jwtDecode } from "jwt-decode";
+import { setUserInfo } from "../../../redux/UserSlice";
+import { useDispatch } from "react-redux";
 
 export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   // const [googleData, SetGoogleData] = useState('')
+  const dispatch = useDispatch();
 
   const LoginData = {
     email,
@@ -59,6 +62,7 @@ export default function Login() {
       console.log("Login response:", response);
 
       if (response.status === 200) {
+        dispatch(setUserInfo({ user: response.data }));
         navigate("/home");
         toast("Login sucess!!!");
       } else {
