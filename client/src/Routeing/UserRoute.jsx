@@ -33,7 +33,7 @@ const UserRoute = () => {
 
         {/* Protect the product route */}
         <Route
-          path="/product"
+          path="/product/:productId"
           element={
             <UserPrivate>
               <PurchasePage />

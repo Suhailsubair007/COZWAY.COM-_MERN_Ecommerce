@@ -3,9 +3,9 @@ import { Button } from '@/components/ui/button'
 const Footer = () => {
   return (
     <div>
-      <section class='py-5 bg-gray-600 sm:pt-10 lg:pt-12'>
+      <section class='py-5 bg-gray-200 sm:pt-10 lg:pt-12'>
         <div class='px-4 mx-auto sm:px-6 lg:px-8  max-w-7xl'>
-          <div class='grid grid-cols-2 md:col-span-3 lg:grid-cols-6 gap-y-16 gap-x-12'>
+          <div class='grid grid-cols-2 md:col-span-3 lg:grid-cols-6 gap-y-8 gap-x-8'>
             <div class='col-span-2 md:col-span-3 lg:col-span-2 lg:pr-8'>
               <img
                 class='w-auto h-6'
@@ -13,7 +13,7 @@ const Footer = () => {
                 alt=''
               />
 
-              <p class='text-base leading-relaxed text-gray-600 mt-7'>
+              <p class='text-sm leading-relaxed text-gray-600 mt-7'>
                 Amet minim mollit non deserunt ullamco est sit aliqua dolor do
                 amet sint. Velit officia consequat duis enim velit mollit.
               </p>
@@ -100,12 +100,12 @@ const Footer = () => {
                 Company
               </p>
 
-              <ul class='mt-6 space-y-4'>
-                <li>
+              <ul class='text-sm mt-6 space-y-4'>
+                <li className='text-sm'>
                   <a
                     href='#'
                     title=''
-                    class='flex text-base text-black transition-all duration-200 hover:text-blue-600 focus:text-blue-600'
+                    class='flex text-sm  text-black transition-all duration-200 hover:text-blue-600 focus:text-blue-600'
                   >
                     {' '}
                     About{' '}
@@ -116,7 +116,7 @@ const Footer = () => {
                   <a
                     href='#'
                     title=''
-                    class='flex text-base text-black transition-all duration-200 hover:text-blue-600 focus:text-blue-600'
+                    class='flex text-smtext-base text-black transition-all duration-200 hover:text-blue-600 focus:text-blue-600'
                   >
                     {' '}
                     Features{' '}
@@ -127,7 +127,7 @@ const Footer = () => {
                   <a
                     href='#'
                     title=''
-                    class='flex text-base text-black transition-all duration-200 hover:text-blue-600 focus:text-blue-600'
+                    class='flex text-sm  text-black transition-all duration-200 hover:text-blue-600 focus:text-blue-600'
                   >
                     {' '}
                     Works{' '}
@@ -138,7 +138,7 @@ const Footer = () => {
                   <a
                     href='#'
                     title=''
-                    class='flex text-base text-black transition-all duration-200 hover:text-blue-600 focus:text-blue-600'
+                    class='flex text-sm text-black transition-all duration-200 hover:text-blue-600 focus:text-blue-600'
                   >
                     {' '}
                     Career{' '}
@@ -148,7 +148,7 @@ const Footer = () => {
             </div>
 
             <div>
-              <p class='text-sm font-semibold tracking-widest text-gray-400 uppercase'>
+              <p class='text-sm  font-semibold tracking-widest text-gray-400 uppercase'>
                 Help
               </p>
 
@@ -157,7 +157,7 @@ const Footer = () => {
                   <a
                     href='#'
                     title=''
-                    class='flex text-base text-black transition-all duration-200 hover:text-blue-600 focus:text-blue-600'
+                    class='flex text-sm  text-black transition-all duration-200 hover:text-blue-600 focus:text-blue-600'
                   >
                     {' '}
                     Customer Support{' '}
@@ -168,7 +168,7 @@ const Footer = () => {
                   <a
                     href='#'
                     title=''
-                    class='flex text-base text-black transition-all duration-200 hover:text-blue-600 focus:text-blue-600'
+                    class='flex text-sm  text-black transition-all duration-200 hover:text-blue-600 focus:text-blue-600'
                   >
                     {' '}
                     Delivery Details{' '}
@@ -179,7 +179,7 @@ const Footer = () => {
                   <a
                     href='#'
                     title=''
-                    class='flex text-base text-black transition-all duration-200 hover:text-blue-600 focus:text-blue-600'
+                    class='flex text-sm  text-black transition-all duration-200 hover:text-blue-600 focus:text-blue-600'
                   >
                     {' '}
                     Terms & Conditions{' '}
@@ -190,7 +190,7 @@ const Footer = () => {
                   <a
                     href='#'
                     title=''
-                    class='flex text-base text-black transition-all duration-200 hover:text-blue-600 focus:text-blue-600'
+                    class='flex text-sm text-black transition-all duration-200 hover:text-blue-600 focus:text-blue-600'
                   >
                     {' '}
                     Privacy Policy{' '}
@@ -214,13 +214,13 @@ const Footer = () => {
                     name='email'
                     id='email'
                     placeholder='Enter your email'
-                    class='block w-full h-12 p-4 text-black placeholder-gray-500 transition-all duration-200 bg-white border border-gray-200 rounded-md focus:outline-none focus:border-blue-600 caret-blue-600'
+                    class='block w-full h-10 p-4 text-black placeholder-gray-500 transition-all duration-200 bg-white border border-gray-200 rounded-md focus:outline-none focus:border-blue-600 caret-blue-600'
                   />
                 </div>
 
                 <button
                   type='submit'
-                  className='inline-flex items-center justify-center px-4 py-2 mt-3 font-semibold text-white transition-all duration-200 bg-black rounded-md hover:bg-blue-700 focus:bg-black-100'
+                  className='inline-flex items-center justify-center px-5 py-2 mt-4 h-10 font-semibold text-white transition-all duration-200 bg-black rounded-md hover:bg-blue-700 focus:bg-black-100'
                 >
                   Submit
                 </button>

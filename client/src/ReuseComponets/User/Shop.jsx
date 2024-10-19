@@ -3,6 +3,7 @@ import axiosInstance from "@/config/axiosConfig";
 import { Star, ChevronDown, Filter } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
+import { useNavigate } from "react-router-dom";
 import { Badge } from "@/components/ui/badge";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -19,39 +20,82 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 
-const FilterSidebar = ({ className }) => (
+const FilterSidebar = ({ className, categories }) => (
   <div className={className}>
     <h2 className="text-xl font-semibold mb-4">Filters</h2>
     <Accordion type="single" collapsible className="w-full">
-      {["Category", "Fit", "Sleeve", "Size"].map((filter) => (
-        <AccordionItem key={filter} value={filter.toLowerCase()}>
-          <AccordionTrigger className="text-sm font-medium">
-            {filter}
-          </AccordionTrigger>
-          <AccordionContent>
-            <div className="space-y-2">
-              {["Option 1", "Option 2", "Option 3"].map((option) => (
-                <div key={option} className="flex items-center space-x-2">
-                  <Checkbox id={`${filter}-${option}`} />
-                  <label
-                    htmlFor={`${filter}-${option}`}
-                    className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                  >
-                    {option}
-                  </label>
-                </div>
-              ))}
-            </div>
-          </AccordionContent>
-        </AccordionItem>
-      ))}
+      {/* Category Filter */}
+      <AccordionItem value="category">
+        <AccordionTrigger className="text-sm font-medium">
+          Category
+        </AccordionTrigger>
+        <AccordionContent>
+          <div className="space-y-2">
+            {categories.map((category) => (
+              <div key={category._id} className="flex items-center space-x-2">
+                <Checkbox id={`category-${category._id}`} />
+                <label
+                  htmlFor={`category-${category._id}`}
+                  className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                >
+                  {category.name}
+                </label>
+              </div>
+            ))}
+          </div>
+        </AccordionContent>
+      </AccordionItem>
+
+      {/* Sleeve Filter */}
+      <AccordionItem value="sleeve">
+        <AccordionTrigger className="text-sm font-medium">
+          Sleeve
+        </AccordionTrigger>
+        <AccordionContent>
+          <div className="space-y-2">
+            {["Full Sleeve", "Half Sleeve", "Elbow Sleeve"].map((sleeve) => (
+              <div key={sleeve} className="flex items-center space-x-2">
+                <Checkbox id={`sleeve-${sleeve}`} />
+                <label
+                  htmlFor={`sleeve-${sleeve}`}
+                  className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                >
+                  {sleeve}
+                </label>
+              </div>
+            ))}
+          </div>
+        </AccordionContent>
+      </AccordionItem>
+
+      {/* Fit Filter */}
+      <AccordionItem value="fit">
+        <AccordionTrigger className="text-sm font-medium">Fit</AccordionTrigger>
+        <AccordionContent>
+          <div className="space-y-2">
+            {["Slim Fit", "Regular Fit", "Loose Fit"].map((fit) => (
+              <div key={fit} className="flex items-center space-x-2">
+                <Checkbox id={`fit-${fit}`} />
+                <label
+                  htmlFor={`fit-${fit}`}
+                  className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                >
+                  {fit}
+                </label>
+              </div>
+            ))}
+          </div>
+        </AccordionContent>
+      </AccordionItem>
     </Accordion>
   </div>
 );
 
-const ShoppingPage = () => {
+export default function ShoppingPage() {
   const [products, setProducts] = useState([]);
+  const [categories, setCategories] = useState([]);
   const [sortBy, setSortBy] = useState("featured");
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchProduct = async () => {
@@ -79,20 +123,28 @@ const ShoppingPage = () => {
   }, []);
 
   useEffect(() => {
-    console.log(products);
-  }, [products]);
+    const fetchCategories = async () => {
+      try {
+        const response = await axiosInstance.get(
+          "/users/get_active_categories"
+        );
+        setCategories(response.data);
+      } catch (error) {
+        console.error("Error fetching categories:", error);
+      }
+    };
 
-  // console.log('first')
-  // const mine = products.map((x) => {
-  //   console.log("hiii", x.image);
-  // });
-  // console.log('second')
-  // console.log(mine);
-  // console.log('third')
+    fetchCategories();
+  }, []);
 
-  console.log("helooooooooooooooooo", products);
+  const handleNavigate = (product) => {
+    navigate(`/product/${product.id}`, { state: { product } });
+  };
+  console.log("Categories fetched:", categories);
+  console.log("Products fetched:", products);
+
   return (
-    <div className="container mx-auto px-2 py-6">
+    <div className="container mx-auto  py-6">
       <div className="flex flex-col lg:flex-row gap-4">
         {/* Responsive Sidebar */}
         <Sheet>
@@ -102,12 +154,15 @@ const ShoppingPage = () => {
             </Button>
           </SheetTrigger>
           <SheetContent side="left" className="w-[300px] sm:w-[400px]">
-            <FilterSidebar className={"mt-4"} />
+            <FilterSidebar className={"mt-8"} categories={categories} />
           </SheetContent>
         </Sheet>
 
         {/* Desktop Sidebar */}
-        <FilterSidebar className={"hidden lg:block w-64 flex-shrink-0"} />
+        <FilterSidebar
+          className={"w-[200px] pl-[50px]"}
+          categories={categories}
+        />
 
         {/* Main Content */}
         <div className="flex-grow pl-8 pr-8">
@@ -142,59 +197,58 @@ const ShoppingPage = () => {
           </div>
 
           <div className="px-2 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
-            {products &&
-              products.map((Product) => (
-                <Card
-                  key={Product.id}
-                  className="bg-white overflow-hidden flex flex-col group transition-all duration-300 ease-in-out hover:shadow-xl hover:-translate-y-2 hover:bg-gray-50"
-                >
-                  <div className="relative overflow-hidden">
-                    <img
-                      src={Product.image}
-                      alt={Product.name}
-                      className="w-full h-[400px] object-cover transition-transform duration-300 group-hover:scale-110"
-                    />
-                    <div className="absolute inset-0 bg-black opacity-0 group-hover:opacity-10 transition-opacity duration-300"></div>
-                  </div>
-                  <CardContent className="p-4 flex-grow">
-                    <h3 className="text-lg font-semibold group-hover:text-primary transition-colors duration-300">
-                      {Product.name}
-                    </h3>
-                    <p className="text-sm text-gray-500">
-                      {Product.category.name}
-                    </p>
-                    <p className="text-sm font-bold mt-2 group-hover:text-primary transition-colors duration-300">
-                      ₹{Product.price}
-                    </p>
-                    <div className="flex items-center mt-2">
-                      {[...Array(5)].map((_, i) => (
-                        <Star
-                          key={i}
-                          className="w-3 h-3 fill-current text-yellow-400"
-                        />
-                      ))}
-                      <span className="ml-2 text-sm text-gray-600">
-                        4.5 (24 reviews)
-                      </span>
-                    </div>
-                  </CardContent>
-                  <CardFooter className="p-4 flex justify-between items-center">
-                    {Product.stock <= 5 && (
+            {products.map((Product) => (
+              <Card
+                onClick={() => handleNavigate(Product)}
+                key={Product.id}
+                className="bg-white  overflow-hidden flex flex-col group transition-all duration-300 ease-in-out hover:shadow-xl hover:-translate-y-2 hover:bg-gray-50"
+              >
+                <div className="relative pb-[400px] overflow-hidden">
+                  <img
+                    src={Product.image}
+                    alt={Product.name}
+                    className="absolute inset-0 w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
+                  />
+                </div>
+
+                <CardContent className="p-4 flex-grow">
+                  <p className="text-sm font-semibold group-hover:text-primary transition-colors duration-300 truncate">
+                    {Product.name}
+                  </p>
+
+                  <p className="text-sm text-gray-500 truncate">
+                    {Product.category.name}
+                  </p>
+                  {Product.stock <= 5 && (
+                    <div className="flex pt-2 justify-end">
                       <Badge
                         variant="destructive"
-                        className="ml-2 group-hover:animate-pulse"
+                        className="group-hover:animate-pulse"
                       >
                         Only {Product.stock} left!
                       </Badge>
-                    )}
-                  </CardFooter>
-                </Card>
-              ))}
+                    </div>
+                  )}
+                  <p className="text-sm font-bold mt-2 group-hover:text-primary transition-colors duration-300">
+                    ₹{Product.price}
+                  </p>
+                  <div className="flex items-center mt-2">
+                    {[...Array(5)].map((_, i) => (
+                      <Star
+                        key={i}
+                        className="w-3 h-3 fill-current text-yellow-400"
+                      />
+                    ))}
+                    <span className="ml-2 text-sm text-gray-600">
+                      4.5 (24 reviews)
+                    </span>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
           </div>
         </div>
       </div>
     </div>
   );
-};
-
-export default ShoppingPage;
+}

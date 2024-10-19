@@ -1,12 +1,12 @@
 import { Switch } from '@/components/ui/switch'
-import { useState, useEffect } from 'react'
+import { useEffect ,useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { toast } from 'sonner'
 import axiosInstance from '../../config/axiosConfig'
+import { Formik, Form, Field, ErrorMessage } from 'formik'
+import * as Yup from 'yup'
 
 const CategoryComponent = () => {
-  const [name, setName] = useState('')
-  const [description, setDescription] = useState('')
   const [list, SetList] = useState([])
   const navigate = useNavigate()
 
@@ -14,33 +14,25 @@ const CategoryComponent = () => {
     const fetchCategory = async () => {
       try {
         const categories = await axiosInstance.get('/admin/categories')
-        console.log(categories.data)  
         SetList(categories.data)
-        // console.log(list)  
       } catch (error) {
         console.error('Error fetching categories:', error)
       }
     }
   
     fetchCategory()
-  },[]) 
-  
+  },[])
 
-  const handleAddCategory = async e => {
-    e.preventDefault()
-
+  const handleAddCategory = async (values, { resetForm }) => {
     try {
       const response = await axiosInstance.post('/admin/add_category', {
-        name,
-        description
+        name: values.name,
+        description: values.description
       })
-      console.log(response)
     
       if (response.status === 201) {
         toast('Category added successfully!')
-
-        setName('')
-        setDescription('')
+        resetForm() // Reset the form fields
       }
     } catch (error) {
       if (error.response && error.response.status === 400) {
@@ -54,71 +46,83 @@ const CategoryComponent = () => {
   const toggleCategoryStatus = async category => {
     try {
       const updatedStatus = !category.is_active
-
       await axiosInstance.patch(`/admin/categories/${category._id}`, {
         is_active: updatedStatus
       })
-
-
       SetList(prev =>
         prev.map(cat =>
           cat._id === category._id
-            ? { ...cat, is_active: updatedStatus } // Update is_active in state
+            ? { ...cat, is_active: updatedStatus }
             : cat
         )
       )
-      console.log(`Category ${category.name} status changed to ${updatedStatus}`);
       toast(`Category ${updatedStatus ? 'listed' : 'unlisted'} successfully!`)
     } catch (error) {
       toast('Failed to update category status.')
     }
   }
 
+  // Validation schema
+  const validationSchema = Yup.object().shape({
+    name: Yup.string()
+      .trim()
+      .matches(/^[a-zA-Z\s]*$/, 'Only letters are allowed')
+      .required('Category Name is required'),
+    description: Yup.string()
+      .trim()
+      .matches(/^[a-zA-Z\s]*$/, 'Only letters are allowed')
+      .required('Category Description is required'),
+  });
+
   return (
     <div className='flex h-screen bg-gray-100'>
-      {/* Main Content */}
       <main className='flex-1 overflow-y-auto p-4'>
         <h2 className='text-xl font-semibold mb-6'>Add Category</h2>
 
         {/* Form */}
         <div className='mb-10'>
-          <form
+          <Formik
+            initialValues={{ name: '', description: '' }}
+            validationSchema={validationSchema}
             onSubmit={handleAddCategory}
-            className='bg-white p-6 rounded-lg shadow-lg flex flex-col gap-4'
           >
-            <div className='w-full'>
-              <label className='block mb-2 text-sm font-semibold'>
-                Category Name:
-              </label>
-              <input
-                type='text'
-                value={name} // Bind input to state
-                onChange={e => setName(e.target.value)}
-                placeholder='Enter Category Name'
-                className='w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500'
-                required // Optional: Make the field required
-              />
-            </div>
-            <div className='w-full'>
-              <label className='block mb-2 text-sm font-semibold'>
-                Category Description:
-              </label>
-              <textarea
-                value={description} // Bind textarea to state
-                onChange={e => setDescription(e.target.value)}
-                placeholder='Enter Category Description'
-                className='w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500'
-                rows={6}
-                required // Optional: Make the field required
-              />
-            </div>
-            <button
-              type='submit'
-              className='w-full lg:w-32 bg-black hover:bg-gray-600 text-white py-2 px-4 rounded-lg mt-4 text-sm self-end'
-            >
-              Add Category
-            </button>
-          </form>
+            {({ isSubmitting }) => (
+              <Form className='bg-white p-6 rounded-lg shadow-lg flex flex-col gap-4'>
+                <div className='w-full'>
+                  <label className='block mb-2 text-sm font-semibold'>
+                    Category Name:
+                  </label>
+                  <Field
+                    type='text'
+                    name='name'
+                    placeholder='Enter Category Name'
+                    className='w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500'
+                  />
+                  <ErrorMessage name='name' component='div' className='text-red-600 text-sm' />
+                </div>
+                <div className='w-full'>
+                  <label className='block mb-2 text-sm font-semibold'>
+                    Category Description:
+                  </label>
+                  <Field
+                    as='textarea'
+                    name='description'
+                    placeholder='Enter Category Description'
+                    className='w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500'
+                    rows={6}
+                  />
+                  <ErrorMessage name='description' component='div' className='text-red-600 text-sm' />
+                </div>
+                <button
+                  type='submit'
+                  disabled={isSubmitting}
+                  className='w-full lg:w-32 bg-black hover:bg-gray-600 text-white py-2 px-4 rounded-lg mt-4 text-sm self-end'
+                >
+                  Add Category
+                </button>
+              </Form>
+            )}
+          </Formik>
         </div>
 
         {/* Category Table */}
@@ -139,8 +143,8 @@ const CategoryComponent = () => {
                   <td className='border-t py-2 px-4'>{category.description}</td>
                   <td className='border-t py-2 px-4'>
                     <Switch
-                      checked={category.is_active} // Properly bind the switch to is_active state
-                      onCheckedChange={() => toggleCategoryStatus(category)} // Call the toggle function
+                      checked={category.is_active}
+                      onCheckedChange={() => toggleCategoryStatus(category)}
                     />
                   </td>
                   <td className='border-t py-2 px-4'>
