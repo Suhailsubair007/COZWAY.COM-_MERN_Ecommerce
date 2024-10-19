@@ -7,7 +7,6 @@ const verifyUser = async (req, res, next) => {
 
     if (accessToken) {
         try {
-            // Try to verify the access token
             const decode = jwt.verify(accessToken, process.env.ACCESS_TOKEN_SECRET);
             const user = await User.findById(decode.user).select("-password");
             req.user = user; // Attaching user to the request object for later use

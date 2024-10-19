@@ -1,66 +1,103 @@
 import React, { useState } from "react";
+import { Link } from "react-router-dom";
+import { useSelector } from "react-redux";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { Menu, Search, User } from "lucide-react";
-import {Link , Navigate} from 'react-router-dom'
-import { useSelector } from "react-redux";
-
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { useNavigate } from "react-router-dom";
+import axiosInstance from "@/config/axiosConfig";
+import { logoutUser } from "../../redux/UserSlice";
+import { useDispatch } from "react-redux";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import {
+  Menu,
+  Search,
+  User,
+  LogOut,
+  ShoppingBag,
+  UserCircle,
+} from "lucide-react";
 const Header = () => {
   const [isSearchVisible, setSearchVisible] = useState(false);
-  const userInfo = useSelector((state) => state.user.userData);
-  console.log(userInfo);
-  
+  const user = useSelector((state) => state.user.userInfo);
+  const dispatch = useDispatch();
 
   const toggleSearch = () => {
     setSearchVisible(!isSearchVisible);
+  };
+  const navigate = useNavigate();
+
+  const handleLogout = async () => {
+    console.log('gjdhsgjhksdgkjgk')
+    try {
+      const response = await axiosInstance.post("/users/logout");
+
+      console.log(response)
+      if (response.status === 200) {
+        dispatch(logoutUser());
+        localStorage.removeItem("userInfo"); // Clear from localStorage (if applicable)
+        navigate("/"); // Navigate to home
+        toast("User Logged out successfully.."); // Success toast
+      } else {
+        toast.error("Failed to log out. Please try again.");
+      }
+    } catch (err) {
+      console.error("Logout error:", err);
+      toast.error("An error occurred during logout.");
+    }
   };
 
   return (
     <header className="sticky top-0 z-50 w-full bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 shadow-md">
       <div className="container mx-auto px-4">
-        <div className="flex h-16 items-center justify-between">
+        <div className="px-6 flex h-16 items-center justify-between">
           {/* Logo */}
           <div className="flex items-center">
-            <div className="font-bold text-xl tracking-wide px-4 py-2">
+            <Link to="/" className="font-bold text-xl tracking-wide px-4 py-2">
               <img
                 src="https://res.cloudinary.com/dupo7yv88/image/upload/v1728535931/logo-no-background_dx8qjo.png"
-                alt="fff"
-                style={{ width: "100px", height: "auto" }} // Adjust the width/height here
+                alt="Logo"
+                style={{ width: "100px", height: "auto" }}
               />
-            </div>
+            </Link>
           </div>
 
           {/* Navigation Links - Hidden on mobile */}
           <nav className="hidden md:flex items-center space-x-4">
-            <a
-              href="/"
+            <Link
+              to="/"
               className="text-sm font-medium text-muted-foreground hover:text-primary"
             >
               Home
-            </a>
-            <a
-              href="/shop"
+            </Link>
+            <Link
+              to="/shop"
               className="text-sm font-medium text-muted-foreground hover:text-primary"
             >
               Shop
-            </a>
-            <a
-              href="/our-story"
+            </Link>
+            <Link
+              to="/our-story"
               className="text-sm font-medium text-muted-foreground hover:text-primary"
             >
               Our Story
-            </a>
-            <a
-              href="/contact-us"
+            </Link>
+            <Link
+              to="/contact-us"
               className="text-sm font-medium text-muted-foreground hover:text-primary"
             >
               Contact Us
-            </a>
+            </Link>
           </nav>
 
           {/* Search Bar and Icons */}
-          <div className="flex items-center space-x-4">
+          <div className=" flex items-center space-x-4">
             {/* Search Icon */}
             <button
               onClick={toggleSearch}
@@ -73,23 +110,48 @@ const Header = () => {
             {isSearchVisible && (
               <div className="relative hidden md:block">
                 <Input
-                  className="w-full max-w-xs"
+                  className="w-[400px] max-w-xs"
                   type="text"
                   placeholder="Search..."
                 />
               </div>
             )}
 
-            {/* User Icon */}
-            <button className="text-muted-foreground hover:text-primary">
-              <User className="h-5 w-5" />
-            </button>
+            {/* User Profile or Login Button */}
+            {user ? (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    className="relative h-8 w-8 rounded-full"
+                  >
+                    <Avatar className="h-8 w-8">
+                      <AvatarImage src={user.name} alt={"no name"} />
+                      <AvatarFallback>{user.name.charAt(0)}</AvatarFallback>
+                    </Avatar>
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent className="w-56" align="end" forceMount>
+                  <DropdownMenuItem>
+                    <User className="mr-2 h-4 w-4" />
+                    <span>Account</span>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem>
+                    <ShoppingBag className="mr-2 h-4 w-4" />
+                    <span>My Orders</span>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem>
+                    <LogOut className="mr-2 h-4 w-4" />
+                    <span  onClick={handleLogout} >Log out</span>
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            ) : (
+              <Link to="/login">
+                <Button className="hidden md:inline-flex">Login</Button>
+              </Link>
+            )}
 
-            {/* Login Button - Hidden on mobile */}
-
-            <Link to="/login">
-              <Button className="hidden md:inline-flex">Login</Button>
-            </Link>
             {/* Mobile Menu */}
             <Sheet>
               <SheetTrigger asChild>
@@ -100,31 +162,41 @@ const Header = () => {
               </SheetTrigger>
               <SheetContent side="right">
                 <nav className="flex flex-col space-y-4">
-                  <a
-                    href="/"
+                  <Link
+                    to="/"
                     className="text-sm font-medium hover:text-primary"
                   >
                     Home
-                  </a>
-                  <a
-                    href="/shop"
+                  </Link>
+                  <Link
+                    to="/shop"
                     className="text-sm font-medium hover:text-primary"
                   >
                     Shop
-                  </a>
-                  <a
-                    href="/our-story"
+                  </Link>
+                  <Link
+                    to="/our-story"
                     className="text-sm font-medium hover:text-primary"
                   >
                     Our Story
-                  </a>
-                  <a
-                    href="/contact-us"
+                  </Link>
+                  <Link
+                    to="/contact-us"
                     className="text-sm font-medium hover:text-primary"
                   >
                     Contact Us
-                  </a>
-                  <Button className="w-full">Login</Button>
+                  </Link>
+                  {user ? (
+                    <div className="flex items-center space-x-2">
+                      <Avatar className="h-8 w-8">
+                        <AvatarImage src={user.avatarUrl} alt={user.name} />
+                        <AvatarFallback>{user.name.charAt(0)}</AvatarFallback>
+                      </Avatar>
+                      <span className="text-sm font-medium">{user.name}</span>
+                    </div>
+                  ) : (
+                    <Button className="w-full">Login</Button>
+                  )}
                 </nav>
               </SheetContent>
             </Sheet>

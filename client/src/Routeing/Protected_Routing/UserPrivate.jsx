@@ -3,10 +3,11 @@ import { Navigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 
 function UserPrivate({ children }) {
-  const userInfo = useSelector((state) => state.user.userData);
+  const userInfo = useSelector((state) => state.user.userInfo);
+  console.log("Private route", userInfo);
 
   if (!userInfo) {
-    return <Navigate to={"/login"} />;
+    return <Navigate to={"/"} />;
   }
 
   return children;

@@ -5,7 +5,7 @@ import adminReducer from "./AdminSlice";
 const store = configureStore({
   reducer: {
     user: userReducer,
-    admin: adminReducer,
+    // admin: adminReducer,
   },
 });
 

@@ -7,7 +7,6 @@ import { Toaster } from "@/components/ui/sonner";
 const App = () => {
   return (
     <>
-      <Toaster position="bottom-center" />
       <Router>
         <Routes>
           <Route path="/admin" element={<AdminLogin />} />

@@ -11,7 +11,7 @@ const Landing = () => {
     <div className="min-h-screen bg-white">
       <Header />
       <HeroSection />
-      <div className="pl-8 pr-8 px-4 lg:px-8">
+      <div className="pl-16 pr-16 px-6 lg:px-12">
         <ShopByCategories />
         <NewArrivals />
         <TopSelling />

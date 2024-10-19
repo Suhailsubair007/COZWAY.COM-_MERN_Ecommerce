@@ -4,11 +4,11 @@ import { useSelector } from "react-redux";
 import { Navigate } from "react-router-dom";
 
 function UserLoginProtect({ children }) {
-  const userInfo = useSelector((state) => state.user.userData);
-  console.log(userInfo)
+  const userInfo = useSelector((state) => state.user.userInfo);
+  console.log("When user not logged in ",userInfo)
 
   if (userInfo) {
-    return <Navigate to={"/login"} />;
+    return <Navigate to={"/"} />;
   }
   return children;
 }

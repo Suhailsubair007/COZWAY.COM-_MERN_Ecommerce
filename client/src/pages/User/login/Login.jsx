@@ -43,8 +43,9 @@ export default function Login() {
       toast("Google Login successful!");
       navigate("/home");
     } catch (error) {
-      console.error("Error logging in with Google:", error);
-      toast("Error logging in with Google. Please try again.");
+      if (error.response && error.response.status === 403) {
+        toast.error(error.response.data.message);
+      }
     }
   };
 
@@ -64,16 +65,27 @@ export default function Login() {
 
       if (response.status === 200) {
         const userData = response.data.user;
-        localStorage.setItem("userData", JSON.stringify(userData));
-        dispatch(setUserDetails(response.data.user));
-        navigate("/home");
-        toast("Login sucess!!!");
-      } else {
-        console.log("Unexpected response:", response);
-        alert("Failed to login.");
+        dispatch(setUserDetails(userData));
+        navigate("/");
+        toast.success(response.data.message || "Login successful!!!");
       }
     } catch (err) {
-      console.error("Login error:", err);
+      if (err.response && err.response.status === 400) {
+        toast.error(err.response.data.message || "All fields are required!!");
+      } else if (err.response && err.response.status === 401) {
+        toast.error(err.response.data.message || "Invalid credentials.");
+      } else if (err.response && err.response.status === 403) {
+        toast.error(
+          err.response.data.message ||
+            "User is blocked. Please contact support."
+        );
+      } else if (err.response && err.response.status === 500) {
+        toast.error(
+          err.response.data.message || "Server error. Please try again later."
+        );
+      } else {
+        toast.error("An error occurred during login. Please try again.");
+      }
     }
   };
 

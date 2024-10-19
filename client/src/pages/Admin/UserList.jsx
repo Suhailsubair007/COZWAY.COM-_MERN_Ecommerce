@@ -11,10 +11,12 @@ import { Switch } from "@/components/ui/switch";
 import { Input } from "@/components/ui/input";
 import axiosInstance from "@/config/axiosConfig"; // Import axios instance
 import { toast } from "sonner";
-
+import { logoutUser } from "../../redux/UserSlice";
+import { useDispatch } from "react-redux";
 export default function UserList() {
   const [users, setUsers] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
+  const dispatch = useDispatch();
 
   useEffect(() => {
     const fetchCustomers = async () => {
@@ -47,8 +49,11 @@ export default function UserList() {
         )
       );
 
-      // Show a toast notification
-      toast.success(`User ${updatedStatus ? "blocked" : "UnBlocked"} successfully.`);
+      dispatch(logoutUser());
+      localStorage.removeItem("userInfo");
+      toast.success(
+        `User ${updatedStatus ? "blocked" : "UnBlocked"} successfully.`
+      );
     } catch (error) {
       console.error("Failed to update blocked status:", error);
       toast.error("Failed to update blocked status.");

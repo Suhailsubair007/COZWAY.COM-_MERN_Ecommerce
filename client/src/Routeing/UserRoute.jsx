@@ -21,15 +21,13 @@ const UserRoute = () => {
             </UserLoginProtect>
           }
         />
-        <Route path="/signup" element={<Signup />} />
 
-        {/* Protect the home route */}
         <Route
-          path="/home"
+          path="/signup"
           element={
-            <UserPrivate>
-              <Landing />
-              </UserPrivate>
+            <UserLoginProtect>
+              <Signup />
+            </UserLoginProtect>
           }
         />
 
@@ -49,7 +47,7 @@ const UserRoute = () => {
           element={
             <UserPrivate>
               <MainShoppingPage />
-            </UserPrivate>
+             </UserPrivate>
           }
         />
       </Routes>

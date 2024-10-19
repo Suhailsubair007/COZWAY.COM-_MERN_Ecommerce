@@ -156,10 +156,11 @@ export default function SignUp() {
           },
         }
       );
-      console.log(response.data);
-      toast("Google Signup successful!");
+      console.log(response.data.user);
+      
       dispatch(setUserDetails(response.data.user));
-      navigate("/landing");
+      toast("Google Signup successful!");
+      navigate("/home");
     } catch (error) {
       console.error("Error signing in with Google:", error);
       toast("Error signing in with Google. Please try again.");

@@ -9,16 +9,14 @@ const ShopByCategories = () => {
     const fetchProduct = async () => {
       try {
         const response = await axiosInstance.get(
-          "/users/fetch_product_display"
+          "/users/fetch_product_by_date"
         );
         const fetchedProducts = response.data.slice(0, 4).map((product) => ({
           name: product.name,
           image: product.images[0],
           id: product._id,
         }));
-
         setProducts(fetchedProducts);
-        // console.log(fetchedProducts);
       } catch (error) {
         console.error("Error fetching products:", error);
       }
@@ -26,6 +24,10 @@ const ShopByCategories = () => {
 
     fetchProduct();
   }, []);
+  console.log(products)
+  const handleclick =()=>{
+    navigate('/shop')
+  }
 
   return (
     <section className="py-12">
@@ -34,6 +36,7 @@ const ShopByCategories = () => {
         <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-4">
           {products.map((product) => (
             <div
+            onClick={handleclick}
               key={product.id}
               className="relative bg-white shadow-lg rounded-lg overflow-hidden"
             >

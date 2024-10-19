@@ -3,6 +3,7 @@ const bcrypt = require("bcrypt");
 const otpGenarator = require('otp-generator');
 const OTP = require('../model/otpModel')
 const Product = require('../model/Product')
+const Category = require('../model/Category');
 const { OAuth2Client } = require('google-auth-library');
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID); ('google-auth-library');
 const genarateAccesTocken = require('../utils/genarateAccesTocken')
@@ -96,6 +97,9 @@ const login = async (req, res) => {
         if (!finduser) {
             return res.status(401).json({ success: false, message: "Invalid credentials" });
         }
+        if (finduser.is_blocked) {
+            return res.status(403).json({ success: false, message: "User is blocked. Please contact support." });
+        }
         const PasswordMatching = await bcrypt.compare(password, finduser.password);
         console.log(PasswordMatching)
         if (PasswordMatching) {
@@ -126,9 +130,11 @@ const googleSignIn = async (req, res) => {
 
     try {
         let user = await User.findOne({ email });
+        if (user.is_blocked) {
+            return res.status(403).json({ success: false, message: "User is blocked. Please contact support." });
+        }
 
         if (!user) {
-
             user = new User({
                 name,
                 email,
@@ -138,6 +144,8 @@ const googleSignIn = async (req, res) => {
 
             await user.save();
         }
+        genarateAccesTocken(res, user._id);
+        genarateRefreshTocken(res, user._id);
 
         return res.status(200).json({
             message: 'User successfully signed in',
@@ -161,6 +169,13 @@ const googleLoginUser = async (req, res) => {
     try {
         let user = await User.findOne({ email });
 
+        if (user && user.is_blocked) {
+            return res.status(403).json({
+                success: false,
+                message: "User is blocked. Please contact support.",
+            });
+        }
+
         if (!user) {
             user = new User({
                 email,
@@ -169,8 +184,13 @@ const googleLoginUser = async (req, res) => {
             });
             await user.save();
         }
+
+        genarateAccesTocken(res, user._id);
+        genarateRefreshTocken(res, user._id);
         return res.status(200).json({
-            sucess: true, message: 'Jayy jawann rakshapettu', user: {
+            success: true,
+            message: "Login successful",
+            user: {
                 name: user.name,
                 email: user.email,
                 id: user._id,
@@ -178,9 +198,10 @@ const googleLoginUser = async (req, res) => {
         });
     } catch (error) {
         console.error(error);
-        return res.status(500).json({ message: 'Server error' });
+        return res.status(500).json({ message: "Server error" });
     }
 };
+
 
 
 const fetchLatestProduct = async (req, res) => {
@@ -196,6 +217,23 @@ const fetchLatestProduct = async (req, res) => {
 };
 
 
+const fetchActiveProduct = async (req, res) => {
+    try {
+        const products = await Product.find({ is_active: true }).populate('category', 'name');;
+        res.status(200).json(products);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Server error' });
+    }
+};
+
+const UserLogout = (req, res) => {
+    res.clearCookie("accessTocken");
+    res.clearCookie('refreshToken');
+    res.status(200).json("User logged out successfully");
+};
+
+
 
 
 module.exports = {
@@ -204,5 +242,7 @@ module.exports = {
     login,
     googleSignIn,
     googleLoginUser,
+    UserLogout,
     fetchLatestProduct,
+    fetchActiveProduct,
 };
