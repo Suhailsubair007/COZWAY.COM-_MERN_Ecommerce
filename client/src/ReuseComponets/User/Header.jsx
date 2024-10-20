@@ -9,6 +9,7 @@ import { useNavigate } from "react-router-dom";
 import axiosInstance from "@/config/axiosConfig";
 import { logoutUser } from "../../redux/UserSlice";
 import { useDispatch } from "react-redux";
+import { toast } from "sonner";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -34,7 +35,6 @@ const Header = () => {
   const navigate = useNavigate();
 
   const handleLogout = async () => {
-    console.log('gjdhsgjhksdgkjgk')
     try {
       const response = await axiosInstance.post("/users/logout");
 

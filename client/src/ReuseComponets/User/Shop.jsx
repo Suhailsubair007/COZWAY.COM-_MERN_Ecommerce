@@ -158,7 +158,7 @@ const ShoppingPage = () => {
         </Sheet>
 
         <FilterSidebar
-          className={"w-[200px] pl-[50px]"}
+          className={"w-[190px]"}
           categories={categories}
         />
 
@@ -215,16 +215,28 @@ const ShoppingPage = () => {
                   <p className="text-sm text-gray-500 truncate">
                     {Product.category.name}
                   </p>
-                  {Product.stock <= 5 && (
+                  {Product.stock === 0 ? (
                     <div className="flex pt-2 justify-end">
                       <Badge
                         variant="destructive"
                         className="group-hover:animate-pulse"
                       >
-                        Only {Product.stock} left!
+                        Out of stock!
                       </Badge>
                     </div>
+                  ) : (
+                    Product.stock <= 5 && (
+                      <div className="flex pt-2 justify-end">
+                        <Badge
+                          variant="destructive"
+                          className="group-hover:animate-pulse"
+                        >
+                          Only {Product.stock} left!
+                        </Badge>
+                      </div>
+                    )
                   )}
+
                   <p className="text-sm font-bold mt-2 group-hover:text-primary transition-colors duration-300">
                     ₹{Product.price}
                   </p>

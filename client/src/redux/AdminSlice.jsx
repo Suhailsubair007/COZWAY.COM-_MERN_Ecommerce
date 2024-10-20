@@ -1,4 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
+import Cookies from "js-cookie";  // Import js-cookie
 
 const initialState = {
   adminInfo: localStorage.getItem("adminInfo")
@@ -17,6 +18,10 @@ const adminSlice = createSlice({
     logoutAdmin: (state) => {
       state.adminInfo = null;
       localStorage.removeItem("adminInfo");
+
+      // Clear the accessToken and refreshToken cookies
+      Cookies.remove("accessToken");
+      Cookies.remove("refreshToken");
     },
   },
 });

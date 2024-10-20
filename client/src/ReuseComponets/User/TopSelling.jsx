@@ -51,7 +51,7 @@ const TopSelling = () => {
                   className='w-full object-cover'
                 />
                 <div className='p-4 text-center'>
-                  <h3 className='font-semibold mb-2'>
+                  <h3 className='font-medium text-sm mb-2'>
                     {product.name}
                   </h3>
                 </div>

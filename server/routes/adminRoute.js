@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const verifyAdmin = require('../middleware/adminAuth')
-const { registerAdmin, AdminLogin, getCoutomers, updateCoustomerStatus } = require('../controller/adminController');
+const { registerAdmin, AdminLogin, getCoutomers, updateCoustomerStatus, AdminLogout } = require('../controller/adminController');
 const { addCategory, updateCategory, getCategories, fetchCategoryById, updateCategoryStatus } = require('../controller/CategoryController')
 const { addProduct, getProduct, updateProductStatus, updateProduct, fetchProductById } = require('../controller/ProductController')
 
@@ -9,6 +9,7 @@ const { addProduct, getProduct, updateProductStatus, updateProduct, fetchProduct
 //Admin login and Signup route..
 router.post('/signup', registerAdmin);
 router.post('/login', AdminLogin);
+router.post('/logout', AdminLogout);
 
 
 //Category related routes..

@@ -47,7 +47,7 @@ const TrendingNow = () => {
                 className="w-full h-[400px] object-cover"
               />
               <div className="p-4">
-                <h3 className="font-semibold text-gray-800 text-lg">
+                <h3 className="font text-gray-800 text-xs text-center font-medium">
                   {item.name}
                 </h3>
               </div>

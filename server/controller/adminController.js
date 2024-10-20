@@ -106,6 +106,12 @@ const updateCoustomerStatus = async (req, res) => {
 
 }
 
+const AdminLogout = (req, res) => {
+    res.clearCookie("accessToken");
+    res.clearCookie('refreshToken');
+    res.status(200).json("admin logged out successfully");
+};
+
 
 
 module.exports = {
@@ -113,6 +119,7 @@ module.exports = {
     updateCoustomerStatus,
     registerAdmin,
     AdminLogin,
+    AdminLogout,
 };
 
 

@@ -12,7 +12,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { getCroppedImg } from "../../config/cropImage"; // Import your cropping function
+import { getCroppedImg } from "../../config/cropImage";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
@@ -30,15 +30,17 @@ export default function AddProduct() {
     fit: "",
     sleeve: "",
     sizes: { S: "", M: "", L: "", XL: "", XXL: "" },
-    images: Array(5).fill(null), // Array to hold cropped images
+    images: Array(5).fill(null),
   });
 
   const [categories, setCategories] = useState([]);
-  const [selectedImageIndex, setSelectedImageIndex] = useState(null); // Track which image is being cropped
-  const [image, setImage] = useState(null); // Image for cropping
+  const [selectedImageIndex, setSelectedImageIndex] = useState(null);
+  const [image, setImage] = useState(null);
   const [crop, setCrop] = useState({ x: 0, y: 0 });
   const [zoom, setZoom] = useState(1);
   const [croppedAreaPixels, setCroppedAreaPixels] = useState(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [errors, setErrors] = useState({});
 
   useEffect(() => {
     const fetchCategories = async () => {
@@ -53,13 +55,57 @@ export default function AddProduct() {
     fetchCategories();
   }, []);
 
-  // Handle input changes for the fields
+  const isValidText = (text) => {
+    // This regex allows only letters, numbers, and spaces
+    const regex = /^[a-zA-Z0-9\s]*$/;
+    return regex.test(text);
+  };
+
+  const validateForm = () => {
+    let newErrors = {};
+    if (!product.name.trim()) newErrors.name = "Name is required";
+    if (!isValidText(product.name.trim())) newErrors.name = "Name can only contain letters, numbers, and spaces";
+    if (!product.description.trim()) newErrors.description = "Description is required";
+    if (!isValidText(product.description.trim())) newErrors.description = "Description can only contain letters, numbers, and spaces";
+    if (!product.price || isNaN(product.price) || Number(product.price) <= 0) {
+      newErrors.price = "Price must be a positive number";
+    }
+    if (!product.category) newErrors.category = "Category is required";
+    if (!product.fit) newErrors.fit = "Fit is required";
+    if (!product.sleeve) newErrors.sleeve = "Sleeve is required";
+
+    Object.entries(product.sizes).forEach(([size, stock]) => {
+      if (stock && (isNaN(stock) || Number(stock) < 0)) {
+        newErrors[`sizes.${size}`] = "Stock must be a non-negative number";
+      }
+    });
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setProduct({
-      ...product,
-      [name]: value,
-    });
+
+    if (name === 'name' || name === 'description') {
+      const trimmedValue = value.trim();
+      if (isValidText(trimmedValue)) {
+        setProduct({
+          ...product,
+          [name]: trimmedValue,
+        });
+      }
+    } else {
+      setProduct({
+        ...product,
+        [name]: value,
+      });
+    }
+
+    // Clear the error for this field if it exists
+    if (errors[name]) {
+      setErrors({ ...errors, [name]: null });
+    }
   };
 
   const handleSizeChange = (size, value) => {
@@ -70,14 +116,17 @@ export default function AddProduct() {
         [size]: value,
       },
     });
+    // Clear the error for this size if it exists
+    if (errors[`sizes.${size}`]) {
+      setErrors({ ...errors, [`sizes.${size}`]: null });
+    }
   };
 
-  // Handle image file selection and cropping
   const handleImageChange = (index, event) => {
     const file = event.target.files[0];
     if (file) {
-      setImage(URL.createObjectURL(file)); // Show the cropping UI for the selected image
-      setSelectedImageIndex(index); // Track the index of the image being cropped
+      setImage(URL.createObjectURL(file));
+      setSelectedImageIndex(index);
     }
   };
 
@@ -85,17 +134,16 @@ export default function AddProduct() {
     setCroppedAreaPixels(croppedAreaPixels);
   }, []);
 
-  // Handle the cropping and store the result in the images array
   const saveCroppedImage = async () => {
     try {
       const croppedImageBlob = await getCroppedImg(image, croppedAreaPixels);
       const croppedImageURL = URL.createObjectURL(croppedImageBlob);
 
       const newImages = [...product.images];
-      newImages[selectedImageIndex] = croppedImageBlob; // Store the cropped image blob
+      newImages[selectedImageIndex] = croppedImageBlob;
 
       setProduct({ ...product, images: newImages });
-      setImage(null); // Reset cropping UI after saving the cropped image
+      setImage(null);
       setSelectedImageIndex(null);
     } catch (error) {
       console.error("Error cropping image:", error);
@@ -128,11 +176,18 @@ export default function AddProduct() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    if (!validateForm()) {
+      toast("Please correct the errors in the form");
+      return;
+    }
+
+    setIsSubmitting(true);
+
     const { name, description, price, category, fit, sleeve, sizes } = product;
 
     const sizeArray = Object.entries(sizes).map(([size, stock]) => ({
       size,
-      stock: Number(stock),
+      stock: Number(stock) || 0,
     }));
 
     const imageUrls = await uploadImagesToCloudinary();
@@ -140,6 +195,7 @@ export default function AddProduct() {
 
     if (filteredImages.length === 0) {
       toast("Error uploading images");
+      setIsSubmitting(false);
       return;
     }
 
@@ -168,11 +224,13 @@ export default function AddProduct() {
     } catch (error) {
       console.error("Error:", error);
       toast("Error adding product.");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
   return (
-    <div className=" flex bg-gray-100">
+    <div className="flex bg-gray-100">
       <main className="flex-1 p-8 overflow-y-auto">
         <div className="mb-8">
           <h2 className="text-3xl font-bold">Add Product</h2>
@@ -224,7 +282,6 @@ export default function AddProduct() {
               ))}
             </div>
 
-            {/* Product Details Section */}
             <div className="space-y-4 mt-6">
               <Input
                 placeholder="Type name here..."
@@ -232,6 +289,8 @@ export default function AddProduct() {
                 name="name"
                 value={product.name}
                 onChange={handleChange}
+                error={errors.name}
+                maxLength={100}
               />
 
               <Textarea
@@ -240,6 +299,8 @@ export default function AddProduct() {
                 name="description"
                 value={product.description}
                 onChange={handleChange}
+                error={errors.description}
+                maxLength={500}
               />
 
               <Input
@@ -248,6 +309,10 @@ export default function AddProduct() {
                 name="price"
                 value={product.price}
                 onChange={handleChange}
+                error={errors.price}
+                type="number"
+                min="0"
+                step="0.01"
               />
             </div>
 
@@ -269,6 +334,7 @@ export default function AddProduct() {
                     ))}
                   </SelectContent>
                 </Select>
+                {errors.category && <p className="text-red-500 text-sm">{errors.category}</p>}
 
                 <Select
                   onValueChange={(value) =>
@@ -284,6 +350,7 @@ export default function AddProduct() {
                     <SelectItem value="loose">Loose Fit</SelectItem>
                   </SelectContent>
                 </Select>
+                {errors.fit && <p className="text-red-500 text-sm">{errors.fit}</p>}
 
                 <Select
                   onValueChange={(value) =>
@@ -299,6 +366,7 @@ export default function AddProduct() {
                     <SelectItem value="sleeveless">Elbow Sleeve</SelectItem>
                   </SelectContent>
                 </Select>
+                {errors.sleeve && <p className="text-red-500 text-sm">{errors.sleeve}</p>}
               </div>
 
               <div className="space-y-4">
@@ -310,20 +378,25 @@ export default function AddProduct() {
                         placeholder="10"
                         value={product.sizes[size]}
                         onChange={(e) => handleSizeChange(size, e.target.value)}
+                        type="number"
+                        min="0"
+                        step="1"
                       />
                     </div>
                   ))}
                 </div>
+                {Object.entries(errors).filter(([key]) => key.startsWith('sizes.')).map(([key, value]) => (
+                  <p key={key} className="text-red-500 text-sm">{value}</p>
+                ))}
               </div>
             </div>
 
-            <Button type="submit" className="mt-6">
-              Add Product
+            <Button type="submit" className="mt-6" disabled={isSubmitting}>
+              {isSubmitting ? "Uploading..." : "Add Product"}
             </Button>
           </div>
         </form>
 
-        {/* Cropping Modal */}
         {image && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4">
             <Card className="w-full max-w-lg">

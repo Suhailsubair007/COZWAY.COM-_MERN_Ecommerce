@@ -46,7 +46,7 @@ const ShopByCategories = () => {
                 className="w-full h-[440px] object-cover"
               />
               <div className="absolute bottom-0 left-0 right-0 bg-black bg-opacity-50 text-white p-3">
-                <p className="text-center text-base font-semibold tracking-wide">
+                <p className="text-center text-xs  tracking-wide">
                   {product.name}
                 </p>
               </div>
