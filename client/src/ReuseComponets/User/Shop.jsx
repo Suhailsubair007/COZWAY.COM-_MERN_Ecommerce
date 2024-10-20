@@ -20,11 +20,12 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 
+//Side filter bar....
+
 const FilterSidebar = ({ className, categories }) => (
   <div className={className}>
     <h2 className="text-xl font-semibold mb-4">Filters</h2>
     <Accordion type="single" collapsible className="w-full">
-      {/* Category Filter */}
       <AccordionItem value="category">
         <AccordionTrigger className="text-sm font-medium">
           Category
@@ -46,7 +47,6 @@ const FilterSidebar = ({ className, categories }) => (
         </AccordionContent>
       </AccordionItem>
 
-      {/* Sleeve Filter */}
       <AccordionItem value="sleeve">
         <AccordionTrigger className="text-sm font-medium">
           Sleeve
@@ -68,7 +68,6 @@ const FilterSidebar = ({ className, categories }) => (
         </AccordionContent>
       </AccordionItem>
 
-      {/* Fit Filter */}
       <AccordionItem value="fit">
         <AccordionTrigger className="text-sm font-medium">Fit</AccordionTrigger>
         <AccordionContent>
@@ -91,7 +90,7 @@ const FilterSidebar = ({ className, categories }) => (
   </div>
 );
 
-export default function ShoppingPage() {
+const ShoppingPage = () => {
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
   const [sortBy, setSortBy] = useState("featured");
@@ -158,15 +157,12 @@ export default function ShoppingPage() {
           </SheetContent>
         </Sheet>
 
-        {/* Desktop Sidebar */}
         <FilterSidebar
           className={"w-[200px] pl-[50px]"}
           categories={categories}
         />
 
-        {/* Main Content */}
         <div className="flex-grow pl-8 pr-8">
-          {/* Top Bar */}
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
             <h1 className="text-3xl font-bold">Products</h1>
             <DropdownMenu>
@@ -251,4 +247,6 @@ export default function ShoppingPage() {
       </div>
     </div>
   );
-}
+};
+
+export default ShoppingPage;

@@ -6,12 +6,15 @@ import { Label } from "@/components/ui/label";
 import { EyeIcon, EyeOffIcon } from "lucide-react";
 import axiosInstance from "@/config/axiosConfig";
 import { toast } from "sonner";
-import { Toaster } from '@/components/ui/sonner'
+import { Toaster } from "@/components/ui/sonner";
+import { setAdminDetails } from "../../redux/AdminSlice";
+import { useDispatch } from "react-redux";
 
 const AdminLogin = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const dispatch = useDispatch();
 
   const LoginData = {
     email,
@@ -30,6 +33,8 @@ const AdminLogin = () => {
       console.log("Login response:", response);
 
       if (response.status === 200) {
+        console.log(response.data);
+        dispatch(setAdminDetails(response.data.admin));
         toast("Login success ✔");
         navigate("/admin/dashboard");
       } else {
@@ -98,7 +103,6 @@ const AdminLogin = () => {
           </Button>
         </form>
       </div>
-      
     </div>
   );
 };

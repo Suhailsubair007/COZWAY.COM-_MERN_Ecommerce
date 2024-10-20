@@ -1,8 +1,8 @@
 const jwt = require("jsonwebtoken");
 
-function generateRefreshToken(res, user) {
-  const refreshToken = jwt.sign({ user }, process.env.REFRESH_TOKEN_SECRET, {
-    expiresIn: "90d", // Typically, refresh tokens have a longer expiration time
+function genarateRefreshTocken(res, admin) {
+  const refreshToken = jwt.sign({ admin }, process.env.REFRESH_TOKEN_SECRET, {
+    expiresIn: "90d", 
   });
 
   res.cookie("refreshToken", refreshToken, {
@@ -13,4 +13,4 @@ function generateRefreshToken(res, user) {
   });
 }
 
-module.exports = generateRefreshToken;
+module.exports = genarateRefreshTocken;

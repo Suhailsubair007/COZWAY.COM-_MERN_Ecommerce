@@ -7,18 +7,11 @@ import { useNavigate } from "react-router-dom";
 const HeroSection = () => {
   const images = [
     {
-      src: "https://www.snitch.co.in/cdn/shop/files/4_WebBanner_1920x1080_1_1400x.jpg?v=1728392099",
+      src: "https://res.cloudinary.com/dupo7yv88/image/upload/v1729429246/main1_mq6mhj.png",
       alt: "Mens Collection - Exclusive",
       title: "Classic Exclusive",
       subtitle: "Mens Collection",
       offer: "UPTO 40% OFF",
-    },
-    {
-      src: "https://www.westside.com/cdn/shop/files/C2_08_1920X900_FORMAL_SHIRT_3b893f14-041c-4927-a40c-aa6972bb302f.jpg?v=1727421617",
-      alt: "Limited Edition Deals",
-      title: "Limited Edition",
-      subtitle: "Formal Shirts",
-      offer: "BUY 2 GET 1 FREE",
     },
     {
       src: "https://www.snitch.co.in/cdn/shop/files/2_WebBanner_1920x1080_4_1400x.jpg?v=1728458033",
@@ -45,7 +38,7 @@ const HeroSection = () => {
     if (isAutoplay) {
       interval = setInterval(() => {
         setCurrentIndex((prevIndex) => (prevIndex + 1) % images.length);
-      }, 5000); // Change slide every 5 seconds
+      }, 5000); 
     }
     return () => clearInterval(interval);
   }, [isAutoplay]);
@@ -74,7 +67,7 @@ const HeroSection = () => {
 
   return (
     <section
-    onClick={handleClick}
+    // onClick={handleClick}
       
       className="relative w-full h-screen overflow-hidden"
     >

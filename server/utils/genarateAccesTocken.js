@@ -1,18 +1,18 @@
 const jwt = require("jsonwebtoken");
 
-function  generateJWT(res, user) {
-  const token = jwt.sign({ user }, process.env.ACCESS_TOKEN_SECRET, {
-    expiresIn: "30m",
+function genarateAccesTocken(res, admin) {
+  const token = jwt.sign({ admin }, process.env.ACCESS_TOKEN_SECRET, {
+    expiresIn: "1m",
   });
 
-  res.cookie("accessTocken", token, {
+  res.cookie("accessToken", token, {
     httpOnly: true,
     secure: false,
     sameSite: "strict",
-    maxAge: 30 * 24 * 60 * 60 * 1000, 
+    maxAge: 1 * 60 * 1000,
   });
 }
 
 
 
-module.exports = generateJWT;
+module.exports = genarateAccesTocken;

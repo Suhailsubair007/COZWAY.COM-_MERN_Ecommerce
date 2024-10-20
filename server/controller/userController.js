@@ -245,6 +245,26 @@ const getActiveCategories = async (req, res) => {
 };
 
 
+const fetchOneProdyctById = async (req, res) => {
+    const { id } = req.params;
+
+    console.log(id)
+
+    try {
+        const product = await Product.findById(id).populate('category');
+
+        if (!product) {
+            return res.status(404).json({ message: 'Product not found' });
+        }
+
+        res.status(200).json(product);
+    } catch (error) {
+        console.error('Error fetching category:', error);
+        res.status(500).json({ message: 'Server error. Please try again later.' });
+    }
+};
+
+
 
 
 module.exports = {
@@ -257,4 +277,5 @@ module.exports = {
     fetchLatestProduct,
     fetchActiveProduct,
     getActiveCategories,
+    fetchOneProdyctById,
 };

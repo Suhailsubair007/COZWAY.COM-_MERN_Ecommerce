@@ -3,6 +3,8 @@ const Category = require('../model/Category');
 const bcrypt = require("bcrypt");
 const Product = require('../model/Product')
 const Admin = require('../model/Admin')
+const genarateAccesTocken = require('../utils/genarateAccesTocken')
+const genarateRefreshTocken = require('../utils/genarateRefreshTocken')
 
 const securePassword = async (password) => {
     try {
@@ -47,12 +49,17 @@ const AdminLogin = async (req, res) => {
             return res.status(401).json({ success: false, message: "Invalid credentials" });
         }
 
+        genarateAccesTocken(res, admin._id); 
+        genarateRefreshTocken(res, admin._id); 
+
         res.status(200).json({
             success: true,
             message: "User logged in successfully",
-            name: admin.name,
-            email: admin.email,
-            _id: admin._id
+            admin: {
+                name: admin.name,
+                email: admin.email,
+                _id: admin._id
+            },
         });
     } catch (error) {
         res.status(500).json({ success: false, message: "Server error" });

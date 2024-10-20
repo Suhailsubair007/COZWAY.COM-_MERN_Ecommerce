@@ -8,6 +8,7 @@ import EditCategory from '../pages/Admin/EditCategory'
 import Aside from '@/ReuseComponets/Admin/Aside'
 import UserList from '@/pages/Admin/UserList'
 import EditProduct from '@/pages/Admin/EditProduct'
+import AdminProtect from './Protected_Routing/admin/adminProtect'
 
 const AdminRoute = () => {
   return (
@@ -15,7 +16,6 @@ const AdminRoute = () => {
       <Aside />
       <main className='flex-grow'>
         <Routes>
-
           <Route path='/dashboard' element={<AdminDashbord />} />
           <Route path='/categories' element={<AddCategory />} />
           <Route path='/categories/edit/:categoryId' element={<EditCategory />} />
