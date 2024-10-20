@@ -1,8 +1,6 @@
-"use client"
-
 import { useState, useEffect } from "react"
 import { Badge } from "@/components/ui/badge"
-import { Star, MessageSquare, ThumbsUp, ThumbsDown, Heart } from "lucide-react"
+import { Star, MessageSquare, ThumbsUp, ThumbsDown, Heart, X } from "lucide-react"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
@@ -10,6 +8,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { useParams } from "react-router-dom"
 import axiosInstance from "@/config/axiosConfig"
+import { motion, AnimatePresence } from "framer-motion"
 
 export default function Component() {
   const [selectedImage, setSelectedImage] = useState(0)
@@ -17,6 +16,7 @@ export default function Component() {
   const [userRating, setUserRating] = useState(0)
   const [reviewContent, setReviewContent] = useState("")
   const [productData, setProductData] = useState(null)
+  const [isZoomModalOpen, setIsZoomModalOpen] = useState(false)
   const { productId } = useParams()
 
   useEffect(() => {
@@ -40,11 +40,27 @@ export default function Component() {
     setReviewContent("")
   }
 
+  const openZoomModal = () => {
+    setIsZoomModalOpen(true)
+  }
+
+  const closeZoomModal = () => {
+    setIsZoomModalOpen(false)
+  }
+
   if (!productData) {
     return <div>Loading...</div>
   }
 
   const { name, price, images, sizes, description, category } = productData
+
+  // Dummy coupons data
+  const dummyCoupons = [
+    { code: "SUMMER10", discount: "10% off" },
+    { code: "FREESHIP", discount: "Free Shipping" },
+    { code: "NEWUSER", discount: "15% off first order" },
+    { code: "FLASH25", discount: "25% off for next 2 hours" },
+  ]
 
   return (
     <div>
@@ -63,17 +79,23 @@ export default function Component() {
               />
             ))}
           </div>
-          <div className="flex-1">
+          <div className="flex-1 relative overflow-hidden">
             <img
               src={images[selectedImage]}
               alt="Main product view"
-              className="w-full h-[500px] object-cover"
+              className="w-full h-[500px] object-cover cursor-zoom-in"
+              onClick={openZoomModal}
             />
           </div>
         </div>
         <div className="flex-1 space-y-5">
           <h1 className="text-3xl font-bold">{name}</h1>
           <p className="text-2xl font-semibold">${price.toFixed(2)}</p>
+          {productData.totalStock < 5 && (
+            <p className="text-red-500 font-semibold">
+              Only {productData.totalStock} left in stock!
+            </p>
+          )}
           <div className="flex items-center gap-1">
             {[...Array(5)].map((_, i) => (
               <Star
@@ -82,6 +104,14 @@ export default function Component() {
               />
             ))}
             <span className="text-sm text-gray-600">(4.5)</span>
+          </div>
+          <div className="space-y-2">
+            <p className="font-semibold">Available Coupons:</p>
+            {dummyCoupons.map((coupon, index) => (
+              <Badge key={index} variant="secondary" className="mr-2">
+                {coupon.code}: {coupon.discount}
+              </Badge>
+            ))}
           </div>
           <div>
             <p className="font-semibold mb-3">Select Size:</p>
@@ -180,6 +210,44 @@ export default function Component() {
           </TabsContent>
         </Tabs>
       </div>
+
+      <AnimatePresence>
+        {isZoomModalOpen && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50"
+            onClick={closeZoomModal}
+          >
+            <motion.div
+              initial={{ scale: 0.5, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.5, opacity: 0 }}
+              transition={{ type: "spring", damping: 25, stiffness: 300 }}
+              className="relative max-w-[30vw] max-h-[100vh]"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <Button
+                variant="ghost"
+                size="icon"
+                className="absolute top-2 right-2 text-white hover:text-gray-200 z-10"
+                onClick={closeZoomModal}
+              >
+                <X className="h-6 w-6" />
+              </Button>
+              <img
+                src={images[selectedImage]}
+                alt="Zoomed product view"
+                className="w-full h-full object-contain"
+              />
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   )
 }
+
+
+//relative max-w-[30vw] max-h-[100vh]
