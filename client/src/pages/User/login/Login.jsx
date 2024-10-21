@@ -40,7 +40,7 @@ export default function Login() {
       );
       console.log(response.data);
       dispatch(setUserDetails(response.data.user));
-      toast("Google Login successful!");
+      toast.success("Google Login successfull!");
       navigate("/home");
     } catch (error) {
       if (error.response && error.response.status === 403) {
@@ -71,11 +71,11 @@ export default function Login() {
       }
     } catch (err) {
       if (err.response && err.response.status === 400) {
-        toast.error(err.response.data.message || "All fields are required!!");
+        toast.warning(err.response.data.message || "All fields are required!!");
       } else if (err.response && err.response.status === 401) {
-        toast.error(err.response.data.message || "Invalid credentials.");
+        toast.info(err.response.data.message || "Invalid email or password");
       } else if (err.response && err.response.status === 403) {
-        toast.error(
+        toast.warning(
           err.response.data.message ||
             "User is blocked. Please contact support."
         );

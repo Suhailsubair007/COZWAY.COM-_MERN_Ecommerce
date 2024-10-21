@@ -30,7 +30,7 @@ export default function AddProduct() {
     fit: "",
     sleeve: "",
     sizes: { S: "", M: "", L: "", XL: "", XXL: "" },
-    images: Array(5).fill(null), // Array to hold cropped images
+    images: Array(5).fill(null),
   });
 
   const [categories, setCategories] = useState([]);
@@ -53,7 +53,8 @@ export default function AddProduct() {
     fetchCategories();
   }, []);
 
-  // Handle input changes for the fields
+
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setProduct({
@@ -61,6 +62,7 @@ export default function AddProduct() {
       [name]: value,
     });
   };
+
 
   const handleSizeChange = (size, value) => {
     setProduct({
@@ -72,12 +74,12 @@ export default function AddProduct() {
     });
   };
 
-  // Handle image file selection and cropping
+
   const handleImageChange = (index, event) => {
     const file = event.target.files[0];
     if (file) {
-      setImage(URL.createObjectURL(file)); // Show the cropping UI for the selected image
-      setSelectedImageIndex(index); // Track the index of the image being cropped
+      setImage(URL.createObjectURL(file)); 
+      setSelectedImageIndex(index);
     }
   };
 
@@ -85,7 +87,8 @@ export default function AddProduct() {
     setCroppedAreaPixels(croppedAreaPixels);
   }, []);
 
-  // Handle the cropping and store the result in the images array
+
+
   const saveCroppedImage = async () => {
     try {
       const croppedImageBlob = await getCroppedImg(image, croppedAreaPixels);
@@ -95,12 +98,15 @@ export default function AddProduct() {
       newImages[selectedImageIndex] = croppedImageBlob; // Store the cropped image blob
 
       setProduct({ ...product, images: newImages });
-      setImage(null); // Reset cropping UI after saving the cropped image
+      setImage(null);
       setSelectedImageIndex(null);
     } catch (error) {
       console.error("Error cropping image:", error);
     }
   };
+
+
+  //functio to uplaod image to cloudinary..
 
   const uploadImagesToCloudinary = async () => {
     const uploadPromises = product.images.map(async (file) => {
@@ -124,6 +130,7 @@ export default function AddProduct() {
 
     return await Promise.all(uploadPromises);
   };
+
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -171,6 +178,7 @@ export default function AddProduct() {
     }
   };
 
+  
   return (
     <div className=" flex bg-gray-100">
       <main className="flex-1 p-8 overflow-y-auto">

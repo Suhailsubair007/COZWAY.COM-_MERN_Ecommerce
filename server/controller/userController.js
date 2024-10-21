@@ -265,6 +265,27 @@ const fetchOneProdyctById = async (req, res) => {
 };
 
 
+const fetchRelatedProducts = async (req, res) => {
+    console.log('njn ivide vanneeee');
+    const { id } = req.params;
+    console.log("poooiii",id);
+    try {
+        console.log('njn ivide vanneeee');
+        const products = await Product.find({ category: id, is_active: true }).populate('category', 'name');
+        if (products.length === 0) {
+            return res.status(404).json({ message: 'No products found for this category' });
+        }
+
+        res.status(200).json(products);
+    } catch (error) {
+        console.error('Error fetching products by category:', error);
+        res.status(500).json({ message: 'Server error. Please try again later.' });
+    }
+};
+
+
+
+
 
 
 module.exports = {
@@ -278,4 +299,5 @@ module.exports = {
     fetchActiveProduct,
     getActiveCategories,
     fetchOneProdyctById,
+    fetchRelatedProducts,
 };

@@ -7,9 +7,9 @@ function genarateRefreshTocken(res, admin) {
 
   res.cookie("refreshToken", refreshToken, {
     httpOnly: true,
-    secure: false, // You may want to set this to true in production
+    secure: false, 
     sameSite: "strict",
-    maxAge: 90 * 24 * 60 * 60 * 1000, // 90 days
+    maxAge: 90 * 24 * 60 * 60 * 1000, 
   });
 }
 

@@ -1,5 +1,7 @@
 import { useState, useEffect } from "react";
+import RelatedProducts from "./RelatedProduct";
 import { Badge } from "@/components/ui/badge";
+import { ChevronRight, Home } from "lucide-react"
 import {
   Star,
   MessageSquare,
@@ -8,6 +10,14 @@ import {
   Heart,
   X,
 } from "lucide-react";
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from "@/components/ui/breadcrumb";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -19,27 +29,32 @@ import { motion, AnimatePresence } from "framer-motion";
 
 export default function Component() {
   const [selectedImage, setSelectedImage] = useState(0);
+  const [productName, setProductName] = useState("");
   const [selectedSize, setSelectedSize] = useState(null);
+  const [isLoading, setIsLoading] = useState(true)
   const [userRating, setUserRating] = useState(0);
   const [reviewContent, setReviewContent] = useState("");
   const [productData, setProductData] = useState(null);
   const [isZoomModalOpen, setIsZoomModalOpen] = useState(false);
-  const { productId } = useParams();
+  const { id } = useParams();
 
   useEffect(() => {
     const fetchProduct = async () => {
       try {
-        const response = await axiosInstance.get(`/users/product/${productId}`);
+        const response = await axiosInstance.get(`/users/product/${id}`);
+        console.log(response.data);
         setProductData(response.data);
+        // console.log(response.data.name)
+        setProductName(response.data.name);
       } catch (error) {
         console.error("Failed to fetch product details:", error);
       }
     };
-    if (productId) {
+    if (id) {
       fetchProduct();
     }
-  }, [productId]);
-
+  }, [id]);
+console.log(productName)
   const handleSubmitReview = (e) => {
     e.preventDefault();
     console.log("Submitted review:", {
@@ -64,7 +79,6 @@ export default function Component() {
 
   const { name, price, images, sizes, description, category } = productData;
 
-  // Dummy coupons data
   const dummyCoupons = [
     { code: "SUMMER10", discount: "10% off" },
     { code: "FREESHIP", discount: "Free Shipping" },
@@ -74,6 +88,32 @@ export default function Component() {
 
   return (
     <div>
+      <div className="container mx-3 px-4 py-4">
+        <Breadcrumb className="mb-6">
+          <BreadcrumbList>
+            <BreadcrumbItem>
+              <BreadcrumbLink href="/">
+                <Home className="h-4 w-4" />
+                <span className="sr-only">Home</span>
+              </BreadcrumbLink>
+            </BreadcrumbItem>
+            <BreadcrumbSeparator>
+              <ChevronRight className="h-4 w-4" />
+            </BreadcrumbSeparator>
+            <BreadcrumbItem>
+              <BreadcrumbLink href="/shop">Shop</BreadcrumbLink>
+            </BreadcrumbItem>
+            <BreadcrumbSeparator>
+              <ChevronRight className="h-4 w-4" />
+            </BreadcrumbSeparator>
+            <BreadcrumbItem>
+              <BreadcrumbPage>
+                {productName}
+              </BreadcrumbPage>
+            </BreadcrumbItem>
+          </BreadcrumbList>
+        </Breadcrumb>
+      </div>
       <div className="flex flex-col md:flex-row gap-8 p-6 max-w-6xl mx-auto">
         <div className="flex gap-4">
           <div className="flex flex-col gap-2">
@@ -102,7 +142,7 @@ export default function Component() {
         </div>
         <div className="flex-1 space-y-5">
           <h1 className="text-3xl font-bold">{name}</h1>
-          <p className="text-2xl font-semibold">${price.toFixed(2)}</p>
+          <p className="text-2xl font-semibold">₹{price.toFixed(2)}</p>
           {productData.totalStock === 0 ? (
             <p className="text-red-500 font-semibold">Out of stock!</p>
           ) : (
@@ -291,8 +331,7 @@ export default function Component() {
           </motion.div>
         )}
       </AnimatePresence>
+      <RelatedProducts id={category._id} />
     </div>
   );
 }
-
-//relative max-w-[30vw] max-h-[100vh]

@@ -32,7 +32,7 @@ const Product = () => {
           sleeve: product.sleeve,
           price: product.price,
           totalStock: product.totalStock,
-          image: product.images[0], // Display only the first image
+          image: product.images[0], 
           isListed: product.is_active,
         }));
 
@@ -57,7 +57,6 @@ const Product = () => {
   const handleEditProduct = (productId) => {
     console.log(`Editing product with ID: ${productId}`);
     navigate(`/admin/product/edit/${productId}`);
-    // Add your edit logic here
   };
 
   const handleToggleProductListing = async (productId, currentStatus) => {

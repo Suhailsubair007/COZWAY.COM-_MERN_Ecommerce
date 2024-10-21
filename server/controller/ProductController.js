@@ -15,8 +15,6 @@ const addProduct = async (req, res) => {
             return res.status(400).json({ message: 'Category not found.' });
         }
 
-
-
         const newProduct = new Product({
             name,
             description,
@@ -49,11 +47,9 @@ const getProduct = async (req, res) => {
         const products = await Product.find({}).populate('category', 'name');
 
         const formattedProducts = products.map(product => ({
-            ...product.toObject(), // Convert the Mongoose document to a plain JavaScript object
-            category: product.category.name, // Replace the category ID with the category name
+            ...product.toObject(),
+            category: product.category.name, 
         }));
-
-        // Send the formatted response
         res.status(200).json(formattedProducts);
     } catch (error) {
         console.error(error);
@@ -88,22 +84,20 @@ const updateProductStatus = async (req, res) => {
 
 
 
+
+
 const updateProduct = async (req, res) => {
     try {
         const { id } = req.params;
-        const { name, description, price, category, fit, sleeve, sizes, totalStock, images } = req.body;
+        const { name, description, price, category, fit, sleeve, sizes, images } = req.body;
 
         if (!id) {
             return res.status(400).json({ message: 'Product ID is required.' });
         }
-
-
         const existingProduct = await Product.findById(id);
         if (!existingProduct) {
             return res.status(404).json({ message: 'Product not found.' });
         }
-
-
         if (category) {
             const existingCategory = await Category.findById(category);
             if (!existingCategory) {
@@ -117,10 +111,12 @@ const updateProduct = async (req, res) => {
         existingProduct.category = category || existingProduct.category;
         existingProduct.fit = fit || existingProduct.fit;
         existingProduct.sleeve = sleeve || existingProduct.sleeve;
-        existingProduct.sizes = sizes || existingProduct.sizes;
-        existingProduct.totalStock = totalStock || existingProduct.totalStock;
         existingProduct.images = images || existingProduct.images;
 
+        if (sizes) {
+            existingProduct.sizes = sizes;
+            existingProduct.totalStock = sizes.reduce((total, size) => total + size.stock, 0);
+        }
 
         const updatedProduct = await existingProduct.save();
 
@@ -134,6 +130,7 @@ const updateProduct = async (req, res) => {
         res.status(500).json({ message: 'Server error. Please try again later.' });
     }
 };
+
 
 const fetchProductById = async (req, res) => {
     const { id } = req.params;

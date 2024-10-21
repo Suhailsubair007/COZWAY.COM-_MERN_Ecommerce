@@ -1,4 +1,10 @@
 import React, { useState, useEffect } from "react";
+import { Switch } from "@/components/ui/switch";
+import { Input } from "@/components/ui/input";
+import axiosInstance from "@/config/axiosConfig";
+import { toast } from "sonner";
+import { logoutUser } from "../../redux/UserSlice";
+import { useDispatch } from "react-redux";
 import {
   Table,
   TableBody,
@@ -7,12 +13,6 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Switch } from "@/components/ui/switch";
-import { Input } from "@/components/ui/input";
-import axiosInstance from "@/config/axiosConfig"; // Import axios instance
-import { toast } from "sonner";
-import { logoutUser } from "../../redux/UserSlice";
-import { useDispatch } from "react-redux";
 export default function UserList() {
   const [users, setUsers] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
@@ -22,14 +22,14 @@ export default function UserList() {
     const fetchCustomers = async () => {
       try {
         const response = await axiosInstance.get("/admin/coustmers");
-        setUsers(response.data.users); // Ensure users are fetched correctly
+        setUsers(response.data.users);
       } catch (error) {
         console.error("Error fetching customers:", error);
       }
     };
 
     fetchCustomers();
-  }, []); // Empty dependency array to run only once on mount
+  }, []);
 
   const handleSearch = (event) => {
     setSearchTerm(event.target.value);

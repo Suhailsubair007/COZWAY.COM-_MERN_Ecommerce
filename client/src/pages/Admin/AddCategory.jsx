@@ -31,14 +31,14 @@ const CategoryComponent = () => {
       })
     
       if (response.status === 201) {
-        toast('Category added successfully!')
-        resetForm() // Reset the form fields
+        toast.success('Category added successfully!')
+        resetForm() 
       }
     } catch (error) {
       if (error.response && error.response.status === 400) {
-        toast('Category with this name already exists.')
+        toast.error('Category with this name already exists.')
       } else {
-        toast('An error occurred. Please try again.')
+        toast.error('An error occurred. Please try again.')
       }
     }
   }
@@ -56,9 +56,9 @@ const CategoryComponent = () => {
             : cat
         )
       )
-      toast(`Category ${updatedStatus ? 'listed' : 'unlisted'} successfully!`)
+      toast.success(`Category ${updatedStatus ? 'listed' : 'unlisted'} successfully!`)
     } catch (error) {
-      toast('Failed to update category status.')
+      toast.error('Failed to update category status.')
     }
   }
 

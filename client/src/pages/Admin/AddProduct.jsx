@@ -49,24 +49,28 @@ export default function AddProduct() {
         setCategories(response.data);
       } catch (error) {
         console.error("Error fetching categories:", error);
-        toast("Failed to load categories");
+        toast.error("Failed to load categories");
       }
     };
     fetchCategories();
   }, []);
 
-  const isValidText = (text) => {
-    // This regex allows only letters, numbers, and spaces
-    const regex = /^[a-zA-Z0-9\s]*$/;
+  const isValidName = (text) => {
+    const regex = /^[a-zA-Z\s]*$/;
     return regex.test(text);
   };
 
-  const validateForm = () => {
+  const isValidDescription = (text) => {
+    const regex = /^[a-zA-Z0-9\s!@#$%^&*()_+\-=\[\]{};':"\\|,.<>/?]*$/;
+    return regex.test(text);
+  };
+
+  const validateForm = useCallback(() => {
     let newErrors = {};
     if (!product.name.trim()) newErrors.name = "Name is required";
-    if (!isValidText(product.name.trim())) newErrors.name = "Name can only contain letters, numbers, and spaces";
+    if (!isValidName(product.name.trim())) newErrors.name = "Name can only contain letters and spaces";
     if (!product.description.trim()) newErrors.description = "Description is required";
-    if (!isValidText(product.description.trim())) newErrors.description = "Description can only contain letters, numbers, and spaces";
+    if (!isValidDescription(product.description.trim())) newErrors.description = "Description contains invalid characters";
     if (!product.price || isNaN(product.price) || Number(product.price) <= 0) {
       newErrors.price = "Price must be a positive number";
     }
@@ -82,31 +86,27 @@ export default function AddProduct() {
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
-  };
+  }, [product]);
 
-  const handleChange = (e) => {
+  const handleChange = useCallback((e) => {
     const { name, value } = e.target;
 
-    if (name === 'name' || name === 'description') {
-      const trimmedValue = value.trim();
-      if (isValidText(trimmedValue)) {
-        setProduct({
-          ...product,
-          [name]: trimmedValue,
-        });
+    if (name === 'name') {
+      if (isValidName(value)) {
+        setProduct(prev => ({ ...prev, [name]: value }));
+      }
+    } else if (name === 'description') {
+      if (isValidDescription(value)) {
+        setProduct(prev => ({ ...prev, [name]: value }));
       }
     } else {
-      setProduct({
-        ...product,
-        [name]: value,
-      });
+      setProduct(prev => ({ ...prev, [name]: value }));
     }
 
-    // Clear the error for this field if it exists
     if (errors[name]) {
-      setErrors({ ...errors, [name]: null });
+      setErrors(prev => ({ ...prev, [name]: null }));
     }
-  };
+  }, [errors]);
 
   const handleSizeChange = (size, value) => {
     setProduct({
@@ -116,7 +116,7 @@ export default function AddProduct() {
         [size]: value,
       },
     });
-    // Clear the error for this size if it exists
+
     if (errors[`sizes.${size}`]) {
       setErrors({ ...errors, [`sizes.${size}`]: null });
     }
@@ -217,13 +217,13 @@ export default function AddProduct() {
       );
       if (response.status === 201) {
         navigate('/admin/product')
-        toast("Product added successfully!");
+        toast.success("Product added successfully!");
       } else {
-        toast("Failed to add product.");
+        toast.error("Failed to add product.");
       }
     } catch (error) {
       console.error("Error:", error);
-      toast("Error adding product.");
+      toast.error("Error adding product.");
     } finally {
       setIsSubmitting(false);
     }
@@ -434,7 +434,7 @@ export default function AddProduct() {
                     onValueChange={(value) => setZoom(value[0])}
                   />
                 </div>
-                <Button onClick={saveCroppedImage} className="mt-4 w-full">
+                <Button  onClick={saveCroppedImage} className="mt-4 w-full">
                   <Save className="h-4 w-4 mr-2" />
                   Save Cropped Image
                 </Button>

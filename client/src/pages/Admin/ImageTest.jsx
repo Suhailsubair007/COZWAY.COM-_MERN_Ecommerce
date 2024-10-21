@@ -11,7 +11,7 @@ export default function ImageCropUpload() {
   const [crop, setCrop] = useState({ x: 0, y: 0 })
   const [zoom, setZoom] = useState(1)
 
-  // Handle file selection
+
   const handleImageChange = (event) => {
     const file = event.target.files[0]
     if (file) {
@@ -24,14 +24,20 @@ export default function ImageCropUpload() {
     setCroppedAreaPixels(croppedAreaPixels)
   }, [])
 
-  // Upload the cropped image to Cloudinary
+
+  
+
+  
+
+  //Uploading to cloudinary....
+
   const uploadCroppedImage = async () => {
     try {
       const croppedImageBlob = await getCroppedImg(image, croppedAreaPixels)
       
       const formData = new FormData()
-      formData.append('file', croppedImageBlob, 'croppedImage.jpg') // Append the cropped image blob
-      formData.append('upload_preset', 'cozway') // Replace 'cozway' with your Cloudinary preset
+      formData.append('file', croppedImageBlob, 'croppedImage.jpg')
+      formData.append('upload_preset', 'cozway') 
 
       const response = await axios.post(
         'https://api.cloudinary.com/v1_1/dupo7yv88/image/upload',
@@ -44,6 +50,8 @@ export default function ImageCropUpload() {
       toast('Error uploading image')
     }
   }
+
+
 
   return (
     <div className='flex flex-col items-center space-y-4'>

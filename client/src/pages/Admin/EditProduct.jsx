@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -39,11 +39,15 @@ const EditProduct = () => {
   const [crop, setCrop] = useState({ x: 0, y: 0 });
   const [zoom, setZoom] = useState(1);
   const [croppedAreaPixels, setCroppedAreaPixels] = useState(null);
+  const [errors, setErrors] = useState({});
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchProductDetails = async () => {
       try {
-        const response = await axiosInstance.get(`/admin/product/edit/${productId}`);
+        const response = await axiosInstance.get(
+          `/admin/product/edit/${productId}`
+        );
         const productData = response.data;
         setProduct({
           name: productData.name || "",
@@ -81,20 +85,58 @@ const EditProduct = () => {
     fetchCategories();
   }, [productId]);
 
+  const validateField = (name, value) => {
+    let error = "";
+    switch (name) {
+      case "name":
+        if (!/^[a-zA-Z\s]*$/.test(value.trim())) {
+          error = "Name should only contain letters and spaces";
+        }
+        break;
+
+      case "description":
+        if (!/^[a-zA-Z0-9\!$%&(){}'",.]*$/.test(value.trim())) {
+          error = "Description should only contain letters";
+        }
+        break;
+
+      case "price":
+        if (!/^\d+(\.\d{1,2})?$/.test(value) || parseFloat(value) <= 0) {
+          error = "Price must be a positive number";
+        }
+        break;
+
+      default:
+        // Validate sizes
+        if (name.startsWith("sizes.")) {
+          if (!/^\d+$/.test(value) || parseInt(value) < 0) {
+            error = "Stock must be a non-negative integer";
+          }
+        }
+    }
+    return error;
+  };
+
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setProduct((prevProduct) => ({
-      ...prevProduct,
-      [name]: value,
+    const trimmedValue = value.trim();
+    const error = validateField(name, trimmedValue);
+    setErrors((prev) => ({ ...prev, [name]: error }));
+    setProduct((prev) => ({
+      ...prev,
+      [name]: name === "price" ? value : trimmedValue,
     }));
   };
 
   const handleSizeChange = (size, value) => {
-    setProduct((prevProduct) => ({
-      ...prevProduct,
+    const trimmedValue = value.trim();
+    const error = validateField(`sizes.${size}`, trimmedValue);
+    setErrors((prev) => ({ ...prev, [`sizes.${size}`]: error }));
+    setProduct((prev) => ({
+      ...prev,
       sizes: {
-        ...prevProduct.sizes,
-        [size]: value,
+        ...prev.sizes,
+        [size]: trimmedValue,
       },
     }));
   };
@@ -155,6 +197,25 @@ const EditProduct = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    // Validate all fields
+    const newErrors = {};
+    Object.entries(product).forEach(([key, value]) => {
+      if (typeof value === "string") {
+        const error = validateField(key, value);
+        if (error) newErrors[key] = error;
+      }
+    });
+    Object.entries(product.sizes).forEach(([size, stock]) => {
+      const error = validateField(`sizes.${size}`, stock);
+      if (error) newErrors[`sizes.${size}`] = error;
+    });
+
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
+      toast("Please correct the errors before submitting.");
+      return;
+    }
+
     const { name, description, price, category, fit, sleeve, sizes } = product;
 
     const sizeArray = Object.entries(sizes).map(([size, stock]) => ({
@@ -187,13 +248,14 @@ const EditProduct = () => {
         updatedProduct
       );
       if (response.status === 200) {
-        toast("Product updated successfully!");
+        toast.success("Product updated successfully!");
+        navigate("/admin/product");
       } else {
-        toast("Failed to update product.");
+        toast.error("Failed to update product.");
       }
     } catch (error) {
       console.error("Error:", error);
-      toast("Error updating product.");
+      toast.error("Error updating product.");
     }
   };
 
@@ -201,15 +263,22 @@ const EditProduct = () => {
     <div className="min-h-screen bg-gradient-to-b from-gray-100 to-gray-200 p-8">
       <Card className="max-w-4xl mx-auto">
         <CardHeader>
-          <CardTitle className="text-3xl font-bold text-primary">Edit Product</CardTitle>
-          <p className="text-muted-foreground">Dashboard &gt; product &gt; edit</p>
+          <CardTitle className="text-3xl font-bold text-primary">
+            Edit Product
+          </CardTitle>
+          <p className="text-muted-foreground">
+            Dashboard &gt; product &gt; edit
+          </p>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-8">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {Array.from({ length: 5 }, (_, index) => (
                 <div key={index} className="space-y-2">
-                  <Label htmlFor={`image-${index}`} className="text-sm font-medium text-gray-700">
+                  <Label
+                    htmlFor={`image-${index}`}
+                    className="text-sm font-medium text-gray-700"
+                  >
                     Image {index + 1}
                   </Label>
                   <div className="flex items-center space-x-2">
@@ -217,7 +286,9 @@ const EditProduct = () => {
                       type="button"
                       variant="outline"
                       size="icon"
-                      onClick={() => document.getElementById(`image-${index}`).click()}
+                      onClick={() =>
+                        document.getElementById(`image-${index}`).click()
+                      }
                     >
                       <Upload className="h-4 w-4" />
                     </Button>
@@ -251,7 +322,11 @@ const EditProduct = () => {
                 name="name"
                 value={product.name}
                 onChange={handleChange}
+                error={errors.name}
               />
+              {errors.name && (
+                <p className="text-red-500 text-sm mt-1">{errors.name}</p>
+              )}
 
               <Textarea
                 placeholder="Type description here..."
@@ -259,7 +334,13 @@ const EditProduct = () => {
                 name="description"
                 value={product.description}
                 onChange={handleChange}
+                error={errors.description}
               />
+              {errors.description && (
+                <p className="text-red-500 text-sm mt-1">
+                  {errors.description}
+                </p>
+              )}
 
               <Input
                 placeholder="₹ 1399"
@@ -267,7 +348,11 @@ const EditProduct = () => {
                 name="price"
                 value={product.price}
                 onChange={handleChange}
+                error={errors.price}
               />
+              {errors.price && (
+                <p className="text-red-500 text-sm mt-1">{errors.price}</p>
+              )}
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -333,14 +418,22 @@ const EditProduct = () => {
 
               <div className="space-y-4">
                 {Object.entries(product.sizes).map(([size, stock]) => (
-                  <Input
-                    key={size}
-                    placeholder={`${size} (size)`}
-                    label={size}
-                    name={`sizes.${size}`}
-                    value={stock}
-                    onChange={(e) => handleSizeChange(size, e.target.value)}
-                  />
+                  <>
+                    <Input
+                      key={size}
+                      placeholder={`${size} (size)`}
+                      label={size}
+                      name={`sizes.${size}`}
+                      value={stock}
+                      onChange={(e) => handleSizeChange(size, e.target.value)}
+                      error={errors[`sizes.${size}`]}
+                    />
+                    {errors[`sizes.${size}`] && (
+                      <p className="text-red-500 text-sm mt-1">
+                        {errors[`sizes.${size}`]}
+                      </p>
+                    )}
+                  </>
                 ))}
               </div>
             </div>
@@ -355,7 +448,6 @@ const EditProduct = () => {
       {image && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4">
           <Card className="w-full max-w-lg">
-
             <CardHeader>
               <CardTitle className="text-2xl font-bold">Crop Image</CardTitle>
               <Button
@@ -373,7 +465,7 @@ const EditProduct = () => {
                   image={image}
                   crop={crop}
                   zoom={zoom}
-                  aspect={2 /3}
+                  aspect={2 / 3}
                   onCropChange={setCrop}
                   onZoomChange={setZoom}
                   onCropComplete={onCropComplete}

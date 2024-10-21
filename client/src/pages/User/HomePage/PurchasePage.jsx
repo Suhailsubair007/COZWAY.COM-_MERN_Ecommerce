@@ -11,7 +11,7 @@ const PurchasePage = () => {
       <div className="px-[200px] py-[50px]">
         <ProductDetail />
       </div>
-      <RelatedProducts />
+      {/* <RelatedProducts /> */}
       <Footer />
     </div>
   );

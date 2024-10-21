@@ -7,7 +7,7 @@ import { useNavigate } from "react-router-dom";
 const HeroSection = () => {
   const images = [
     {
-      src: "https://res.cloudinary.com/dupo7yv88/image/upload/v1729429246/main1_mq6mhj.png",
+      src: "https://res.cloudinary.com/dupo7yv88/image/upload/v1729519788/2_WebBanner_1920x1080_5_1400x_ifn7km.jpg",
       alt: "Mens Collection - Exclusive",
       title: "Classic Exclusive",
       subtitle: "Mens Collection",
@@ -21,7 +21,7 @@ const HeroSection = () => {
       offer: "UP TO 50% OFF",
     },
     {
-      src: "https://blackberrys.com/cdn/shop/files/WEEKEND_CHILL_03db8124-a03b-420c-b90e-72406a968ba0.jpg?v=1715746352",
+      src: "https://res.cloudinary.com/dupo7yv88/image/upload/v1729519788/3_WebBanner_1920x1080_4_1400x_x3nts5.jpg",
       alt: "Weekend Chill",
       title: "Weekend Chill",
       subtitle: "Casual Collection",

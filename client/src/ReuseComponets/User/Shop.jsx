@@ -23,7 +23,7 @@ import {
 //Side filter bar....
 
 const FilterSidebar = ({ className, categories }) => (
-  <div className={className}>
+  <div className={`${className} flex flex-col items-center`}>
     <h2 className="text-xl font-semibold mb-4">Filters</h2>
     <Accordion type="single" collapsible className="w-full">
       <AccordionItem value="category">
@@ -143,8 +143,8 @@ const ShoppingPage = () => {
   console.log("Products fetched:", products);
 
   return (
-    <div className="container mx-auto  py-6">
-      <div className="flex flex-col lg:flex-row gap-4">
+    <div className="container mx-auto px-10  py-6">
+      <div className="flex flex-col lg:flex-row gap-10">
         {/* Responsive Sidebar */}
         <Sheet>
           <SheetTrigger asChild>
@@ -157,10 +157,7 @@ const ShoppingPage = () => {
           </SheetContent>
         </Sheet>
 
-        <FilterSidebar
-          className={"w-[190px]"}
-          categories={categories}
-        />
+        <FilterSidebar className={"w-[200px]"} categories={categories} />
 
         <div className="flex-grow pl-8 pr-8">
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">

@@ -23,7 +23,10 @@ import {
   LogOut,
   ShoppingBag,
   UserCircle,
+  Heart,
+  ShoppingCart,
 } from "lucide-react";
+
 const Header = () => {
   const [isSearchVisible, setSearchVisible] = useState(false);
   const user = useSelector((state) => state.user.userInfo);
@@ -38,12 +41,12 @@ const Header = () => {
     try {
       const response = await axiosInstance.post("/users/logout");
 
-      console.log(response)
+      console.log(response);
       if (response.status === 200) {
         dispatch(logoutUser());
         localStorage.removeItem("userInfo"); // Clear from localStorage (if applicable)
         navigate("/"); // Navigate to home
-        toast("User Logged out successfully.."); // Success toast
+        toast.success("User Logged out successfully.."); // Success toast
       } else {
         toast.error("Failed to log out. Please try again.");
       }
@@ -54,7 +57,7 @@ const Header = () => {
   };
 
   return (
-    <header className="sticky top-0 z-50 w-full bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 shadow-md">
+    <header className="sticky top-0 z-50 w-full bg-white/95 shadow-md">
       <div className="container mx-auto px-4">
         <div className="px-6 flex h-16 items-center justify-between">
           {/* Logo */}
@@ -97,7 +100,7 @@ const Header = () => {
           </nav>
 
           {/* Search Bar and Icons */}
-          <div className=" flex items-center space-x-4">
+          <div className="flex items-center space-x-4">
             {/* Search Icon */}
             <button
               onClick={toggleSearch}
@@ -116,6 +119,24 @@ const Header = () => {
                 />
               </div>
             )}
+
+            {/* Cart Icon */}
+            <Button
+              variant="ghost"
+              size="icon"
+              className="text-muted-foreground hover:text-primary"
+            >
+              <ShoppingCart className="h-5 w-5" />
+            </Button>
+
+            {/* Wishlist Icon */}
+            <Button
+              variant="ghost"
+              size="icon"
+              className="text-muted-foreground hover:text-primary"
+            >
+              <Heart className="h-5 w-5" />
+            </Button>
 
             {/* User Profile or Login Button */}
             {user ? (
@@ -140,9 +161,9 @@ const Header = () => {
                     <ShoppingBag className="mr-2 h-4 w-4" />
                     <span>My Orders</span>
                   </DropdownMenuItem>
-                  <DropdownMenuItem>
+                  <DropdownMenuItem onClick={handleLogout}>
                     <LogOut className="mr-2 h-4 w-4" />
-                    <span  onClick={handleLogout} >Log out</span>
+                    <span>Log out</span>
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>

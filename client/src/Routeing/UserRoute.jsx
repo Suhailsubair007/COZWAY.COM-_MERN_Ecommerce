@@ -1,7 +1,7 @@
 import { Routes, Route } from "react-router-dom";
 import Signup from "../pages/User/login/Signup";
 import Login from "../pages/User/login/Login";
-import { Toaster } from "@/components/ui/sonner";
+import { Toaster } from "sonner";
 import Landing from "../pages/User/HomePage/Landing";
 import PurchasePage from "@/pages/User/HomePage/PurchasePage";
 import MainShoppingPage from "@/pages/User/HomePage/MainShoppingPage";
@@ -33,7 +33,7 @@ const UserRoute = () => {
 
         {/* Protect the product route */}
         <Route
-          path="/product/:productId"
+          path="/product/:id"
           element={
             <UserPrivate>
               <PurchasePage />
@@ -47,12 +47,12 @@ const UserRoute = () => {
           element={
             <UserPrivate>
               <MainShoppingPage />
-             </UserPrivate>
+            </UserPrivate>
           }
         />
       </Routes>
 
-      <Toaster position="bottom-center" />
+      <Toaster richColors position="bottom-center" />
     </div>
   );
 };

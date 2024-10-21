@@ -4,8 +4,8 @@ const OTP = require('../model/otpModel');
 const verifyOTP = async (req, res, next) => {
     
     const { email, otp } = req.body;
-    console.log(email,otp);
-    console.log("hiiiiiiiii")
+    // console.log(email,otp);
+    // console.log("hiiiiiiiii")
 
     try {
         const otpRecord = await OTP.findOne({ email, otp });

@@ -6,7 +6,7 @@ import { Label } from "@/components/ui/label";
 import { EyeIcon, EyeOffIcon } from "lucide-react";
 import axiosInstance from "@/config/axiosConfig";
 import { toast } from "sonner";
-import { Toaster } from "@/components/ui/sonner";
+import { Toaster } from "sonner";
 import { setAdminDetails } from "../../redux/AdminSlice";
 import { useDispatch } from "react-redux";
 
@@ -31,6 +31,7 @@ const AdminLogin = () => {
       });
 
       console.log("Login response:", response);
+      toast.success('Login sucess');
 
       if (response.status === 200) {
         console.log(response.data);
@@ -49,7 +50,7 @@ const AdminLogin = () => {
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen p-4 bg-background">
-      <Toaster position="bottom-center" />
+      <Toaster richColors position="bottom-center" />
       <div className="w-full max-w-md space-y-8">
         <div className="text-center">
           <h1 className="text-2xl font-bold">cozway.com</h1>
@@ -58,7 +59,6 @@ const AdminLogin = () => {
 
         {/* Login Form */}
         <form onSubmit={handleLogin} className="space-y-6">
-          {/* Email Input */}
           <div className="space-y-2">
             <Label htmlFor="email">Email address</Label>
             <Input
@@ -71,7 +71,6 @@ const AdminLogin = () => {
             />
           </div>
 
-          {/* Password Input */}
           <div className="space-y-2">
             <Label htmlFor="password">Password</Label>
             <div className="relative">
@@ -97,7 +96,6 @@ const AdminLogin = () => {
             </div>
           </div>
 
-          {/* Log in Button */}
           <Button type="submit" className="w-full">
             Log in
           </Button>

@@ -26,7 +26,7 @@ export default function Component() {
           <button className="rounded-full p-2 lg:hidden">
             <Menu className="h-6 w-6" />
           </button>
-          <h2 className="text-2xl font-bold">Hello Shahrukh 👋</h2>
+          <h2 className="text-2xl font-bold">Welcome Admin</h2>
           <div className="flex items-center">
             <div className="relative mr-2">
               <input

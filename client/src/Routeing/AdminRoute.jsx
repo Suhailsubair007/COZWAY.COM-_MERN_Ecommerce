@@ -1,5 +1,5 @@
 import { Routes, Route } from "react-router-dom";
-import { Toaster } from "@/components/ui/sonner";
+import { Toaster } from "sonner";
 import AdminDashbord from "../pages/Admin/AdminDasboard";
 import AddCategory from "../pages/Admin/AddCategory";
 import AddProduct from "../pages/Admin/AddProduct";
@@ -30,7 +30,7 @@ const AdminRoute = () => {
           <Route path="/customers" element={<UserList />} />
         </Routes>
       </main>
-      <Toaster position="bottom-center" />
+      <Toaster richColors position="bottom-center" />
     </div>
   );
 };
