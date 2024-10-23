@@ -44,8 +44,8 @@ const Header = () => {
       console.log(response);
       if (response.status === 200) {
         dispatch(logoutUser());
-        localStorage.removeItem("userInfo"); // Clear from localStorage (if applicable)
-        navigate("/"); // Navigate to home
+        localStorage.removeItem("userInfo");
+        navigate("/");
         toast.success("User Logged out successfully.."); // Success toast
       } else {
         toast.error("Failed to log out. Please try again.");
@@ -56,6 +56,9 @@ const Header = () => {
     }
   };
 
+  const handleProfileClick = () => {
+    navigate("/profile");
+  };
   return (
     <header className="sticky top-0 z-50 w-full bg-white/95 shadow-md">
       <div className="container mx-auto px-4">
@@ -153,7 +156,7 @@ const Header = () => {
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent className="w-56" align="end" forceMount>
-                  <DropdownMenuItem>
+                  <DropdownMenuItem onClick={handleProfileClick}>
                     <User className="mr-2 h-4 w-4" />
                     <span>Account</span>
                   </DropdownMenuItem>

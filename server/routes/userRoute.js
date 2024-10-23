@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const { login, registerUser, sendOTP, googleSignIn, googleLoginUser, fetchLatestProduct, UserLogout, fetchActiveProduct, getActiveCategories, fetchRelatedProducts } = require('../controller/userController');
+const { login, registerUser, sendOTP, googleSignIn, googleLoginUser, fetchLatestProduct, UserLogout, fetchActiveProduct, getActiveCategories, fetchRelatedProducts, userAddAddress } = require('../controller/userController');
 const verifyOTP = require('../middleware/verifyOtp');
 const userAuth = require('../middleware/userAuth');
 const { fetchProductById } = require("../controller/ProductController");
@@ -25,5 +25,10 @@ router.get('/fetch_all_product', fetchActiveProduct)
 router.get('/get_active_categories', getActiveCategories);
 router.get('/product/:id', fetchProductById);
 router.get('/products/related/:id', fetchRelatedProducts);
+
+
+
+//USER ADDRESS
+router.post('/addresses', userAddAddress);
 
 module.exports = router;

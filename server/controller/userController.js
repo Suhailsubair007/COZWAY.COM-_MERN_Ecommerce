@@ -3,6 +3,7 @@ const bcrypt = require("bcrypt");
 const otpGenarator = require('otp-generator');
 const OTP = require('../model/otpModel')
 const Product = require('../model/Product')
+const Address = require('../model/Addres')
 const Category = require('../model/Category');
 const { OAuth2Client } = require('google-auth-library');
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID); ('google-auth-library');
@@ -111,6 +112,7 @@ const login = async (req, res) => {
                 user: {
                     name: finduser.name,
                     email: finduser.email,
+                    id: finduser._id,
                 }
             });
 
@@ -268,7 +270,7 @@ const fetchOneProdyctById = async (req, res) => {
 const fetchRelatedProducts = async (req, res) => {
     console.log('njn ivide vanneeee');
     const { id } = req.params;
-    console.log("poooiii",id);
+    console.log("poooiii", id);
     try {
         console.log('njn ivide vanneeee');
         const products = await Product.find({ category: id, is_active: true }).populate('category', 'name');
@@ -282,6 +284,45 @@ const fetchRelatedProducts = async (req, res) => {
         res.status(500).json({ message: 'Server error. Please try again later.' });
     }
 };
+
+
+
+
+const userAddAddress = async (req, res) => {
+    try {
+        const { name, phone, address, district, state, city, pincode, alternatePhone, landmark, user } = req.body;
+
+        if (!name || !phone || !address || !district || !state || !city || !pincode || !user) {
+            return res.status(400).json({ message: 'All required fields must be provided' });
+        }
+
+        const newAddress = new Address({
+            name,
+            phone,
+            address,
+            district,
+            state,
+            city,
+            pincode,
+            alternatePhone,
+            landmark,
+            user
+        });
+
+        const savedAddress = await newAddress.save();
+
+        res.status(201).json({
+            message: 'Address added successfully',
+            address: savedAddress
+        });
+    } catch (error) {
+        res.status(500).json({
+            message: 'An error occurred while adding the address',
+            error: error.message
+        });
+    }
+};
+
 
 
 
@@ -300,4 +341,5 @@ module.exports = {
     getActiveCategories,
     fetchOneProdyctById,
     fetchRelatedProducts,
+    userAddAddress,
 };

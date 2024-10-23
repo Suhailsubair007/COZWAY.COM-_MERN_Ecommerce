@@ -25,9 +25,6 @@ export default function ImageCropUpload() {
   }, [])
 
 
-  
-
-  
 
   //Uploading to cloudinary....
 

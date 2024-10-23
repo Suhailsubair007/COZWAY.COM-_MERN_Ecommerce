@@ -88,7 +88,7 @@ console.log(productName)
 
   return (
     <div>
-      <div className="container mx-3 px-4 py-4">
+      <div className="container mx-3 px-[100px] py-4">
         <Breadcrumb className="mb-6">
           <BreadcrumbList>
             <BreadcrumbItem>
@@ -114,7 +114,7 @@ console.log(productName)
           </BreadcrumbList>
         </Breadcrumb>
       </div>
-      <div className="flex flex-col md:flex-row gap-8 p-6 max-w-6xl mx-auto">
+      <div className="flex flex-col md:flex-row gap-8 p-6 px-[100px] max-w-6xl mx-auto">
         <div className="flex gap-4">
           <div className="flex flex-col gap-2">
             {images.map((img, index) => (

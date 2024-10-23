@@ -7,29 +7,27 @@ import AdminLoginProtect from "./Routeing/Protected_Routing/admin/adminLoginProt
 
 const App = () => {
   return (
-    <>
-      <Router>
-        <Routes>
-          <Route
-            path="/admin"
-            element={
-              <AdminLoginProtect>
-                <AdminLogin />
-              </AdminLoginProtect>
-            }
-          />
-          <Route
-            path="/admin/*"
-            element={
-              <AdminProtect>
-                <AdminRoute />
-              </AdminProtect>
-            }
-          />
-          <Route path="/*" element={<UserRoute />} />
-        </Routes>
-      </Router>
-    </>
+    <Router>
+      <Routes>
+        <Route
+          path="/admin"
+          element={
+            <AdminLoginProtect>
+              <AdminLogin />
+            </AdminLoginProtect>
+          }
+        />
+        <Route
+          path="/admin/*"
+          element={
+            <AdminProtect>
+              <AdminRoute />
+            </AdminProtect>
+          }
+        />
+        <Route path="/*" element={<UserRoute />} />
+      </Routes>
+    </Router>
   );
 };
 
