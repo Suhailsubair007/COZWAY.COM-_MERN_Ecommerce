@@ -1,5 +1,5 @@
 
-const Category = require('../model/Category');
+const Category = require('../../model/Category');
 
 
 
@@ -62,7 +62,7 @@ const updateCategory = async (req, res) => {
 
 const getCategories = async (req, res) => {
     try {
-        const categories = await Category.find({ is_active: true }, '_id name description is_active');
+        const categories = await Category.find({}, '_id name description is_active');
         res.status(200).json(categories);
     } catch (error) {
         console.error(error);

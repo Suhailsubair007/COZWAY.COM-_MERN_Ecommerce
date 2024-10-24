@@ -14,7 +14,9 @@ const CategoryComponent = () => {
     const fetchCategory = async () => {
       try {
         const categories = await axiosInstance.get('/admin/categories')
+        console.log("Categories vannu:",categories.data);
         SetList(categories.data)
+        
       } catch (error) {
         console.error('Error fetching categories:', error)
       }

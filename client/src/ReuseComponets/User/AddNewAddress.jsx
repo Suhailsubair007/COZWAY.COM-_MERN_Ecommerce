@@ -14,6 +14,7 @@ import {
 
 function AddAddressModal({ isOpen, onClose, onAdd }) {
   const user = useSelector((state) => state.user.userInfo.id);
+  console.log(user);
 
   const [address, setAddress] = useState({
     name: "",
@@ -25,8 +26,10 @@ function AddAddressModal({ isOpen, onClose, onAdd }) {
     pincode: "",
     alternatePhone: "",
     landmark: "",
-    user: user, 
+    user: user,
   });
+
+  console.log(address);
 
   const handleChange = (e) => {
     setAddress({ ...address, [e.target.name]: e.target.value });
@@ -77,6 +80,8 @@ function AddAddressModal({ isOpen, onClose, onAdd }) {
                 value={address.phone}
                 onChange={handleChange}
                 placeholder="Phone Number"
+                type="tel" // restrict input to numeric
+                pattern="[0-9]+" // regex pattern to allow only digits
                 required
               />
             </div>
@@ -147,6 +152,8 @@ function AddAddressModal({ isOpen, onClose, onAdd }) {
                 id="alternatePhone"
                 name="alternatePhone"
                 value={address.alternatePhone}
+                type="tel" // restrict input to numeric
+                pattern="[0-9]+" // regex pattern to allow only digits
                 onChange={handleChange}
                 placeholder="Alternate Phone Number"
               />

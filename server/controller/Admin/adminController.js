@@ -1,18 +1,7 @@
-const User = require("../model/User");
-const Category = require('../model/Category');
 const bcrypt = require("bcrypt");
-const Product = require('../model/Product')
-const Admin = require('../model/Admin')
-const genarateAccesTocken = require('../utils/genarateAccesTocken')
-const genarateRefreshTocken = require('../utils/genarateRefreshTocken')
-
-const securePassword = async (password) => {
-    try {
-        return await bcrypt.hash(password, 10);
-    } catch (error) {
-        console.log(error);
-    }
-};
+const Admin = require('../../model/Admin')
+const genarateAccesTocken = require('../../utils/genarateAccesTocken')
+const genarateRefreshTocken = require('../../utils/genarateRefreshTocken')
 
 const registerAdmin = async (req, res) => {
     const { name, email, password } = req.body;
@@ -34,6 +23,7 @@ const registerAdmin = async (req, res) => {
     }
 };
 
+
 const AdminLogin = async (req, res) => {
     try {
         const { email, password } = req.body;
@@ -49,8 +39,8 @@ const AdminLogin = async (req, res) => {
             return res.status(401).json({ success: false, message: "Invalid credentials" });
         }
 
-        genarateAccesTocken(res, admin._id); 
-        genarateRefreshTocken(res, admin._id); 
+        genarateAccesTocken(res, admin._id);
+        genarateRefreshTocken(res, admin._id);
 
         res.status(200).json({
             success: true,
@@ -67,45 +57,6 @@ const AdminLogin = async (req, res) => {
 };
 
 
-
-const getCoutomers = async (req, res) => {
-    try {
-        const users = await User.find({});
-        if (users) {
-            res.status(200).json({
-                users
-
-            });
-            console.log(users)
-        }
-    } catch (error) {
-        console.log("error", error);
-        res.status(500).json({ success: false, message: "Server error" });
-    }
-};
-
-
-const updateCoustomerStatus = async (req, res) => {
-    try {
-        const { id } = req.params;
-        const { is_blocked } = req.body;
-        console.log(is_blocked)
-        console.log(id)
-
-        const updateStats = await User.findByIdAndUpdate(id, { is_blocked }, { new: true })
-        console.log(updateStats);
-        if (!updateStats) {
-            return res.status(404).json({ message: 'Product not found..' });
-        }
-
-        res.status(200).json(updateStats);
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ message: 'Error updating category status' });
-    }
-
-}
-
 const AdminLogout = (req, res) => {
     res.clearCookie("accessToken");
     res.clearCookie('refreshToken');
@@ -115,12 +66,7 @@ const AdminLogout = (req, res) => {
 
 
 module.exports = {
-    getCoutomers,
-    updateCoustomerStatus,
     registerAdmin,
     AdminLogin,
     AdminLogout,
 };
-
-
-

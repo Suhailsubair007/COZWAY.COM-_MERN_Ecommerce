@@ -38,8 +38,9 @@ export default function Login() {
           },
         }
       );
-      console.log(response.data);
+      console.log(response.data.user);
       dispatch(setUserDetails(response.data.user));
+
       toast.success("Google Login successfull!");
       navigate("/home");
     } catch (error) {
