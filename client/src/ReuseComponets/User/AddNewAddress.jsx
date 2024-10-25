@@ -14,7 +14,6 @@ import {
 
 function AddAddressModal({ isOpen, onClose, onAdd }) {
   const user = useSelector((state) => state.user.userInfo.id);
-  console.log(user);
 
   const [address, setAddress] = useState({
     name: "",
@@ -29,8 +28,6 @@ function AddAddressModal({ isOpen, onClose, onAdd }) {
     user: user,
   });
 
-  console.log(address);
-
   const handleChange = (e) => {
     setAddress({ ...address, [e.target.name]: e.target.value });
   };
@@ -41,9 +38,15 @@ function AddAddressModal({ isOpen, onClose, onAdd }) {
     try {
       const response = await axiosInstance.post("/users/addresses", address);
 
-      console.log("Address added successfully:", response.data);
+      console.log("Address added successfully vannnnnnnnnnnnn:", response.data);
 
-      onAdd(response.data);
+      onAdd({
+        _id: response.data.address._id,
+        name: response.data.address.name,
+        phone: response.data.address.phone,
+        address: response.data.address.address,
+        pincode: response.data.address.pincode,
+      });
 
       onClose();
     } catch (error) {

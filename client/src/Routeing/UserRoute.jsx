@@ -10,7 +10,7 @@ import UserLoginProtect from "./Protected_Routing/user/UserLoginProtect";
 import UserPrivate from "./Protected_Routing/user/UserPrivate";
 import ProfilePage from "@/pages/User/ProfilePage";
 import ProfileUpdate from "@/ReuseComponets/User/ProfileUpdate";
-import AddNewAddress from "@/ReuseComponets/User/AddAddress";
+import Address from "@/ReuseComponets/User/Address";
 // import DeliveryAddress from "@/ReuseComponets/User/DeliveryAddress";
 // import Orders from "@/ReuseComponets/User/Orders";
 // import Wallet from "@/ReuseComponets/User/Wallet";
@@ -72,7 +72,7 @@ const UserRoute = () => {
           }
         >
           <Route index element={<ProfileUpdate />} />
-          <Route path="delivery-address" element={<AddNewAddress />} />
+          <Route path="delivery-address" element={<Address />} />
           {/* <Route path="orders" element={<Orders />} />
           <Route path="wallet" element={<Wallet />} />
           <Route path="coupons" element={<Coupons />} />

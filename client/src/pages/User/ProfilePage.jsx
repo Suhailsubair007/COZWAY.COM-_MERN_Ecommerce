@@ -8,11 +8,11 @@ const ProfilePage = () => {
   return (
     <>
       <Header />
-      <div className="flex min-h-screen bg-gray-100">
+      <div className="flex h-screen bg-black">
         <UserProfileSidebar />
 
         {/* Dynamic content for nested routes */}
-        <main className="flex-grow p-6">
+        <main className="flex-grow bg-green-500 ">
           <Outlet />
         </main>
       </div>

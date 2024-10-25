@@ -37,7 +37,7 @@ export default function UserProfileSidebar({ userName = "Suhail Subair" }) {
   };
 
   return (
-    <Card className="w-[290px] min-h-screen bg-white shadow-lg rounded-none overflow-hidden">
+    <Card className="w-[290px] h-screen bg-white shadow-lg rounded-none overflow-hidden">
       <CardContent className="p-6">
         <div className="flex flex-col items-center mb-6">
           <Avatar className="w-20 h-20 mb-4">
