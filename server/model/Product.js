@@ -13,6 +13,10 @@ const productSchema = new mongoose.Schema({
         type: Number,
         required: true,
     },
+    offerPrice: {
+        type: Number,
+        required: true,
+    },
     category: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Category',
@@ -42,9 +46,9 @@ const productSchema = new mongoose.Schema({
             required: true,
         },
     ],
-    is_active:{
-        type:Boolean,
-        default:true,
+    is_active: {
+        type: Boolean,
+        default: true,
     },
 }, { timestamps: true });
 

@@ -6,6 +6,7 @@ const address = require('../controller/User/addressController')
 const categoryController = require('../controller/User/categoryController')
 const productController = require('../controller/User/productController')
 const profileController = require('../controller/User/profileController')
+const cartController = require('../controller/User/cartController')
 // const userAuth = require('../middleware/userAuth');
 
 
@@ -41,6 +42,9 @@ router.delete('/address/:addressId', address.deleteUserAddress);
 router.get('/address/:id', address.getAddressById);
 router.patch('/addresses/:id', address.updateUserAddress);
 
+
+//cart mangement routess...
+router.post('/add-to-cart', cartController.addToCart);
 
 
 module.exports = router;

@@ -59,6 +59,9 @@ const Header = () => {
   const handleProfileClick = () => {
     navigate("/profile");
   };
+  const handleCartClick = () => {
+    navigate("/cart");
+  };
   return (
     <header className="sticky top-0 z-50 w-full bg-white/95 shadow-md">
       <div className="container mx-auto px-4">
@@ -125,6 +128,7 @@ const Header = () => {
 
             {/* Cart Icon */}
             <Button
+              onClick={handleCartClick}
               variant="ghost"
               size="icon"
               className="text-muted-foreground hover:text-primary"

@@ -26,6 +26,7 @@ const EditProduct = () => {
     name: "",
     description: "",
     price: "",
+    offerPrice: "",
     category: "",
     fit: "",
     sleeve: "",
@@ -49,10 +50,14 @@ const EditProduct = () => {
           `/admin/product/edit/${productId}`
         );
         const productData = response.data;
+        console.log("udesshichathh vannuuu :", productData);
         setProduct({
           name: productData.name || "",
           description: productData.description || "",
           price: productData.price ? productData.price.toString() : "",
+          offerPrice: productData.offerPrice
+            ? productData.offerPrice.toString()
+            : "",
           category: productData.category.name || "",
           fit: productData.fit || "",
           sleeve: productData.sleeve || "",
@@ -95,7 +100,7 @@ const EditProduct = () => {
         break;
 
       case "description":
-        if (!/^[a-zA-Z0-9\!$%&(){}'",.]*$/.test(value.trim())) {
+        if (!/^[a-zA-Z]*$/.test(value.trim())) {
           error = "Description should only contain letters";
         }
         break;
@@ -125,6 +130,7 @@ const EditProduct = () => {
     setProduct((prev) => ({
       ...prev,
       [name]: name === "price" ? value : trimmedValue,
+      [name]: name === "offerPrice" ? value : trimmedValue,
     }));
   };
 
@@ -210,13 +216,22 @@ const EditProduct = () => {
       if (error) newErrors[`sizes.${size}`] = error;
     });
 
-    if (Object.keys(newErrors).length > 0) {
+    if (Object.keys(newErrors).length < 0) {
       setErrors(newErrors);
       toast("Please correct the errors before submitting.");
       return;
     }
 
-    const { name, description, price, category, fit, sleeve, sizes } = product;
+    const {
+      name,
+      description,
+      price,
+      offerPrice,
+      category,
+      fit,
+      sleeve,
+      sizes,
+    } = product;
 
     const sizeArray = Object.entries(sizes).map(([size, stock]) => ({
       size,
@@ -235,6 +250,7 @@ const EditProduct = () => {
       name,
       description,
       price: Number(price),
+      offerPrice: Number(offerPrice),
       category,
       fit,
       sleeve,
@@ -334,13 +350,13 @@ const EditProduct = () => {
                 name="description"
                 value={product.description}
                 onChange={handleChange}
-                error={errors.description}
+                // error={errors.description}
               />
-              {errors.description && (
+              {/* {errors.description && (
                 <p className="text-red-500 text-sm mt-1">
                   {errors.description}
                 </p>
-              )}
+              )} */}
 
               <Input
                 placeholder="₹ 1399"
@@ -352,6 +368,17 @@ const EditProduct = () => {
               />
               {errors.price && (
                 <p className="text-red-500 text-sm mt-1">{errors.price}</p>
+              )}
+              <Input
+                placeholder="Offer price of product"
+                label="Offer Price"
+                name="offerPrice"
+                value={product.offerPrice}
+                onChange={handleChange}
+                error={errors.offerPrice}
+              />
+              {errors.offerPrice && (
+                <p className="text-red-500 text-sm mt-1">{errors.offerPrice}</p>
               )}
             </div>
 

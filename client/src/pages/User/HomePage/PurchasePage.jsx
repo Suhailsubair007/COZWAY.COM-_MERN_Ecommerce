@@ -3,7 +3,7 @@ import Header from "@/ReuseComponets/User/Header";
 import Footer from "@/ReuseComponets/User/Footer";
 import RelatedProducts from "@/ReuseComponets/User/RelatedProduct";
 import ProductDetail from "@/ReuseComponets/User/Purchase";
-import Reviews from "@/ReuseComponets/Review";
+// import Reviews from "@/ReuseComponets/Review";
 const PurchasePage = () => {
   return (
     <div>
@@ -11,7 +11,7 @@ const PurchasePage = () => {
       <div className="px-[200px] py-[50px]">
         <ProductDetail />
       </div>
-      {/* <RelatedProducts /> */}
+      <RelatedProducts />
       <Footer />
     </div>
   );

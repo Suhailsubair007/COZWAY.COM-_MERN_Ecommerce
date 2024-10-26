@@ -1,293 +1,346 @@
-import React, { useState } from "react";
-// import { Star, ChevronDown } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Star, ChevronDown, ChevronLeft, ChevronRight } from 'lucide-react'
-import { Card, CardContent, CardFooter } from "@/components/ui/card";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "@/components/ui/accordion";
+import { useState, useEffect } from "react";
+import RelatedProducts from "./RelatedProduct";
 import { Badge } from "@/components/ui/badge";
-// import { Pagination } from '@/components/ui/pagination'
+import { ChevronRight, Home } from "lucide-react";
+import {
+  Star,
+  MessageSquare,
+  ThumbsUp,
+  ThumbsDown,
+  Heart,
+  X,
+} from "lucide-react";
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from "@/components/ui/breadcrumb";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { useParams } from "react-router-dom";
+import axiosInstance from "@/config/axiosConfig";
+import { motion, AnimatePresence } from "framer-motion";
 
-const products = [
-  {
-    id: 1,
-    name: "Classic T-Shirt",
-    category: "Tops",
-    price: 29.99,
-    image:
-      "https://res.cloudinary.com/dupo7yv88/image/upload/v1729091942/ya9agzofv8tchupo7riy.jpg",
-    stock: 3,
-  },
-  {
-    id: 2,
-    name: "Slim Fit Jeans",
-    category: "Bottoms",
-    price: 59.99,
-    image:
-      "https://res.cloudinary.com/dupo7yv88/image/upload/v1729091942/ya9agzofv8tchupo7riy.jpg",
-    stock: 10,
-  },
-  {
-    id: 3,
-    name: "Hooded Sweatshirt",
-    category: "Outerwear",
-    price: 49.99,
-    image:
-      "https://res.cloudinary.com/dupo7yv88/image/upload/v1729091942/ya9agzofv8tchupo7riy.jpg",
-    stock: 7,
-  },
-  {
-    id: 4,
-    name: "Floral Dress",
-    category: "Dresses",
-    price: 79.99,
-    image:
-      "https://res.cloudinary.com/dupo7yv88/image/upload/v1729091942/ya9agzofv8tchupo7riy.jpg",
-    stock: 5,
-  },
-  {
-    id: 5,
-    name: "Leather Jacket",
-    category: "Outerwear",
-    price: 129.99,
-    image:
-      "https://res.cloudinary.com/dupo7yv88/image/upload/v1729091942/ya9agzofv8tchupo7riy.jpg",
-    stock: 2,
-  },
-  {
-    id: 6,
-    name: "Striped Polo Shirt",
-    category: "Tops",
-    price: 39.99,
-    image:
-      "https://res.cloudinary.com/dupo7yv88/image/upload/v1729091942/ya9agzofv8tchupo7riy.jpg",
-    stock: 8,
-  },
-];
+export default function Component() {
+  const [selectedImage, setSelectedImage] = useState(0);
+  const [productName, setProductName] = useState("");
+  const [selectedSize, setSelectedSize] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [userRating, setUserRating] = useState(0);
+  const [reviewContent, setReviewContent] = useState("");
+  const [productData, setProductData] = useState(null);
+  const [isZoomModalOpen, setIsZoomModalOpen] = useState(false);
+  const { id } = useParams();
 
-export default function ShoppingPage() {
-  const [sortBy, setSortBy] = useState("featured");
-  // const [sortBy, setSortBy] = useState('featured')
-  const [currentPage, setCurrentPage] = useState(1)
-  const productsPerPage = 8
+  useEffect(() => {
+    const fetchProduct = async () => {
+      try {
+        const response = await axiosInstance.get(`/users/product/${id}`);
+        console.log("Ithaan data", response.data);
+        setProductData(response.data);
+        console.log(response.data);
+        setProductName(response.data.name);
+      } catch (error) {
+        console.error("Failed to fetch product details:", error);
+      }
+    };
+    if (id) {
+      fetchProduct();
+    }
+  }, [id]);
+  console.log(productName);
+  const handleSubmitReview = (e) => {
+    e.preventDefault();
+    console.log("Submitted review:", {
+      rating: userRating,
+      content: reviewContent,
+    });
+    setUserRating(0);
+    setReviewContent("");
+  };
 
-  const indexOfLastProduct = currentPage * productsPerPage
-  const indexOfFirstProduct = indexOfLastProduct - productsPerPage
-  const currentProducts = products.slice(indexOfFirstProduct, indexOfLastProduct)
+  const openZoomModal = () => {
+    setIsZoomModalOpen(true);
+  };
 
-  const paginate = (pageNumber) => setCurrentPage(pageNumber)
+  const closeZoomModal = () => {
+    setIsZoomModalOpen(false);
+  };
+
+  if (!productData) {
+    return <div>Loading...</div>;
+  }
+
+  const { name, price, offerPrice, images, sizes, description, category } =
+    productData;
+
+  const dummyCoupons = [
+    { code: "SUMMER10", discount: "10% off" },
+    { code: "FREESHIP", discount: "Free Shipping" },
+    { code: "NEWUSER", discount: "15% off first order" },
+    { code: "FLASH25", discount: "25% off for next 2 hours" },
+  ];
 
   return (
-    <div className="container mx-auto pl10 px-4 py-8 flex">
-      {/* Left Sidebar */}
-      <div className="w-64 pl-4 mr-8 flex-shrink-0">
-        <div className="sticky top-8">
-          <h2 className="text-2xl font-bold mb-4">Filters</h2>
-          <Accordion type="single" collapsible className="w-full">
-            <AccordionItem value="category">
-              <AccordionTrigger>Category</AccordionTrigger>
-              <AccordionContent>
-                <div className="space-y-2">
-                  <label className="flex items-center">
-                    <input type="checkbox" className="mr-2" />
-                    Tops
-                  </label>
-                  <label className="flex items-center">
-                    <input type="checkbox" className="mr-2" />
-                    Bottoms
-                  </label>
-                  <label className="flex items-center">
-                    <input type="checkbox" className="mr-2" />
-                    Outerwear
-                  </label>
-                  <label className="flex items-center">
-                    <input type="checkbox" className="mr-2" />
-                    Dresses
-                  </label>
-                </div>
-              </AccordionContent>
-            </AccordionItem>
-            <AccordionItem value="fit">
-              <AccordionTrigger>Fit</AccordionTrigger>
-              <AccordionContent>
-                <div className="space-y-2">
-                  <label className="flex items-center">
-                    <input type="checkbox" className="mr-2" />
-                    Slim
-                  </label>
-                  <label className="flex items-center">
-                    <input type="checkbox" className="mr-2" />
-                    Regular
-                  </label>
-                  <label className="flex items-center">
-                    <input type="checkbox" className="mr-2" />
-                    Loose
-                  </label>
-                </div>
-              </AccordionContent>
-            </AccordionItem>
-            <AccordionItem value="sleeve">
-              <AccordionTrigger>Sleeve</AccordionTrigger>
-              <AccordionContent>
-                <div className="space-y-2">
-                  <label className="flex items-center">
-                    <input type="checkbox" className="mr-2" />
-                    Short Sleeve
-                  </label>
-                  <label className="flex items-center">
-                    <input type="checkbox" className="mr-2" />
-                    Long Sleeve
-                  </label>
-                  <label className="flex items-center">
-                    <input type="checkbox" className="mr-2" />
-                    Sleeveless
-                  </label>
-                </div>
-              </AccordionContent>
-            </AccordionItem>
-            <AccordionItem value="size">
-              <AccordionTrigger>Size</AccordionTrigger>
-              <AccordionContent>
-                <div className="space-y-2">
-                  <label className="flex items-center">
-                    <input type="checkbox" className="mr-2" />
-                    Small
-                  </label>
-                  <label className="flex items-center">
-                    <input type="checkbox" className="mr-2" />
-                    Medium
-                  </label>
-                  <label className="flex items-center">
-                    <input type="checkbox" className="mr-2" />
-                    Large
-                  </label>
-                  <label className="flex items-center">
-                    <input type="checkbox" className="mr-2" />
-                    X-Large
-                  </label>
-                </div>
-              </AccordionContent>
-            </AccordionItem>
-          </Accordion>
+    <div>
+      <div className="container mx-3 px-[100px] py-4">
+        <Breadcrumb className="mb-6">
+          <BreadcrumbList>
+            <BreadcrumbItem>
+              <BreadcrumbLink href="/">
+                <Home className="h-4 w-4" />
+                <span className="sr-only">Home</span>
+              </BreadcrumbLink>
+            </BreadcrumbItem>
+            <BreadcrumbSeparator>
+              <ChevronRight className="h-4 w-4" />
+            </BreadcrumbSeparator>
+            <BreadcrumbItem>
+              <BreadcrumbLink href="/shop">Shop</BreadcrumbLink>
+            </BreadcrumbItem>
+            <BreadcrumbSeparator>
+              <ChevronRight className="h-4 w-4" />
+            </BreadcrumbSeparator>
+            <BreadcrumbItem>
+              <BreadcrumbPage>{productName}</BreadcrumbPage>
+            </BreadcrumbItem>
+          </BreadcrumbList>
+        </Breadcrumb>
+      </div>
+      <div className="flex flex-col md:flex-row gap-8 p-6 px-[100px] max-w-6xl mx-auto">
+        <div className="flex gap-4">
+          <div className="flex flex-col gap-2">
+            {images.map((img, index) => (
+              <img
+                key={index}
+                src={img}
+                alt={`Product view ${index + 1}`}
+                className={`w-20 h-24 object-cover cursor-pointer border-2 ${
+                  selectedImage === index
+                    ? "border-primary"
+                    : "border-transparent"
+                }`}
+                onClick={() => setSelectedImage(index)}
+              />
+            ))}
+          </div>
+          <div className="flex-1 relative overflow-hidden">
+            <img
+              src={images[selectedImage]}
+              alt="Main product view"
+              className="w-full h-[500px] object-cover cursor-zoom-in"
+              onClick={openZoomModal}
+            />
+          </div>
+        </div>
+        <div className="flex-1 space-y-5">
+          <h1 className="text-3xl font-bold">{name}</h1>
+
+          <div className="flex items-center space-x-2">
+            <p className="text-2xl font-semibold">₹{offerPrice.toFixed(2)}</p>
+            <p className="text-[16px] font-thin line-through text-gray-500">
+              ₹{price.toFixed(2)}
+            </p>
+          </div>
+
+          {productData.totalStock === 0 ? (
+            <p className="text-red-500 font-semibold">Out of stock!</p>
+          ) : (
+            productData.totalStock < 5 && (
+              <p className="text-red-500 font-semibold">
+                Only {productData.totalStock} left in stock!
+              </p>
+            )
+          )}
+
+          <div className="flex items-center gap-1">
+            {[...Array(5)].map((_, i) => (
+              <Star
+                key={i}
+                className={`w-5 h-5 ${
+                  i < Math.floor(4.5)
+                    ? "text-yellow-400 fill-current"
+                    : "text-gray-300"
+                }`}
+              />
+            ))}
+            <span className="text-sm text-gray-600">(4.5)</span>
+          </div>
+
+          <div className="space-y-2">
+            <p className="font-semibold">Available Coupons:</p>
+            {dummyCoupons.map((coupon, index) => (
+              <Badge key={index} variant="secondary" className="mr-2">
+                {coupon.code}: {coupon.discount}
+              </Badge>
+            ))}
+          </div>
+
+          <div>
+            <p className="font-semibold mb-3">Select Size:</p>
+            <div className="flex gap-1">
+              {sizes.map((sizeObj) => (
+                <Button
+                  key={sizeObj.size}
+                  variant={
+                    selectedSize === sizeObj.size ? "default" : "outline"
+                  }
+                  className={`w-12 h-12 ${
+                    sizeObj.stock === 0 ? "opacity-50 cursor-not-allowed" : ""
+                  }`}
+                  onClick={() =>
+                    sizeObj.stock > 0 && setSelectedSize(sizeObj.size)
+                  }
+                  disabled={sizeObj.stock === 0}
+                >
+                  {sizeObj.size}
+                </Button>
+              ))}
+            </div>
+          </div>
+
+          <div className="flex flex-col gap-3">
+            <Button className="w-[400px] py-6">Add to Cart</Button>
+            <Button
+              variant="outline"
+              className="w-[400px] py-3 flex items-center justify-center"
+            >
+              <Heart className="w-4 h-4 mr-2" />
+              Wishlist
+            </Button>
+          </div>
         </div>
       </div>
+      <div className="mt-8 mb-8 max-w-4xl mx-auto">
+        <Tabs defaultValue="details" className="w-full">
+          <TabsList className="grid w-full grid-cols-2">
+            <TabsTrigger value="details">Product Details</TabsTrigger>
+            <TabsTrigger value="reviews">Rating & Reviews</TabsTrigger>
+          </TabsList>
+          <TabsContent value="details">
+            <Card>
+              <CardContent className="p-6">
+                <h3 className="text-2xl font-semibold mb-4">Description</h3>
+                <p className="text-gray-700 mb-6">{description}</p>
 
-      {/* Main Content */}
-      <div className="flex-grow pl-8 pr-8">
-        {/* Top Bar */}
-        <div className="flex justify-between items-center mb-6">
-          <h1 className="text-3xl font-bold">Products</h1>
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="outline">
-                Sort by: {sortBy} <ChevronDown className="ml-2 h-4 w-4" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent>
-              <DropdownMenuItem onClick={() => setSortBy("featured")}>
-                Featured
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => setSortBy("price-low-to-high")}>
-                Price: Low to High
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => setSortBy("price-high-to-low")}>
-                Price: High to Low
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => setSortBy("newest")}>
-                Newest
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </div>
+                <h3 className="text-xl font-semibold mb-2">Category</h3>
+                <p className="text-gray-700 mb-4">{category.name}</p>
 
-        {/* Product Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-          {currentProducts.map((product) => (
-            <Card key={product.id} className="overflow-hidden flex flex-col">
-              <div className="relative pt-[100%]">
-                <img
-                  src={product.image}
-                  alt={product.name}
-                  className="absolute top-0 left-0 w-full h-full object-cover"
-                />
-              </div>
-              <CardContent className="p-4 flex-grow">
-                <h3 className="text-lg font-semibold">{product.name}</h3>
-                <p className="text-sm text-gray-500">{product.category}</p>
-                <p className="text-lg font-bold mt-2">
-                  ${product.price.toFixed(2)}
-                </p>
-                <div className="flex items-center mt-2">
-                  {[...Array(5)].map((_, i) => (
-                    <Star
-                      key={i}
-                      className="w-4 h-4 fill-current text-yellow-400"
-                    />
-                  ))}
-                  <span className="ml-2 text-sm text-gray-600">
-                    4.5 (24 reviews)
-                  </span>
+                <h3 className="text-xl font-semibold mb-2">Specifications</h3>
+                <ul className="list-disc list-inside text-gray-700">
+                  <li>Sleeve: {productData.sleeve}</li>
+                  <li>Fit: {productData.fit}</li>
+                  <li>Total Stock: {productData.totalStock}</li>
+                </ul>
+              </CardContent>
+            </Card>
+          </TabsContent>
+          <TabsContent value="reviews">
+            <Card>
+              <CardContent className="p-6">
+                <h3 className="text-2xl font-semibold mb-4">
+                  Customer Reviews
+                </h3>
+                <p>No reviews yet.</p>
+                <div className="mt-8">
+                  <h3 className="text-2xl font-semibold mb-4">
+                    Write a Review
+                  </h3>
+                  <form onSubmit={handleSubmitReview} className="space-y-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Your Rating
+                      </label>
+                      <div className="flex gap-1">
+                        {[1, 2, 3, 4, 5].map((star) => (
+                          <Button
+                            key={star}
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            className={`p-1 ${
+                              userRating >= star
+                                ? "text-yellow-400"
+                                : "text-gray-300"
+                            }`}
+                            onClick={() => setUserRating(star)}
+                          >
+                            <Star className="w-5 h-5 fill-current" />
+                          </Button>
+                        ))}
+                      </div>
+                    </div>
+                    <div>
+                      <label
+                        htmlFor="review"
+                        className="block text-sm font-medium text-gray-700 mb-1"
+                      >
+                        Your Review
+                      </label>
+                      <Textarea
+                        id="review"
+                        placeholder="Write your review here..."
+                        value={reviewContent}
+                        onChange={(e) => setReviewContent(e.target.value)}
+                        rows={4}
+                      />
+                    </div>
+                    <Button
+                      type="submit"
+                      disabled={userRating === 0 || reviewContent.trim() === ""}
+                    >
+                      <MessageSquare className="w-4 h-4 mr-2" />
+                      Submit Review
+                    </Button>
+                  </form>
                 </div>
               </CardContent>
-              <CardFooter className="p-4 flex justify-between items-center">
-                <Button>Add to Cart</Button>
-                {product.stock <= 5 && (
-                  <Badge variant="destructive" className="ml-2">
-                    Only {product.stock} left!
-                  </Badge>
-                )}
-              </CardFooter>
             </Card>
-          ))}
-        </div>
-
-        {/* Pagination */}
-        <div className="mt-8 flex justify-center">
-          <nav className="inline-flex rounded-md shadow">
-            <Button
-              onClick={() => paginate(currentPage - 1)}
-              disabled={currentPage === 1}
-              className="rounded-l-md"
-            >
-              <ChevronLeft className="h-5 w-5" />
-            </Button>
-            {[...Array(Math.ceil(products.length / productsPerPage))].map(
-              (_, index) => (
-                <Button
-                  key={index}
-                  onClick={() => paginate(index + 1)}
-                  className={`${
-                    currentPage === index + 1
-                      ? "bg-primary text-primary-foreground"
-                      : "bg-background"
-                  }`}
-                >
-                  {index + 1}
-                </Button>
-              )
-            )}
-            <Button
-              onClick={() => paginate(currentPage + 1)}
-              disabled={
-                currentPage === Math.ceil(products.length / productsPerPage)
-              }
-              className="rounded-r-md"
-            >
-              <ChevronRight className="h-5 w-5" />
-            </Button>
-          </nav>
-        </div>
+          </TabsContent>
+        </Tabs>
       </div>
+
+      <AnimatePresence>
+        {isZoomModalOpen && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50"
+            onClick={closeZoomModal}
+          >
+            <motion.div
+              initial={{ scale: 0.5, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.5, opacity: 0 }}
+              transition={{ type: "spring", damping: 25, stiffness: 300 }}
+              className="relative max-w-[30vw] max-h-[100vh]"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <Button
+                variant="ghost"
+                size="icon"
+                className="absolute top-2 right-2 text-white hover:text-gray-200 z-10"
+                onClick={closeZoomModal}
+              >
+                <X className="h-6 w-6" />
+              </Button>
+              <img
+                src={images[selectedImage]}
+                alt="Zoomed product view"
+                className="w-full h-full object-contain"
+              />
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+      <RelatedProducts id={category._id} />
     </div>
   );
 }

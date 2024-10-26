@@ -11,6 +11,8 @@ import UserPrivate from "./Protected_Routing/user/UserPrivate";
 import ProfilePage from "@/pages/User/ProfilePage";
 import ProfileUpdate from "@/ReuseComponets/User/ProfileUpdate";
 import Address from "@/ReuseComponets/User/Address";
+import ShoppingCart from "@/ReuseComponets/User/Cart";
+import CartPage from "@/pages/User/HomePage/CartPage";
 // import DeliveryAddress from "@/ReuseComponets/User/DeliveryAddress";
 // import Orders from "@/ReuseComponets/User/Orders";
 // import Wallet from "@/ReuseComponets/User/Wallet";
@@ -48,6 +50,15 @@ const UserRoute = () => {
           element={
             <UserPrivate>
               <PurchasePage />
+            </UserPrivate>
+          }
+        />
+
+        <Route
+          path="/cart"
+          element={
+            <UserPrivate>
+              <CartPage />
             </UserPrivate>
           }
         />

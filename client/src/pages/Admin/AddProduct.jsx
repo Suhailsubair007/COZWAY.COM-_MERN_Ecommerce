@@ -26,6 +26,7 @@ export default function AddProduct() {
     name: "",
     description: "",
     price: "",
+    offerPrice: "",
     category: "",
     fit: "",
     sleeve: "",
@@ -68,11 +69,21 @@ export default function AddProduct() {
   const validateForm = useCallback(() => {
     let newErrors = {};
     if (!product.name.trim()) newErrors.name = "Name is required";
-    if (!isValidName(product.name.trim())) newErrors.name = "Name can only contain letters and spaces";
-    if (!product.description.trim()) newErrors.description = "Description is required";
-    if (!isValidDescription(product.description.trim())) newErrors.description = "Description contains invalid characters";
+    if (!isValidName(product.name.trim()))
+      newErrors.name = "Name can only contain letters and spaces";
+    if (!product.description.trim())
+      newErrors.description = "Description is required";
+    if (!isValidDescription(product.description.trim()))
+      newErrors.description = "Description contains invalid characters";
     if (!product.price || isNaN(product.price) || Number(product.price) <= 0) {
       newErrors.price = "Price must be a positive number";
+    }
+    if (
+      !product.offerPrice ||
+      isNaN(product.offerPrice) ||
+      Number(product.offerPrice) <= 0
+    ) {
+      newErrors.offerPrice = "Price must be a positive number";
     }
     if (!product.category) newErrors.category = "Category is required";
     if (!product.fit) newErrors.fit = "Fit is required";
@@ -88,25 +99,28 @@ export default function AddProduct() {
     return Object.keys(newErrors).length === 0;
   }, [product]);
 
-  const handleChange = useCallback((e) => {
-    const { name, value } = e.target;
+  const handleChange = useCallback(
+    (e) => {
+      const { name, value } = e.target;
 
-    if (name === 'name') {
-      if (isValidName(value)) {
-        setProduct(prev => ({ ...prev, [name]: value }));
+      if (name === "name") {
+        if (isValidName(value)) {
+          setProduct((prev) => ({ ...prev, [name]: value }));
+        }
+      } else if (name === "description") {
+        if (isValidDescription(value)) {
+          setProduct((prev) => ({ ...prev, [name]: value }));
+        }
+      } else {
+        setProduct((prev) => ({ ...prev, [name]: value }));
       }
-    } else if (name === 'description') {
-      if (isValidDescription(value)) {
-        setProduct(prev => ({ ...prev, [name]: value }));
-      }
-    } else {
-      setProduct(prev => ({ ...prev, [name]: value }));
-    }
 
-    if (errors[name]) {
-      setErrors(prev => ({ ...prev, [name]: null }));
-    }
-  }, [errors]);
+      if (errors[name]) {
+        setErrors((prev) => ({ ...prev, [name]: null }));
+      }
+    },
+    [errors]
+  );
 
   const handleSizeChange = (size, value) => {
     setProduct({
@@ -183,7 +197,16 @@ export default function AddProduct() {
 
     setIsSubmitting(true);
 
-    const { name, description, price, category, fit, sleeve, sizes } = product;
+    const {
+      name,
+      description,
+      price,
+      offerPrice,
+      category,
+      fit,
+      sleeve,
+      sizes,
+    } = product;
 
     const sizeArray = Object.entries(sizes).map(([size, stock]) => ({
       size,
@@ -203,6 +226,7 @@ export default function AddProduct() {
       name,
       description,
       price: Number(price),
+      offerPrice: Number(offerPrice),
       category,
       fit,
       sleeve,
@@ -216,7 +240,7 @@ export default function AddProduct() {
         newProduct
       );
       if (response.status === 201) {
-        navigate('/admin/product')
+        navigate("/admin/product");
         toast.success("Product added successfully!");
       } else {
         toast.error("Failed to add product.");
@@ -304,12 +328,24 @@ export default function AddProduct() {
               />
 
               <Input
-                placeholder="₹ 1399"
+                placeholder="Price of product"
                 label="Price"
                 name="price"
                 value={product.price}
                 onChange={handleChange}
                 error={errors.price}
+                type="number"
+                min="0"
+                step="0.01"
+              />
+
+              <Input
+                placeholder="Offer price of product"
+                label="Offer Price"
+                name="offerPrice" 
+                value={product.offerPrice}
+                onChange={handleChange}
+                error={errors.offerPrice}
                 type="number"
                 min="0"
                 step="0.01"
@@ -334,7 +370,9 @@ export default function AddProduct() {
                     ))}
                   </SelectContent>
                 </Select>
-                {errors.category && <p className="text-red-500 text-sm">{errors.category}</p>}
+                {errors.category && (
+                  <p className="text-red-500 text-sm">{errors.category}</p>
+                )}
 
                 <Select
                   onValueChange={(value) =>
@@ -350,7 +388,9 @@ export default function AddProduct() {
                     <SelectItem value="loose">Loose Fit</SelectItem>
                   </SelectContent>
                 </Select>
-                {errors.fit && <p className="text-red-500 text-sm">{errors.fit}</p>}
+                {errors.fit && (
+                  <p className="text-red-500 text-sm">{errors.fit}</p>
+                )}
 
                 <Select
                   onValueChange={(value) =>
@@ -366,7 +406,9 @@ export default function AddProduct() {
                     <SelectItem value="sleeveless">Elbow Sleeve</SelectItem>
                   </SelectContent>
                 </Select>
-                {errors.sleeve && <p className="text-red-500 text-sm">{errors.sleeve}</p>}
+                {errors.sleeve && (
+                  <p className="text-red-500 text-sm">{errors.sleeve}</p>
+                )}
               </div>
 
               <div className="space-y-4">
@@ -385,9 +427,13 @@ export default function AddProduct() {
                     </div>
                   ))}
                 </div>
-                {Object.entries(errors).filter(([key]) => key.startsWith('sizes.')).map(([key, value]) => (
-                  <p key={key} className="text-red-500 text-sm">{value}</p>
-                ))}
+                {Object.entries(errors)
+                  .filter(([key]) => key.startsWith("sizes."))
+                  .map(([key, value]) => (
+                    <p key={key} className="text-red-500 text-sm">
+                      {value}
+                    </p>
+                  ))}
               </div>
             </div>
 
@@ -434,7 +480,7 @@ export default function AddProduct() {
                     onValueChange={(value) => setZoom(value[0])}
                   />
                 </div>
-                <Button  onClick={saveCroppedImage} className="mt-4 w-full">
+                <Button onClick={saveCroppedImage} className="mt-4 w-full">
                   <Save className="h-4 w-4 mr-2" />
                   Save Cropped Image
                 </Button>

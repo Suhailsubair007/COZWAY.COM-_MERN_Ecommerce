@@ -1,7 +1,17 @@
 import { useState, useEffect } from "react";
 import RelatedProducts from "./RelatedProduct";
+import { useSelector } from "react-redux";
 import { Badge } from "@/components/ui/badge";
-import { ChevronRight, Home } from "lucide-react"
+import { ChevronRight, Home } from "lucide-react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { useParams } from "react-router-dom";
+import axiosInstance from "@/config/axiosConfig";
+import { motion, AnimatePresence } from "framer-motion";
+import { toast } from "sonner";
 import {
   Star,
   MessageSquare,
@@ -18,43 +28,81 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { useParams } from "react-router-dom";
-import axiosInstance from "@/config/axiosConfig";
-import { motion, AnimatePresence } from "framer-motion";
 
-export default function Component() {
+const ProductDetail = () => {
+  const userId = useSelector((state) => state.user.userInfo.id);
   const [selectedImage, setSelectedImage] = useState(0);
   const [productName, setProductName] = useState("");
   const [selectedSize, setSelectedSize] = useState(null);
-  const [isLoading, setIsLoading] = useState(true)
+  const [isLoading, setIsLoading] = useState(true);
   const [userRating, setUserRating] = useState(0);
   const [reviewContent, setReviewContent] = useState("");
   const [productData, setProductData] = useState(null);
   const [isZoomModalOpen, setIsZoomModalOpen] = useState(false);
+  const [isInCart, setIsInCart] = useState(false);
   const { id } = useParams();
+
+  console.log("user daraaaaaaaaaa:", userId);
 
   useEffect(() => {
     const fetchProduct = async () => {
       try {
         const response = await axiosInstance.get(`/users/product/${id}`);
-        console.log(response.data);
         setProductData(response.data);
-        // console.log(response.data.name)
         setProductName(response.data.name);
+        setIsLoading(false);
       } catch (error) {
         console.error("Failed to fetch product details:", error);
+        setIsLoading(false);
       }
     };
     if (id) {
       fetchProduct();
     }
   }, [id]);
-console.log(productName)
+
+  const handleAddToCart = async () => {
+    if (!selectedSize) {
+      toast.warning("You must choose a size before adding to cart.");
+      return;
+    }
+    const selectedProduct = productData.sizes.find(
+      (sizeObj) => sizeObj.size === selectedSize
+    );
+    if (!selectedProduct) {
+      toast.error("Selected size is not available.");
+      return;
+    }
+
+    const { stock } = selectedProduct;
+
+    try {
+      const response = await axiosInstance.post("/users/add-to-cart", {
+        userId,
+        product: {
+          productId: id,
+          price: productData.price,
+          offerPrice: productData.offerPrice,
+          quantity: 1,
+          stock,
+          size: selectedSize,
+        },
+      });
+
+      console.log(response)
+      if (response.data.success) {
+        setIsInCart(true);
+        toast.success("The product has been added to your cart.");
+      } else if (response.data.message === "Product is already in cart") {
+        setIsInCart(true);
+        toast.warning("This item is already in your cart.");
+      }
+    } catch (error) {
+      console.error("Failed to add product to cart:", error);
+      toast.error("Failed to add the product to your cart. Please try again.");
+    }
+  };
+
   const handleSubmitReview = (e) => {
     e.preventDefault();
     console.log("Submitted review:", {
@@ -73,11 +121,16 @@ console.log(productName)
     setIsZoomModalOpen(false);
   };
 
-  if (!productData) {
+  if (isLoading) {
     return <div>Loading...</div>;
   }
 
-  const { name, price, images, sizes, description, category } = productData;
+  if (!productData) {
+    return <div>Product not found</div>;
+  }
+
+  const { name, price, offerPrice, images, sizes, description, category } =
+    productData;
 
   const dummyCoupons = [
     { code: "SUMMER10", discount: "10% off" },
@@ -107,14 +160,13 @@ console.log(productName)
               <ChevronRight className="h-4 w-4" />
             </BreadcrumbSeparator>
             <BreadcrumbItem>
-              <BreadcrumbPage>
-                {productName}
-              </BreadcrumbPage>
+              <BreadcrumbPage>{productName}</BreadcrumbPage>
             </BreadcrumbItem>
           </BreadcrumbList>
         </Breadcrumb>
       </div>
       <div className="flex flex-col md:flex-row gap-8 p-6 px-[100px] max-w-6xl mx-auto">
+        {/* Product images code... */}
         <div className="flex gap-4">
           <div className="flex flex-col gap-2">
             {images.map((img, index) => (
@@ -142,7 +194,12 @@ console.log(productName)
         </div>
         <div className="flex-1 space-y-5">
           <h1 className="text-3xl font-bold">{name}</h1>
-          <p className="text-2xl font-semibold">₹{price.toFixed(2)}</p>
+          <div className="flex items-center space-x-2">
+            <p className="text-2xl font-semibold">₹{offerPrice.toFixed(2)}</p>
+            <p className="text-[16px] font-thin line-through text-gray-500">
+              ₹{price.toFixed(2)}
+            </p>
+          </div>
           {productData.totalStock === 0 ? (
             <p className="text-red-500 font-semibold">Out of stock!</p>
           ) : (
@@ -152,6 +209,7 @@ console.log(productName)
               </p>
             )
           )}
+          {/* Rating stars... */}
 
           <div className="flex items-center gap-1">
             {[...Array(5)].map((_, i) => (
@@ -166,6 +224,7 @@ console.log(productName)
             ))}
             <span className="text-sm text-gray-600">(4.5)</span>
           </div>
+          {/* Available Coupons... */}
           <div className="space-y-2">
             <p className="font-semibold">Available Coupons:</p>
             {dummyCoupons.map((coupon, index) => (
@@ -174,6 +233,7 @@ console.log(productName)
               </Badge>
             ))}
           </div>
+
           <div>
             <p className="font-semibold mb-3">Select Size:</p>
             <div className="flex gap-1">
@@ -197,7 +257,13 @@ console.log(productName)
             </div>
           </div>
           <div className="flex flex-col gap-3">
-            <Button className="w-[400px] py-6">Add to Cart</Button>
+            <Button
+              className="w-[400px] py-6"
+              onClick={handleAddToCart}
+              disabled={productData.totalStock === 0 || isInCart}
+            >
+              {isInCart ? "Go to Cart" : "Add to Cart"}
+            </Button>
             <Button
               variant="outline"
               className="w-[400px] py-3 flex items-center justify-center"
@@ -208,6 +274,8 @@ console.log(productName)
           </div>
         </div>
       </div>
+      {/* Rest of the component (Tabs, Reviews, Zoom Modal)... */}
+
       <div className="mt-8 mb-8 max-w-4xl mx-auto">
         <Tabs defaultValue="details" className="w-full">
           <TabsList className="grid w-full grid-cols-2">
@@ -334,4 +402,6 @@ console.log(productName)
       <RelatedProducts id={category._id} />
     </div>
   );
-}
+};
+
+export default ProductDetail;

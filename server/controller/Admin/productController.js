@@ -4,8 +4,8 @@ const Product = require('../../model/Product')
 
 const addProduct = async (req, res) => {
     try {
-        const { name, description, price, category, fit, sleeve, sizes, images } = req.body;
-        if (!name || !description || !price || !category || !fit || !sleeve || !sizes || !images) {
+        const { name, description, price, offerPrice, category, fit, sleeve, sizes, images } = req.body;
+        if (!name || !description || !price || !offerPrice || !category || !fit || !sleeve || !sizes || !images) {
             return res.status(400).json({ message: 'All fields are required.' });
         }
         const totalStock = sizes.reduce((total, size) => total + size.stock, 0);
@@ -19,6 +19,7 @@ const addProduct = async (req, res) => {
             name,
             description,
             price,
+            offerPrice,
             category,
             fit,
             sleeve,
@@ -48,7 +49,7 @@ const getProduct = async (req, res) => {
 
         const formattedProducts = products.map(product => ({
             ...product.toObject(),
-            category: product.category.name, 
+            category: product.category.name,
         }));
         res.status(200).json(formattedProducts);
     } catch (error) {
@@ -89,15 +90,17 @@ const updateProductStatus = async (req, res) => {
 const updateProduct = async (req, res) => {
     try {
         const { id } = req.params;
-        const { name, description, price, category, fit, sleeve, sizes, images } = req.body;
+        const { name, description, offerPrice, price, category, fit, sleeve, sizes, images } = req.body;
 
         if (!id) {
             return res.status(400).json({ message: 'Product ID is required.' });
         }
+
         const existingProduct = await Product.findById(id);
         if (!existingProduct) {
             return res.status(404).json({ message: 'Product not found.' });
         }
+
         if (category) {
             const existingCategory = await Category.findById(category);
             if (!existingCategory) {
@@ -105,9 +108,11 @@ const updateProduct = async (req, res) => {
             }
         }
 
+        // Update fields only if they are provided in the request
         existingProduct.name = name || existingProduct.name;
         existingProduct.description = description || existingProduct.description;
         existingProduct.price = price || existingProduct.price;
+        existingProduct.offerPrice = offerPrice !== undefined ? offerPrice : existingProduct.offerPrice;
         existingProduct.category = category || existingProduct.category;
         existingProduct.fit = fit || existingProduct.fit;
         existingProduct.sleeve = sleeve || existingProduct.sleeve;
@@ -130,6 +135,7 @@ const updateProduct = async (req, res) => {
         res.status(500).json({ message: 'Server error. Please try again later.' });
     }
 };
+
 
 
 const fetchProductById = async (req, res) => {
