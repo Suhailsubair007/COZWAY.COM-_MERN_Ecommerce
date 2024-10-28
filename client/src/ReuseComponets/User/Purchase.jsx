@@ -8,7 +8,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { useParams,useNavigate } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import axiosInstance from "@/config/axiosConfig";
 import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
@@ -69,7 +69,7 @@ const ProductDetail = () => {
           params: { userId, productId: id, size: selectedSize },
         });
         const cart = response.data;
-        console.log("Checking size in cart..",cart);
+        console.log("Checking size in cart..", cart);
 
         setIsInCart(cart.inCart);
       } catch (error) {
@@ -114,7 +114,7 @@ const ProductDetail = () => {
       if (response.status === 200) {
         setIsInCart(true);
         toast.success("The product has been added to your cart.");
-        navigate('/cart')
+        navigate("/cart");
       } else if (response.data.message === "Product is already in cart") {
         setIsInCart(true);
         toast.warning("This item is already in your cart.");
@@ -143,6 +143,9 @@ const ProductDetail = () => {
 
   const closeZoomModal = () => {
     setIsZoomModalOpen(false);
+  };
+  const goToCart = () => {
+    navigate("/cart");
   };
 
   if (isLoading) {
@@ -284,9 +287,16 @@ const ProductDetail = () => {
             <Button
               className="w-[400px] py-6"
               onClick={handleAddToCart}
-              disabled={productData.totalStock === 0}
+              disabled={productData.totalStock === 0 || isInCart}
             >
-              {isInCart ? "Go to Cart" : "Add to Cart"}
+              Add to Cart
+            </Button>
+            <Button
+              className="w-[400px] py-6"
+              onClick={goToCart}
+              disabled={!isInCart}
+            >
+              Go to Cart
             </Button>
             <Button
               variant="outline"
