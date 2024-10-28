@@ -7,122 +7,117 @@ import { useSelector } from "react-redux";
 import EmptyCart from "./EmptyCart";
 import { toast } from "sonner";
 
+const CartItem = ({ item, onUpdateQuantity, onRemove }) => {
+  const [maxQuantity, setMaxQuantity] = useState(5);
 
-//cart card...
-const CartItem = ({ item, onUpdateQuantity, onRemove }) => (
-  <div className="flex items-center py-3">
-    <img
-      src={item.productId.images[0]}
-      alt={item.productId.name}
-      className="w-20 h-28 object-cover mr-3"
-    />
-    <div className="flex-grow">
-      <h3 className="font-semibold text-base">{item.productId.name}</h3>
-      <p className="text-xs text-gray-600">
-        Category: {item.productId.category.name}
-      </p>
-      <p className="text-xs text-gray-600">
-        Size: {item.size} | Fit: {item.productId.fit} | Sleeve:{" "}
-        {item.productId.sleeve}
-      </p>
-      <div className="flex items-center mt-1">
-        <Button
-          variant="outline"
-          size="icon"
-          onClick={() => {
-            const sizeData = item.productId.sizes.find(
-              (s) => s.size === item.size
-            );
-            onUpdateQuantity(
-              item._id,
-              Math.max(1, item.quantity - 1),
-              item.size
-            );
-          }}
-        >
-          <MinusIcon className="h-3 w-3" />
-        </Button>
-        <span className="mx-2 w-6 text-center text-sm">{item.quantity}</span>
-        <Button
-          variant="outline"
-          size="icon"
-          onClick={() => {
-            const sizeData = item.productId.sizes.find(
-              (s) => s.size === item.size
-            );
-            if (sizeData) {
-              const maxQuantity = Math.min(sizeData.stock, 5);
+  useEffect(() => {
+    const sizeData = item.productId.sizes.find((s) => s.size === item.size);
+    if (sizeData) {
+      setMaxQuantity(Math.min(sizeData.stock, 5));
+    }
+  }, [item]);
 
-              if (item.quantity + 1 > 5) {
-                toast.info("Maximum 5 items allowed per size");
-              } else if (item.quantity + 1 > sizeData.stock) {
-                toast.info(
-                  `Only ${sizeData.stock} items available for size ${item.size}`
-                );
-              } else {
-                onUpdateQuantity(item._id, item.quantity + 1, item.size);
-              }
+  return (
+    <div className="flex items-center py-3">
+      <img
+        src={item.productId.images[0]}
+        alt={item.productId.name}
+        className="w-20 h-28 object-cover mr-3"
+      />
+      <div className="flex-grow">
+        <h3 className="font-semibold text-base">{item.productId.name}</h3>
+        <p className="text-xs text-gray-600">
+          Category: {item.productId.category.name}
+        </p>
+        <p className="text-xs text-gray-600">
+          Size: {item.size} | Fit: {item.productId.fit} | Sleeve:{" "}
+          {item.productId.sleeve}
+        </p>
+        <div className="flex items-center mt-1">
+          <Button
+            variant="outline"
+            size="icon"
+            onClick={() =>
+              onUpdateQuantity(
+                item._id,
+                Math.max(1, item.quantity - 1),
+                item.size
+              )
             }
-          }}
+          >
+            <MinusIcon className="h-3 w-3" />
+          </Button>
+          <span className="mx-2 w-6 text-center text-sm">{item.quantity}</span>
+          <Button
+            variant="outline"
+            size="icon"
+            onClick={() => {
+              if (item.quantity < maxQuantity) {
+                onUpdateQuantity(item._id, item.quantity + 1, item.size);
+              } else {
+                toast.info(
+                  `Maximum ${maxQuantity} items allowed for size ${item.size}`
+                );
+              }
+            }}
+          >
+            <PlusIcon className="h-3 w-3" />
+          </Button>
+        </div>
+      </div>
+      <div className="text-right">
+        <p className="font-bold text-base">
+          ₹{(item.price * item.quantity).toFixed(2)}
+        </p>
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() => onRemove(item._id)}
+          className="mt-1"
         >
-          <PlusIcon className="h-3 w-3" />
+          <TrashIcon className="h-3 w-3 mr-1" />
+          <span className="text-xs">Remove</span>
         </Button>
       </div>
     </div>
-    <div className="text-right">
-      <p className="font-bold text-base">
-        ₹{(item.price * item.quantity).toFixed(2)}
-      </p>
-      <Button
-        variant="ghost"
-        size="sm"
-        onClick={() => onRemove(item._id)}
-        className="mt-1"
-      >
-        <TrashIcon className="h-3 w-3 mr-1" />
-        <span className="text-xs">Remove</span>
-      </Button>
-    </div>
-  </div>
-);
+  );
+};
 
 const ShoppingCart = () => {
   const [cartItems, setCartItems] = useState([]);
   const userId = useSelector((state) => state.user.userInfo.id);
 
-  //fetching cart items...
   useEffect(() => {
     fetchCart();
   }, [userId]);
 
-  //function for fetchcart items...
   const fetchCart = async () => {
     try {
       const response = await axiosInstance.get(`/users/cart/${userId}`);
       setCartItems(response.data.cartItems);
-      console.log("Cart items :", response.data.cartItems);
     } catch (error) {
       console.error("Error fetching cart:", error);
     }
   };
 
-  //updating quantity..
   const updateQuantity = async (itemId, newQuantity, size) => {
     try {
-      const item = cartItems.find((cartItem) => cartItem._id === itemId);
-      const sizeData = item.productId.sizes.find((s) => s.size === size);
-
-      if (newQuantity > sizeData.stock) {
-        toast.warning(`Only ${sizeData.stock} items left for ${size} size`);
-        return;
+      const response = await axiosInstance.patch(
+        `/users/quantity/${userId}/${itemId}`,
+        {
+          quantity: newQuantity,
+          size: size,
+        }
+      );
+      console.log("Increment and decrementing fetch :",response.data)
+      if (response.data.success) {
+        fetchCart();
+      } else {
+        toast.error(response.data.message);
       }
-      console.log("sizes is :", size);
-      await axiosInstance.patch(`/users/quantity/${userId}/${itemId}`, {
-        quantity: newQuantity,
-      });
-      fetchCart();
     } catch (error) {
       console.error("Error updating quantity:", error);
+      toast.error("Failed to update quantity");
     }
   };
 
