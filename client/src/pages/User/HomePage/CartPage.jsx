@@ -7,7 +7,9 @@ const CartPage = () => {
   return (
     <div>
       <Header />
-      <ShoppingCart />
+      <div className="min-h-[calc(100vh-200px)]">
+        <ShoppingCart />
+      </div>
       <Footer />
     </div>
   );

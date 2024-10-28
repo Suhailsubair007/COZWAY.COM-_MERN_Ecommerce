@@ -45,6 +45,10 @@ router.patch('/addresses/:id', address.updateUserAddress);
 
 //cart mangement routess...
 router.post('/add-to-cart', cartController.addToCart);
+router.get('/get-cart-details', cartController.getCartDetails);
+router.get('/cart/:userId', cartController.getAllCartItems);
+router.delete('/delete/:id/:pr_id', cartController.deleteItem);
+router.patch('/quantity/:userId/:itemId', cartController.updateCartItemQuantity);
 
 
 module.exports = router;

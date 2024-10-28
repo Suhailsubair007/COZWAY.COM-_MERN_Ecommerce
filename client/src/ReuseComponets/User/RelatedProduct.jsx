@@ -1,16 +1,18 @@
 import { useState, useEffect } from "react";
 import axiosInstance from "@/config/axiosConfig";
-import { useParams } from 'react-router-dom';
+import { useParams } from "react-router-dom";
 
 export default function RelatedProducts({ id }) {
-  console.log("category id :",id)
+  console.log("category id :", id);
   const [relatedProducts, setRelatedProducts] = useState([]);
 
   useEffect(() => {
     const fetchRelatedProducts = async () => {
       try {
-        const response = await axiosInstance.get(`/users/products/related/${id}`);
-        console.log(response.data)
+        const response = await axiosInstance.get(
+          `/users/products/related/${id}`
+        );
+        console.log(response.data);
         setRelatedProducts(response.data);
       } catch (error) {
         console.error("Failed to fetch related products:", error);
@@ -28,7 +30,11 @@ export default function RelatedProducts({ id }) {
         <h2 className="text font-bold text-center mb-8">YOU MAY ALSO LIKE</h2>
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
           {relatedProducts.map((product) => (
-            <a key={product.id} href={`/product/${product._id}`} className="group">
+            <a
+              key={product._id}
+              href={`/product/${product._id}`}
+              className="group"
+            >
               <div className="aspect-[3/4] relative overflow-hidden bg-gray-100 rounded-sm">
                 <img
                   src={product.images[0]}
