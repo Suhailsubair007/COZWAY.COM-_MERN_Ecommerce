@@ -107,7 +107,7 @@ const ShoppingPage = () => {
           image: product.images[0],
           id: product._id,
           description: product.description,
-          price: product.price,
+          price: product.offerPrice,
           category: product.category,
           stock: product.totalStock,
         }));

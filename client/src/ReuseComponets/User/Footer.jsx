@@ -1,43 +1,43 @@
-'use client'
+"use client";
 
-import { useState } from 'react'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Facebook, Twitter, Instagram, Github } from 'lucide-react'
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Facebook, Twitter, Instagram, Github } from "lucide-react";
 
 export default function Footer() {
-  const [email, setEmail] = useState('')
-  const [error, setError] = useState('')
-  const [success, setSuccess] = useState(false)
+  const [email, setEmail] = useState("");
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState(false);
 
   const handleSubmit = (e) => {
-    e.preventDefault()
-    setError('')
-    setSuccess(false)
+    e.preventDefault();
+    setError("");
+    setSuccess(false);
 
     if (!email) {
-      setError('Please enter your email')
-      return
+      setError("Please enter your email");
+      return;
     }
 
     if (!/\S+@\S+\.\S+/.test(email)) {
-      setError('Please enter a valid email address')
-      return
+      setError("Please enter a valid email address");
+      return;
     }
 
     // Here you would typically send the email to your server
-    console.log('Subscribing email:', email)
-    setSuccess(true)
-    setEmail('')
-  }
+    console.log("Subscribing email:", email);
+    setSuccess(true);
+    setEmail("");
+  };
 
   return (
-    <footer className="bg-background text-foreground">
-      <div className="container mx-auto px-4 py-12">
+    <footer className="bg-gray-200 text-foreground">
+      <div className="container mx-auto px-[120px] py-12">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           <div className="space-y-4">
             <img
-              className="h-8 w-auto"
+              className="h-6 w-auto"
               src="https://res.cloudinary.com/dupo7yv88/image/upload/v1728535931/logo-no-background_dx8qjo.png"
               alt="Company logo"
             />
@@ -63,9 +63,12 @@ export default function Footer() {
           <div>
             <h3 className="font-semibold mb-4">Company</h3>
             <ul className="space-y-2">
-              {['About', 'Features', 'Works', 'Career'].map((item) => (
+              {["About", "Features", "Works", "Career"].map((item) => (
                 <li key={item}>
-                  <a href="#" className="text-sm text-muted-foreground hover:text-primary">
+                  <a
+                    href="#"
+                    className="text-sm text-muted-foreground hover:text-primary"
+                  >
                     {item}
                   </a>
                 </li>
@@ -76,9 +79,17 @@ export default function Footer() {
           <div>
             <h3 className="font-semibold mb-4">Help</h3>
             <ul className="space-y-2">
-              {['Customer Support', 'Delivery Details', 'Terms & Conditions', 'Privacy Policy'].map((item) => (
+              {[
+                "Customer Support",
+                "Delivery Details",
+                "Terms & Conditions",
+                "Privacy Policy",
+              ].map((item) => (
                 <li key={item}>
-                  <a href="#" className="text-sm text-muted-foreground hover:text-primary">
+                  <a
+                    href="#"
+                    className="text-sm text-muted-foreground hover:text-primary"
+                  >
                     {item}
                   </a>
                 </li>
@@ -97,7 +108,11 @@ export default function Footer() {
                 className="w-full"
               />
               {error && <p className="text-destructive text-sm">{error}</p>}
-              {success && <p className="text-green-600 text-sm">Thank you for subscribing!</p>}
+              {success && (
+                <p className="text-green-600 text-sm">
+                  Thank you for subscribing!
+                </p>
+              )}
               <Button type="submit" className="w-full">
                 Subscribe
               </Button>
@@ -105,12 +120,12 @@ export default function Footer() {
           </div>
         </div>
 
-        <div className="mt-12 pt-8 border-t border-border">
+        <div className="mt-16 mb-4 flex justify-center items-center  pt-4 border-t border-border">
           <p className="text-center text-sm text-muted-foreground">
             © {new Date().getFullYear()} Your Company Name. All rights reserved.
           </p>
         </div>
       </div>
     </footer>
-  )
+  );
 }

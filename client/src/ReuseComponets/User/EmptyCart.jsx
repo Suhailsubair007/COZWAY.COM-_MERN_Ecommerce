@@ -1,8 +1,12 @@
 import React from "react";
 import { Button } from "@/components/ui/button";
 import { ShoppingCart as ShoppingCartIcon } from "lucide-react";
-import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 const EmptyCart = () => {
+  const navigate = useNavigate();
+  const handleShop = () => {
+    navigate("/shop");
+  };
   return (
     <div>
       <div className="flex flex-col items-center justify-center h-[calc(100vh-200px)]">
@@ -11,9 +15,10 @@ const EmptyCart = () => {
         <p className="text-gray-500 mb-4">
           Looks like you haven't added any items to your cart yet.
         </p>
-        <Link href="/shop">
-          <Button className="px-6 py-2">Start Shopping</Button>
-        </Link>
+
+        <Button onClick={handleShop} className="px-6 py-2">
+          Start Shopping
+        </Button>
       </div>
     </div>
   );

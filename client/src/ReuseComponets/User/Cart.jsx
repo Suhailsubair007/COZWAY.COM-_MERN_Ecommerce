@@ -1,22 +1,14 @@
 import React, { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
-import { MinusIcon, PlusIcon, TrashIcon } from "lucide-react";
+import { MinusIcon, PlusIcon, TrashIcon, ChevronRight } from "lucide-react";
 import axiosInstance from "@/config/axiosConfig";
 import { useSelector } from "react-redux";
 import EmptyCart from "./EmptyCart";
 import { toast } from "sonner";
+import { useNavigate } from "react-router-dom";
 
 const CartItem = ({ item, onUpdateQuantity, onRemove }) => {
-  const [maxQuantity, setMaxQuantity] = useState(5);
-
-  useEffect(() => {
-    const sizeData = item.productId.sizes.find((s) => s.size === item.size);
-    if (sizeData) {
-      setMaxQuantity(Math.min(sizeData.stock, 5));
-    }
-  }, [item]);
-
   return (
     <div className="flex items-center py-3">
       <img
@@ -29,21 +21,12 @@ const CartItem = ({ item, onUpdateQuantity, onRemove }) => {
         <p className="text-xs text-gray-600">
           Category: {item.productId.category.name}
         </p>
-        <p className="text-xs text-gray-600">
-          Size: {item.size} | Fit: {item.productId.fit} | Sleeve:{" "}
-          {item.productId.sleeve}
-        </p>
+        <p className="text-sm text-gray-900">Size: {item.size}</p>
         <div className="flex items-center mt-1">
           <Button
             variant="outline"
             size="icon"
-            onClick={() =>
-              onUpdateQuantity(
-                item._id,
-                Math.max(1, item.quantity - 1),
-                item.size
-              )
-            }
+            onClick={() => onUpdateQuantity(item, "decrease")}
           >
             <MinusIcon className="h-3 w-3" />
           </Button>
@@ -51,15 +34,7 @@ const CartItem = ({ item, onUpdateQuantity, onRemove }) => {
           <Button
             variant="outline"
             size="icon"
-            onClick={() => {
-              if (item.quantity < maxQuantity) {
-                onUpdateQuantity(item._id, item.quantity + 1, item.size);
-              } else {
-                toast.info(
-                  `Maximum ${maxQuantity} items allowed for size ${item.size}`
-                );
-              }
-            }}
+            onClick={() => onUpdateQuantity(item, "increase")}
           >
             <PlusIcon className="h-3 w-3" />
           </Button>
@@ -67,12 +42,12 @@ const CartItem = ({ item, onUpdateQuantity, onRemove }) => {
       </div>
       <div className="text-right">
         <p className="font-bold text-base">
-          ₹{(item.price * item.quantity).toFixed(2)}
+          ₹{(item.offerPrice * item.quantity).toFixed(2)}
         </p>
         <Button
           variant="ghost"
           size="sm"
-          onClick={() => onRemove(item._id)}
+          onClick={() => onRemove(item)}
           className="mt-1"
         >
           <TrashIcon className="h-3 w-3 mr-1" />
@@ -83,10 +58,13 @@ const CartItem = ({ item, onUpdateQuantity, onRemove }) => {
   );
 };
 
-const ShoppingCart = () => {
+export default function ShoppingCart() {
+  const navigate = useNavigate();
   const [cartItems, setCartItems] = useState([]);
+  const [subtotal, setSubtotal] = useState(0);
   const userId = useSelector((state) => state.user.userInfo.id);
 
+  // Fetch cart items and calculate subtotal
   useEffect(() => {
     fetchCart();
   }, [userId]);
@@ -94,48 +72,59 @@ const ShoppingCart = () => {
   const fetchCart = async () => {
     try {
       const response = await axiosInstance.get(`/users/cart/${userId}`);
-      setCartItems(response.data.cartItems);
+      console.log(response.data.cartItems);
+      setCartItems(response.data.cartItems.products);
+
+      setSubtotal(response.data.cartItems.totalCartPrice);
     } catch (error) {
       console.error("Error fetching cart:", error);
+      if (error.response) {
+        toast.error(error.response.data.message);
+      }
     }
   };
 
-  const updateQuantity = async (itemId, newQuantity, size) => {
+  const updateQuantity = async (item, action) => {
     try {
-      const response = await axiosInstance.patch(
-        `/users/quantity/${userId}/${itemId}`,
-        {
-          quantity: newQuantity,
-          size: size,
-        }
+      const endpoint = action === "increase" ? "add" : "min";
+      await axiosInstance.patch(
+        `/users/quantity/${endpoint}/${userId}/${item._id}`
       );
-      console.log("Increment and decrementing fetch :",response.data)
-      if (response.data.success) {
-        fetchCart();
-      } else {
-        toast.error(response.data.message);
-      }
+      fetchCart();
     } catch (error) {
       console.error("Error updating quantity:", error);
-      toast.error("Failed to update quantity");
+      if (error.response) {
+        toast.error(error.response.data.message);
+      }
     }
   };
 
-  const removeItem = async (itemId) => {
+  const removeItem = async (item) => {
     try {
-      await axiosInstance.delete(`/users/delete/${userId}/${itemId}`);
+      const response = await axiosInstance.delete(
+        `/users/delete/${userId}/${item._id}`
+      );
+      toast.success(response.data.message);
       fetchCart();
     } catch (error) {
       console.error("Error removing item from cart:", error);
+      if (error.response) {
+        toast.error(error.response.data.message);
+      }
     }
   };
 
-  const subtotal = cartItems.reduce(
-    (sum, item) => sum + item.price * item.quantity,
-    0
-  );
+  // const calculateSubtotal = (items) => {
+  //   const newSubtotal = items.reduce(
+  //     (acc, item) => acc + item.price * item.quantity,
+  //     0
+  //   );
+  //   setSubtotal(newSubtotal);
+  // };
 
-  const total = subtotal;
+  const handleCheckout = () => {
+    navigate("/checkout");
+  };
 
   return (
     <div className="container mx-auto px-6 py-4">
@@ -145,14 +134,14 @@ const ShoppingCart = () => {
       ) : (
         <div className="flex flex-col md:flex-row gap-6">
           <div className="md:w-2/3">
-            {cartItems.map((item, index) => (
+            {cartItems.map((item) => (
               <React.Fragment key={item._id}>
                 <CartItem
                   item={item}
                   onUpdateQuantity={updateQuantity}
                   onRemove={removeItem}
                 />
-                {index < cartItems.length - 1 && <Separator />}
+                <Separator />
               </React.Fragment>
             ))}
           </div>
@@ -166,15 +155,16 @@ const ShoppingCart = () => {
               <Separator className="my-3" />
               <div className="flex justify-between text-base font-bold">
                 <span>Total</span>
-                <span>₹{total.toFixed(2)}</span>
+                <span>₹{subtotal.toFixed(2)}</span>
               </div>
-              <Button className="w-full mt-4">Proceed to Checkout</Button>
+              <Button onClick={handleCheckout} className="w-full mt-4">
+                Go to Checkout
+                <ChevronRight className="ml-2 h-4 w-4" />
+              </Button>
             </div>
           </div>
         </div>
       )}
     </div>
   );
-};
-
-export default ShoppingCart;
+}
