@@ -11,9 +11,12 @@ import AddAddressModal from "./AddNewAddress";
 import paypal from "../../assets/image/pay.png";
 import { CreditCard, Smartphone, Banknote, Wallet } from "lucide-react";
 import { toast } from "sonner";
+import OrderConfirmationModal from "./OrderConfirmModal";
 
 const CheckoutPage = () => {
   const [addresses, setAddresses] = useState([]);
+  const [showConfirmation, setShowConfirmation] = useState(false);
+  const [placedOrder, setPlacedOrder] = useState(null);
   const [items, setItems] = useState([]);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [selectedAddress, setSelectedAddress] = useState("");
@@ -69,32 +72,30 @@ const CheckoutPage = () => {
       toast(
         "Please select both a delivery address and a payment method before placing your order."
       );
-      return; // Stop further execution if validation fails
+      return;
     }
 
-    // Find the selected address based on the selected address ID
     const addressToSend = addresses.find(
       (address) => address._id === selectedAddress
     );
 
     if (!addressToSend) {
       toast("Selected address not found.");
-      return; // Stop further execution if address not found
+      return;
     }
 
     try {
       const response = await axiosInstance.post(`/users/order/`, {
         userId: user,
         order_items: items,
-        address: addressToSend, // Send the full address object
-        payment_method: selectedPaymentMethod, // Use the correct variable name
-        subtotal, // Include subtotal in the request
+        address: addressToSend,
+        payment_method: selectedPaymentMethod,
+        subtotal,
       });
 
-      console.log(response);
-      // Handle successful order placement
-      toast("Order placed successfully!");
-      // Optionally clear items or redirect
+      console.log("Response received:", response.data);
+      setPlacedOrder(response.data.order);
+      setShowConfirmation(true);
       setItems([]); // Clear cart items after successful order
     } catch (error) {
       console.error("Error placing order:", error);
@@ -265,6 +266,12 @@ const CheckoutPage = () => {
           </Button>
         </div>
       </div>
+      {showConfirmation && (
+        <OrderConfirmationModal
+          order={placedOrder}
+          onClose={() => setShowConfirmation(false)}
+        />
+      )}
     </div>
   );
 };

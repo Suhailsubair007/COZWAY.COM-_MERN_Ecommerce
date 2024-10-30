@@ -1,5 +1,6 @@
 const Order = require('../../model/order');
 const Cart = require('../../model/cart')
+const Product = require('../../model/Product');
 
 const getCheckoutCartItems = async (req, res) => {
     try {
@@ -47,8 +48,10 @@ const createOrder = async (req, res) => {
             price: item.offerPrice,
             discount: 0,
             totalProductPrice: item.totalProductPrice,
-            order_status: "Pending"
+            order_status: "Pending",
+            size: item.size
         }));
+
 
         const order = await Order.create({
             userId,
@@ -60,17 +63,38 @@ const createOrder = async (req, res) => {
             shipping_fee: 0,
         });
 
+        console.log("order itemss=====>>>>",order_items)
+
+
+        for (const item of order_items) {
+            const product = await Product.findById(item.productId._id);
+            console.log("prouct =======================>",product)
+            if (product) {
+                const sizeIndex = product.sizes.findIndex(s => s.size === item.size);
+                if (sizeIndex !== -1) {
+                    product.sizes[sizeIndex].stock -= item.quantity;
+                    await product.save();
+                    console.log("size updatedddddd")
+                }
+            }
+        }
+
         const cart = await Cart.findOne({ userId });
-        console.log(cart)
 
         if (cart) {
-            cart.products = cart.products.filter(item =>
-                !order_items.some(orderItem => orderItem.product === item.productId)
+            cart.products = cart.products.filter(cartItem =>
+                !order_items.some(orderItem =>
+                    orderItem.productId._id === cartItem.productId.toString() &&
+                    orderItem.size === cartItem.size
+                )
             );
-            await cart.save();
-            console.log("Items removed from cart");
 
+            cart.totalCartPrice = cart.products.reduce((total, item) => total + item.totalProductPrice, 0);
+
+            await cart.save();
+            console.log("Updated cart:", cart);
         }
+
         return res.status(201).json({ order, success: true, message: "Order Placed" });
 
     } catch (error) {
