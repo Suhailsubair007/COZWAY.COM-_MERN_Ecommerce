@@ -7,6 +7,7 @@ const categoryController = require('../controller/User/categoryController')
 const productController = require('../controller/User/productController')
 const profileController = require('../controller/User/profileController')
 const cartController = require('../controller/User/cartController')
+const orderController = require('../controller/User/orderController')
 // const userAuth = require('../middleware/userAuth');
 
 
@@ -16,8 +17,8 @@ router.post('/login', userController.login)
 router.post('/signup', verifyOTP, userController.registerUser);
 router.post('/logout', userController.UserLogout)
 router.post('/send-otp', userController.sendOTP);
-router.patch('/profile/:id',profileController.updateProfile);
-router.get('/user/:id',profileController.getUserData);
+router.patch('/profile/:id', profileController.updateProfile);
+router.get('/user/:id', profileController.getUserData);
 
 
 
@@ -51,5 +52,11 @@ router.delete('/delete/:id/:pr_id', cartController.deleteItem);
 // router.patch('/quantity/:userId/:itemId', cartController.updateCartItemQuantity);
 router.patch('/quantity/add/:userId/:itemId', cartController.incrementCartItemQuantity);
 router.patch('/quantity/min/:userId/:itemId', cartController.decrementCartItemQuantity);
+
+
+//order
+router.get('/items/:userId', orderController.getCheckoutCartItems);
+router.post('/order', orderController.createOrder);
+
 
 module.exports = router;

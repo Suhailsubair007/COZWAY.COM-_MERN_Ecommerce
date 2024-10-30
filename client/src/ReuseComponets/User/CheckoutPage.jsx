@@ -8,14 +8,21 @@ import { Separator } from "@/components/ui/separator";
 import { useSelector } from "react-redux";
 import axiosInstance from "@/config/axiosConfig";
 import AddAddressModal from "./AddNewAddress";
+import paypal from "../../assets/image/pay.png";
+import { CreditCard, Smartphone, Banknote, Wallet } from "lucide-react";
+import { toast } from "sonner";
 
 const CheckoutPage = () => {
   const [addresses, setAddresses] = useState([]);
+  const [items, setItems] = useState([]);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [selectedAddress, setSelectedAddress] = useState("");
+  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState("");
   const user = useSelector((state) => state.user.userInfo.id);
 
   useEffect(() => {
     fetchAddresses();
+    fetchItems();
   }, [user]);
 
   const fetchAddresses = async () => {
@@ -27,72 +34,122 @@ const CheckoutPage = () => {
     }
   };
 
+  const fetchItems = async () => {
+    try {
+      const response = await axiosInstance.get(`/users/items/${user}`);
+      setItems(response.data.products);
+    } catch (error) {
+      console.error("Error fetching items:", error);
+    }
+  };
+
   const handleAddAddress = (newAddress) => {
     setAddresses([...addresses, newAddress]);
     setIsAddModalOpen(false);
   };
 
-  const items = [
-    {
-      id: 1,
-      name: "Mint Green Slim Fit Shirt",
-      price: 1120,
-      quantity: 1,
-      image:
-        "https://res.cloudinary.com/dupo7yv88/image/upload/v1730002040/nnklwxujgbahhpwkmf32.jpg",
-    },
-    {
-      id: 2,
-      name: "Mint Green Slim Fit Shirt",
-      price: 1120,
-      quantity: 1,
-      image:
-        "https://res.cloudinary.com/dupo7yv88/image/upload/v1730002040/nnklwxujgbahhpwkmf32.jpg",
-    },
-  ];
+  const calculateTotalSavings = () => {
+    return items.reduce((acc, item) => {
+      const originalTotal = item.offerPrice * item.quantity;
+      const actualTotal = item.price * item.quantity;
+      return acc + (originalTotal - actualTotal);
+    }, 0);
+  };
 
   const subtotal = items.reduce(
-    (acc, item) => acc + item.price * item.quantity,
+    (acc, item) => acc + item.offerPrice * item.quantity,
     0
   );
   const shipping = "Free";
   const total = subtotal;
+  const totalSavings = calculateTotalSavings();
+
+  const handlePlaceOrder = async () => {
+    if (!selectedAddress || !selectedPaymentMethod) {
+      toast(
+        "Please select both a delivery address and a payment method before placing your order."
+      );
+      return; // Stop further execution if validation fails
+    }
+
+    // Find the selected address based on the selected address ID
+    const addressToSend = addresses.find(
+      (address) => address._id === selectedAddress
+    );
+
+    if (!addressToSend) {
+      toast("Selected address not found.");
+      return; // Stop further execution if address not found
+    }
+
+    try {
+      const response = await axiosInstance.post(`/users/order/`, {
+        userId: user,
+        order_items: items,
+        address: addressToSend, // Send the full address object
+        payment_method: selectedPaymentMethod, // Use the correct variable name
+        subtotal, // Include subtotal in the request
+      });
+
+      console.log(response);
+      // Handle successful order placement
+      toast("Order placed successfully!");
+      // Optionally clear items or redirect
+      setItems([]); // Clear cart items after successful order
+    } catch (error) {
+      console.error("Error placing order:", error);
+      toast("Error placing order. Please try again.");
+    }
+  };
+
+  // const handlePlcaceOrder = async () => {};
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <h1 className="text-2xl font-normal mb-8">CHECKOUT DETAILS</h1>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-        <div>
-          <RadioGroup defaultValue="1">
-            {addresses.map((address) => (
-              <div
-                key={address._id}
-                className="flex items-center space-x-2 mb-4"
-              >
-                <RadioGroupItem
-                  value={address._id.toString()}
-                  id={`address-${address._id}`}
-                />
-                <Label htmlFor={`address-${address._id}`} className="flex-grow">
-                  <Card>
-                    <CardContent className="p-4">
-                      <p>{address.address}</p>
-                      <p>{address.district}</p>
-                      <p>{address.pincode}</p>
-                      <p>Contact : {address.phone}</p>
-                    </CardContent>
-                  </Card>
-                </Label>
-              </div>
-            ))}
-          </RadioGroup>
-          <Button
-            variant="outline"
-            className="w-full mt-4"
-            onClick={() => setIsAddModalOpen(true)}
-          >
-            Add New Address
-          </Button>
+    <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 max-w-7xl">
+      <h1 className="text-3xl font-bold mb-8 text-center sm:text-left">
+        Checkout
+      </h1>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <div className="space-y-8">
+          <section className="bg-white p-6 rounded-lg shadow-md">
+            <h2 className="text-2xl font-semibold mb-4">Delivery Address</h2>
+            <RadioGroup
+              value={selectedAddress}
+              onValueChange={setSelectedAddress}
+            >
+              {addresses.map((address) => (
+                <div
+                  key={address._id}
+                  className="flex items-center space-x-2 mb-4"
+                >
+                  <RadioGroupItem
+                    value={address._id.toString()}
+                    id={`address-${address._id}`}
+                  />
+                  <Label
+                    htmlFor={`address-${address._id}`}
+                    className="flex-grow"
+                  >
+                    <Card>
+                      <CardContent className="p-4">
+                        <p className="font-medium">{address.address}</p>
+                        <p>{address.district}</p>
+                        <p>{address.pincode}</p>
+                        <p>Contact: {address.phone}</p>
+                      </CardContent>
+                    </Card>
+                  </Label>
+                </div>
+              ))}
+            </RadioGroup>
+            <Button
+              variant="outline"
+              className="w-full mt-4"
+              onClick={() => setIsAddModalOpen(true)}
+            >
+              Add New Address
+            </Button>
+          </section>
 
           <AddAddressModal
             isOpen={isAddModalOpen}
@@ -100,65 +157,112 @@ const CheckoutPage = () => {
             onAdd={handleAddAddress}
           />
 
-          <h2 className="text-2xl font-semibold mt-8 mb-4">Payment Methods</h2>
-          <p className="mb-4">Select any payment methods</p>
-          <RadioGroup>
-            <div className="flex items-center space-x-2 mb-2">
-              <RadioGroupItem value="card" id="card" />
-              <Label htmlFor="card">Debit Card / Credit Card</Label>
-            </div>
-            <div className="flex items-center space-x-2 mb-2">
-              <RadioGroupItem value="bank" id="bank" />
-              <Label htmlFor="bank">Bank</Label>
-            </div>
-            <div className="flex items-center space-x-2 mb-2">
-              <RadioGroupItem value="upi" id="upi" />
-              <Label htmlFor="upi">UPI Method</Label>
-            </div>
-            <div className="flex items-center space-x-2 mb-2">
-              <RadioGroupItem value="cod" id="cod" />
-              <Label htmlFor="cod">Cash on delivery</Label>
-            </div>
-            <div className="flex items-center space-x-2 mb-2">
-              <RadioGroupItem value="wallet" id="wallet" />
-              <Label htmlFor="wallet">Wallet</Label>
-            </div>
-          </RadioGroup>
+          <section className="bg-white p-6 rounded-lg shadow-md">
+            <h2 className="text-2xl font-semibold mb-4">Payment Methods</h2>
+            <p className="mb-4 text-gray-600">Select a payment method</p>
+            <RadioGroup
+              value={selectedPaymentMethod}
+              onValueChange={setSelectedPaymentMethod}
+              className="space-y-4"
+            >
+              <div className="flex items-center space-x-3 p-3 border rounded-md hover:bg-gray-50 transition-colors">
+                <RadioGroupItem value="Credit Card/ Debit Card" id="card" />
+                <CreditCard className="h-6 w-6 text-blue-500" />
+                <Label htmlFor="card" className="flex-grow">
+                  Credit Card/ Debit Card
+                </Label>
+              </div>
+              <div className="flex items-center space-x-3 p-3 border rounded-md hover:bg-gray-50 transition-colors">
+                <RadioGroupItem value="Wallet" />
+                {/* <Landmark /> */}
+                <Wallet className="h-6 w-6 text-green-500" />
+                <Label htmlFor="bank" className="flex-grow">
+                  Wallet
+                </Label>
+              </div>
+              <div className="flex items-center space-x-3 p-3 border rounded-md hover:bg-gray-50 transition-colors">
+                <RadioGroupItem value="UPI" id="upi" />
+                <Smartphone className="h-6 w-6 text-purple-500" />
+                <Label htmlFor="UPI" className="flex-grow">
+                  UPI
+                </Label>
+              </div>
+              <div className="flex items-center space-x-3 p-3 border rounded-md hover:bg-gray-50 transition-colors">
+                <RadioGroupItem value="Cash on Delivery" id="cod" />
+                <Banknote className="h-6 w-6 text-yellow-500" />
+                <Label htmlFor="cod" className="flex-grow">
+                  Cash on Delivery
+                </Label>
+              </div>
+            </RadioGroup>
+          </section>
         </div>
 
-        <div className="p-4 border shadow-md">
-          {items.map((item) => (
-            <div key={item.id} className="flex items-center space-x-4 mb-4">
-              <img
-                src={item.image}
-                alt={item.name}
-                className="w-20 h-30 object-cover"
-              />
-              <div className="flex-grow">
-                <h3 className="font-semibold">{item.name}</h3>
-                <p>Quantity: {item.quantity}</p>
+        <div className="bg-white p-6 rounded-lg shadow-md">
+          <h2 className="text-2xl font-semibold mb-4">Order Summary</h2>
+          <div className="space-y-4 mb-6">
+            {items.map((item) => (
+              <div key={item._id} className="flex items-center space-x-4">
+                <img
+                  src={item.productId.images[0]}
+                  alt={item.name}
+                  className="w-20 h-30 object-cover rounded-md"
+                />
+                <div className="flex-grow">
+                  <h3 className="font-semibold">{item.productId.name}</h3>
+                  <p className="text-sm text-gray-600">
+                    Quantity: {item.quantity}
+                  </p>
+                  <div className="text-sm text-green-600 font-medium">
+                    {Math.round(item.discount)}% OFF
+                  </div>
+                </div>
+                <div className="text-right">
+                  <p className="line-through text-gray-500">₹{item.price}</p>
+                  <p className="font-semibold">₹{item.offerPrice}</p>
+                  <p className="text-sm text-gray-600">
+                    Total: ₹{item.offerPrice * item.quantity}
+                  </p>
+                </div>
               </div>
-              <p className="font-semibold">₹{item.price}</p>
+            ))}
+          </div>
+          <Separator className="my-6" />
+          <div className="space-y-2 text-sm">
+            <div className="flex justify-between">
+              <span className="text-gray-600">Subtotal:</span>
+              <span>₹{subtotal}</span>
             </div>
-          ))}
+            <div className="flex justify-between">
+              <span className="text-gray-600">Shipping:</span>
+              <span>{shipping}</span>
+            </div>
+            <div className="flex justify-between text-green-600 font-medium">
+              <span>Total Savings:</span>
+              <span>₹{totalSavings}</span>
+            </div>
+          </div>
           <Separator className="my-4" />
-          <div className="flex justify-between mb-2">
-            <span>Subtotal:</span>
-            <span>₹{subtotal}</span>
+          <div className="flex justify-between text-lg font-semibold mb-6">
+            <span>Total:</span>
+            <span>₹{total}</span>
           </div>
-          <div className="flex justify-between mb-2">
-            <span>Shipping:</span>
-            <span>{shipping}</span>
+          <div className="flex space-x-2 mb-6">
+            <Input placeholder="Apply coupon code" className="flex-grow" />
+            <Button variant="outline">Apply</Button>
           </div>
-          <div className="flex justify-between mb-4">
-            <span className="font-semibold">Total:</span>
-            <span className="font-semibold">₹{total}</span>
-          </div>
-          <div className="flex space-x-2 mb-4">
-            <Input placeholder="Apply coupon code" />
-            <Button>Apply Coupon</Button>
-          </div>
-          <Button className="w-full">Place Order</Button>
+          <Button
+            className="w-full mb-4"
+            size="lg"
+            onClick={handlePlaceOrder}
+            // disabled={!selectedAddress || !selectedPaymentMethod}
+          >
+            Place Order
+          </Button>
+          <Button variant="outline" className="w-full" size="lg">
+            <img src={paypal} alt="PayPal" className="h-10 mr-2" />
+            Pay with PayPal
+          </Button>
         </div>
       </div>
     </div>

@@ -9,6 +9,8 @@ import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
 
 const CartItem = ({ item, onUpdateQuantity, onRemove }) => {
+  const x = item.discount
+  const discount = Math.floor(x);
   return (
     <div className="flex items-center py-3">
       <img
@@ -21,7 +23,8 @@ const CartItem = ({ item, onUpdateQuantity, onRemove }) => {
         <p className="text-xs text-gray-600">
           Category: {item.productId.category.name}
         </p>
-        <p className="text-sm text-gray-900">Size: {item.size}</p>
+        <p className="text-lg text-gray-900">Size: {item.size}</p>
+        <p className="text-sm text-green-500">Size: {discount}%</p>
         <div className="flex items-center mt-1">
           <Button
             variant="outline"
@@ -68,6 +71,7 @@ export default function ShoppingCart() {
   useEffect(() => {
     fetchCart();
   }, [userId]);
+
 
   const fetchCart = async () => {
     try {
