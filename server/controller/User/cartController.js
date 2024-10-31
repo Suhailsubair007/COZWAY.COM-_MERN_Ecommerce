@@ -1,6 +1,6 @@
 const Cart = require('../../model/cart');
 
-// Controller to add a product to the cart
+// Controller to add a product to the cart.....
 const addToCart = async (req, res) => {
     try {
         console.log("vannu njnnnnn")
@@ -106,8 +106,8 @@ const getAllCartItems = async (req, res) => {
 
             const product = item.productId;
             const sizeData = product.sizes.find((s) => s.size === item.size);
-            console.log("productss:=>", product)
-            console.log("sizedata vann :", sizeData);
+            // console.log("productss:=>", product)
+            // console.log("sizedata vann :", sizeData);
             if (sizeData) {
                 if (item.quantity > sizeData.stock) {
                     item.quantity = sizeData.stock;
@@ -269,4 +269,24 @@ const decrementCartItemQuantity = async (req, res) => {
 };
 
 
-module.exports = { addToCart, getCartDetails, getAllCartItems, deleteItem, incrementCartItemQuantity, decrementCartItemQuantity };
+
+//Cart length display....
+const getUserCartProductCount = async (req, res) => {
+    try {
+        const { id } = req.params;
+        console.log(id);
+        console.log("ivide vanuu")
+        const cart = await Cart.findOne({ userId: id });
+        console.log(cart)
+        if (!cart) {
+            return res.status(404).json({ message: 'Cart not found for this user' });
+        }
+        const productCount = cart.products.length;
+        res.status(200).json({ success: true, productCount });
+    } catch (error) {
+        console.error("Error fetching product count:", error);
+        res.status(500).json({ message: 'Server error' });
+    }
+};
+
+module.exports = { addToCart, getCartDetails, getAllCartItems, deleteItem, incrementCartItemQuantity, decrementCartItemQuantity, getUserCartProductCount };

@@ -11,7 +11,7 @@ const TopSelling = () => {
       const fetchTrendingItems = async () => {
         try {
           const response = await axiosInstance.get(
-            "/users/fetch_product_by_date"
+            "/users/latest"
           );
           console.log(response.data)
   

@@ -29,7 +29,7 @@ export default function AddressCard({
           <div className="text-lg font-semibold">{name}</div>
           <div className="text-sm text-gray-600">{phone}</div>
           <div className="text-sm text-gray-600">{address}</div>
-          <div className="text-sm text-gray-600">Pincode: {pincode}</div>
+          <div className="text-sm text-gray-600">{pincode}</div>
         </div>
         <Button
           variant="outline"

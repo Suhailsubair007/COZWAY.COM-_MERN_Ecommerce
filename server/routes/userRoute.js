@@ -28,13 +28,21 @@ router.post('/auth/google-login', userController.googleLoginUser);
 
 
 //products , etc...
-router.get('/fetch_product_by_date', productController.fetchLatestProduct)
-router.get('/fetch_all_product', productController.fetchActiveProduct)
+// router.get('/fetch_product_by_date', productController.fetchLatestProduct)
+// router.get('/fetch_all_product', productController.fetchActiveProduct)
+// router.get('/product/:id', productController.fetchProductById);
+// router.get('/products/related/:id', productController.fetchRelatedProducts);
+router.get('/get_active_categories', categoryController.getActiveCategories);
+router.get('/advanced-search', productController.advancedSearch);
+router.get('/latest', productController.fetchLatestProduct);
+router.get('/active', productController.fetchActiveProduct);
 router.get('/product/:id', productController.fetchProductById);
-router.get('/products/related/:id', productController.fetchRelatedProducts);
+router.get('/related/:id', productController.fetchRelatedProducts);
+                                                                                         
 
 //category related..
-router.get('/get_active_categories', categoryController.getActiveCategories);
+// router.get('/get_active_categories', categoryController.getActiveCategories);
+router.get('/:id', productController.fetchProductById);
 
 //mage the address routes end points...
 router.post('/addresses', address.userAddAddress);
@@ -43,11 +51,12 @@ router.delete('/address/:addressId', address.deleteUserAddress);
 router.get('/address/:id', address.getAddressById);
 router.patch('/addresses/:id', address.updateUserAddress);
 
-
+        
 //cart mangement routess...
 router.post('/add-to-cart', cartController.addToCart);
 router.get('/get-cart-details', cartController.getCartDetails);
 router.get('/cart/:userId', cartController.getAllCartItems);
+router.get('/cartLength/:id', cartController.getUserCartProductCount);
 router.delete('/delete/:id/:pr_id', cartController.deleteItem);
 // router.patch('/quantity/:userId/:itemId', cartController.updateCartItemQuantity);
 router.patch('/quantity/add/:userId/:itemId', cartController.incrementCartItemQuantity);
@@ -57,6 +66,8 @@ router.patch('/quantity/min/:userId/:itemId', cartController.decrementCartItemQu
 //order
 router.get('/items/:userId', orderController.getCheckoutCartItems);
 router.post('/order', orderController.createOrder);
+router.get('/orders/:userId', orderController.getUserOrders);
+router.get('/order/:orderId', orderController.getOrderById);
 
 
 module.exports = router;

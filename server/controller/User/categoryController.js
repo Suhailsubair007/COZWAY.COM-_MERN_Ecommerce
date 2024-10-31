@@ -14,4 +14,4 @@ const getActiveCategories = async (req, res) => {
 
 module.exports = {
     getActiveCategories,
-};
+};     

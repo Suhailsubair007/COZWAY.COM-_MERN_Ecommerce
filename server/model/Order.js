@@ -47,8 +47,8 @@ const orderSchema = new mongoose.Schema({
         address: String,
         district: String,
         state: String,
-        state: String,
         phone: Number,
+        pincode: Number,
     },
     payment_method: {
         type: String,
@@ -102,7 +102,7 @@ const orderSchema = new mongoose.Schema({
 }, { timestamps: true });
 
 
-//To genarate a random unique id for each ordersss.....
+//To genarate a random unique order id for each ordersss.....
 
 orderSchema.pre('save', function (next) {
     if (!this.order_id) {

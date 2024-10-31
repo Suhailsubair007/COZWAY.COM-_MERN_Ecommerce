@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { Input } from "@/components/ui/input";
@@ -9,6 +9,7 @@ import { useNavigate } from "react-router-dom";
 import axiosInstance from "@/config/axiosConfig";
 import { logoutUser } from "../../redux/UserSlice";
 import { useDispatch } from "react-redux";
+import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 import {
   DropdownMenu,
@@ -29,9 +30,28 @@ import {
 
 const Header = () => {
   const [isSearchVisible, setSearchVisible] = useState(false);
-  const user = useSelector((state) => state.user.userInfo);
+  const [count, setCount] = useState([]);
+  const userId = useSelector((state) => state.user.userInfo);
+  // const id = useSelector((state) => state.user.userInfo.id);
   const dispatch = useDispatch();
 
+  // useEffect(() => {
+  //   fetchCart();
+  // }, [id]);
+
+  // const fetchCart = async () => {
+  //   try {
+  //     const response = await axiosInstance.get(`/users/cartLength/${id}`);
+  //     setCount(response.data.productCount);
+  //     console.log(response.data);
+  //   } catch (error) {
+  //     console.error("Error fetching cart:", error);
+  //     if (error.response) {
+  //       toast.error(error.response.data.message);
+  //     }
+  //   }
+  // };
+  // console.log(count);
   const toggleSearch = () => {
     setSearchVisible(!isSearchVisible);
   };
@@ -127,14 +147,24 @@ const Header = () => {
             )}
 
             {/* Cart Icon */}
-            <Button
-              onClick={handleCartClick}
-              variant="ghost"
-              size="icon"
-              className="text-muted-foreground hover:text-primary"
-            >
-              <ShoppingCart className="h-5 w-5" />
-            </Button>
+            <div className="relative">
+              <Button
+                onClick={handleCartClick}
+                variant="ghost"
+                size="icon"
+                className="text-muted-foreground hover:text-primary"
+              >
+                <ShoppingCart className="h-5 w-5" />
+              </Button>
+              {count > 0 && (
+                <Badge
+                  variant="destructive"
+                  className="absolute -top-2 -right-2 px-2 py-1 text-xs font-bold rounded-full"
+                >
+                  {count}
+                </Badge>
+              )}
+            </div>
 
             {/* Wishlist Icon */}
             <Button
@@ -146,7 +176,7 @@ const Header = () => {
             </Button>
 
             {/* User Profile or Login Button */}
-            {user ? (
+            {userId ? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button
@@ -154,8 +184,8 @@ const Header = () => {
                     className="relative h-8 w-8 rounded-full"
                   >
                     <Avatar className="h-8 w-8">
-                      <AvatarImage src={user.name} alt={"no name"} />
-                      <AvatarFallback>{user.name.charAt(0)}</AvatarFallback>
+                      <AvatarImage src={userId.name} alt={"no name"} />
+                      <AvatarFallback>{userId.name.charAt(0)}</AvatarFallback>
                     </Avatar>
                   </Button>
                 </DropdownMenuTrigger>
@@ -214,17 +244,17 @@ const Header = () => {
                   >
                     Contact Us
                   </Link>
-                  {user ? (
+                  {/* {userId ? (
                     <div className="flex items-center space-x-2">
                       <Avatar className="h-8 w-8">
-                        <AvatarImage src={user.avatarUrl} alt={user.name} />
-                        <AvatarFallback>{user.name.charAt(0)}</AvatarFallback>
+                        <AvatarImage src={userId.avatarUrl} alt={userId.name} />
+                        <AvatarFallback>{userId.name.charAt(0)}</AvatarFallback>
                       </Avatar>
-                      <span className="text-sm font-medium">{user.name}</span>
+                      <span className="text-sm font-medium">{userId.name}</span>
                     </div>
                   ) : (
                     <Button className="w-full">Login</Button>
-                  )}
+                  )} */}
                 </nav>
               </SheetContent>
             </Sheet>

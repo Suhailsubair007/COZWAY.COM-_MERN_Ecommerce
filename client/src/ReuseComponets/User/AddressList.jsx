@@ -2,6 +2,10 @@ import React from "react";
 import AddressCard from "./AddressCard";
 
 export default function AddressList({ addresses, onDelete, onEdit }) {
+  console.log("address vannuuuuuu",addresses);
+  addresses.map((x)=>{
+    console.log(x);
+  })
   return (
     <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
       {addresses.map((address) => (

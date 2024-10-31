@@ -79,6 +79,8 @@ const CheckoutPage = () => {
       (address) => address._id === selectedAddress
     );
 
+    console.log("selected addresss============================", addressToSend);
+
     if (!addressToSend) {
       toast("Selected address not found.");
       return;
@@ -137,6 +139,7 @@ const CheckoutPage = () => {
                         <p>{address.district}</p>
                         <p>{address.pincode}</p>
                         <p>Contact: {address.phone}</p>
+                        <p>pincode: {address.pincode}</p>
                       </CardContent>
                     </Card>
                   </Label>

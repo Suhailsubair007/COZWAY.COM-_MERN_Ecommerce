@@ -26,7 +26,7 @@ const addressSchema = new mongoose.Schema({
         required: true,
     },
     state: {
-        type: Number,
+        type: String,
         required: true,
     },
     alternatePhone: {
@@ -35,7 +35,10 @@ const addressSchema = new mongoose.Schema({
     landmark: {
         type: String,
 
-    }, user: {
+    }, pincode: {
+        type: Number,
+    },
+    user: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User',
         required: true,

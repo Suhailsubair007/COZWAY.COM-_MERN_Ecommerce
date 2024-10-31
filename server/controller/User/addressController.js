@@ -7,7 +7,8 @@ const Address = require('../../model/Addres')
 const userAddAddress = async (req, res) => {
     try {
         const { name, phone, address, district, state, city, pincode, alternatePhone, landmark, user } = req.body;
-        console.log(name, phone, address, district, state, city, pincode, alternatePhone, landmark, user);
+        // console.log(name, phone, address, district, state, city, pincode, alternatePhone, landmark, user);
+        console.log(user)
 
         if (!name || !phone || !address || !district || !state || !city || !pincode || !user) {
             return res.status(400).json({ message: 'All required fields must be provided' });
@@ -27,12 +28,14 @@ const userAddAddress = async (req, res) => {
         });
 
         const savedAddress = await newAddress.save();
+        console.log("Address save ayyiii..",savedAddress);                  
 
         res.status(201).json({
             message: 'Address added successfully',
             address: savedAddress
         });
     } catch (error) {
+        console.error("Error addinggg address:", error); 
         res.status(500).json({
             message: 'An error occurred while adding the address',
             error: error.message
@@ -142,8 +145,11 @@ const updateUserAddress = async (req, res) => {
         console.log(name)
 
         if (!id) {
+            console.log("id illaaa------>>>>>>");
             return res.status(400).json({ message: 'Address ID is required' });
         }
+
+
 
         const updateFields = {};
         if (name) updateFields.name = name;
@@ -156,11 +162,14 @@ const updateUserAddress = async (req, res) => {
         if (alternatePhone) updateFields.alternatePhone = alternatePhone;
         if (landmark) updateFields.landmark = landmark;
 
+        console.log("updated fieldsssss......",updateFields)
+
         const updatedAddress = await Address.findByIdAndUpdate(
             id,
             { $set: updateFields },
             { new: true } 
         );
+        console.log("updated fieldsssss......",updateUserAddress)
 
         if (!updatedAddress) {
             return res.status(404).json({ message: 'Address not found' });
@@ -171,6 +180,7 @@ const updateUserAddress = async (req, res) => {
             address: updatedAddress
         });
     } catch (error) {
+        console.error("Error updating address:", error); 
         res.status(500).json({
             message: 'An error occurred while updating the address',
             error: error.message

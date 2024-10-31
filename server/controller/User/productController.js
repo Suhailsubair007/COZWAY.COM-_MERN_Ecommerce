@@ -54,9 +54,69 @@ const fetchRelatedProducts = async (req, res) => {
     }
 };
 
+
+const advancedSearch = async (req, res) => {
+    try {
+        const { searchTerm, categories, sizes, page = 1, limit = 8, sortBy = 'createdAt' } = req.query;
+
+        let query = { is_active: true };
+
+        if (searchTerm) {
+            query.$or = [
+                { name: { $regex: searchTerm, $options: 'i' } },
+                { description: { $regex: searchTerm, $options: 'i' } }
+            ];
+        }
+
+        if (categories && categories.length > 0) {
+            query.category = { $in: categories.split(',') };
+        }
+
+        if (sizes && sizes.length > 0) {
+            query.sizes = { $in: sizes.split(',') };
+        }
+
+        const totalProducts = await Product.countDocuments(query);
+        const totalPages = Math.ceil(totalProducts / limit);
+
+        let sortOption = {};
+        switch (sortBy) {
+            case 'price_asc':
+                sortOption = { offerPrice: 1 };
+                break;
+            case 'price_desc':
+                sortOption = { offerPrice: -1 };
+                break;
+            case 'newest':
+                sortOption = { createdAt: -1 };
+                break;
+            default:
+                sortOption = { createdAt: -1 }; 
+        }
+
+        const products = await Product.find(query)
+            .populate('category', 'name')
+            .sort(sortOption)
+            .skip((page - 1) * limit)
+            .limit(Number(limit));
+
+        res.status(200).json({
+            products,
+            currentPage: Number(page),
+            totalPages,
+            totalProducts
+        });
+    } catch (error) {
+        console.error('Error in advanced search:', error);
+        res.status(500).json({ message: 'Server error. Please try again later.' });
+    }
+};
+
+
 module.exports = {
     fetchLatestProduct,
     fetchActiveProduct,
     fetchProductById,
-    fetchRelatedProducts
+    fetchRelatedProducts,
+    advancedSearch
 };

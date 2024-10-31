@@ -14,6 +14,8 @@ import Address from "@/ReuseComponets/User/Address";
 import ShoppingCart from "@/ReuseComponets/User/Cart";
 import CartPage from "@/pages/User/HomePage/CartPage";
 import Checkout from "@/pages/User/Checkout";
+import Order_details from "@/pages/User/Order_details";
+import MyOrders from "@/ReuseComponets/User/MyOrder";
 // import DeliveryAddress from "@/ReuseComponets/User/DeliveryAddress";
 // import Orders from "@/ReuseComponets/User/Orders";
 // import Wallet from "@/ReuseComponets/User/Wallet";
@@ -81,6 +83,14 @@ const UserRoute = () => {
             </UserPrivate>
           }
         />
+        <Route
+          path="/orders/:id"
+          element={
+            <UserPrivate>
+              <Order_details />
+            </UserPrivate>
+          }
+        />
 
         {/* Protected profile routes */}
         <Route
@@ -93,10 +103,10 @@ const UserRoute = () => {
         >
           <Route index element={<ProfileUpdate />} />
           <Route path="delivery-address" element={<Address />} />
-          {/* <Route path="orders" element={<Orders />} />
-          <Route path="wallet" element={<Wallet />} />
+          <Route path="orders" element={<MyOrders />} />
+          {/* <Route path="wallet" element={<Wallet />} />
           <Route path="coupons" element={<Coupons />} />
-          <Route path="change-password" element={<ChangePassword />} /> */}
+          <Route path="change-password" element={<ChangePassword />} />  */}
         </Route>
       </Routes>
       <Toaster richColors position="bottom-center" />

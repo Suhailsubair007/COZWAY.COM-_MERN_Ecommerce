@@ -9,7 +9,7 @@ const ShopByCategories = () => {
     const fetchProduct = async () => {
       try {
         const response = await axiosInstance.get(
-          "/users/fetch_product_by_date"
+          "/users/latest"
         );
         const fetchedProducts = response.data.slice(0, 4).map((product) => ({
           name: product.name,

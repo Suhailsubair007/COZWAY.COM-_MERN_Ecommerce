@@ -63,12 +63,12 @@ const createOrder = async (req, res) => {
             shipping_fee: 0,
         });
 
-        console.log("order itemss=====>>>>",order_items)
+        console.log("order itemss=====>>>>", order_items)
 
 
         for (const item of order_items) {
             const product = await Product.findById(item.productId._id);
-            console.log("prouct =======================>",product)
+            console.log("prouct =======================>", product)
             if (product) {
                 const sizeIndex = product.sizes.findIndex(s => s.size === item.size);
                 if (sizeIndex !== -1) {
@@ -104,5 +104,70 @@ const createOrder = async (req, res) => {
 };
 
 
+const getUserOrders = async (req, res) => {
+    try {
+        const { userId } = req.params;
 
-module.exports = { createOrder, getCheckoutCartItems }
+        const orders = await Order.find({ userId })
+            .populate({
+                path: 'order_items.product',
+                model: 'Product',
+                select: 'name price images category',
+                populate: {
+                    path: 'category',
+                    select: 'name'
+                }
+            });
+
+        if (!orders.length) {
+            return res.status(404).json({ success: false, message: 'No orders found for this user' });
+        }
+
+        res.status(200).json({
+            success: true,
+            message: "User orders fetched successfully",
+            orders
+        });
+    } catch (error) {
+        console.error("Error fetching user orders:", error);
+        res.status(500).json({ success: false, message: 'Server error', error });
+    }
+};
+
+
+const getOrderById = async (req, res) => {
+    try {
+        const { orderId } = req.params;
+
+        const order = await Order.findOne({ _id: orderId })
+            .populate({
+                path: 'order_items.product',
+                model: 'Product',
+                select: 'name price images category',
+                populate: {
+                    path: 'category',
+                    select: 'name'
+                }
+            });
+
+        if (!order) {
+            return res.status(404).json({ success: false, message: 'Order not found' });
+        }
+
+        res.status(200).json({
+            success: true,
+            message: "Order fetched successfully",
+            order
+        });
+    } catch (error) {
+        console.error("Error fetching order:", error);
+        res.status(500).json({ success: false, message: 'Server error', error: error.message });
+    }
+};
+
+module.exports = { createOrder, getCheckoutCartItems, getUserOrders, getOrderById };
+
+
+
+
+// module.exports = { createOrder, getCheckoutCartItems }

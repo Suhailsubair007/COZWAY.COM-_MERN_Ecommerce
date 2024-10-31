@@ -1,54 +1,172 @@
-import React, { useState, useEffect } from 'react'
-import { motion } from 'framer-motion'
-import { Check } from 'lucide-react'
-import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
+import { useState, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import {
+  Check,
+  Package,
+  MapPin,
+  Phone,
+  CreditCard,
+  ShoppingBag,
+  Calendar,
+} from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { useNavigate } from "react-router-dom";
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Separator } from "@/components/ui/separator";
 
-const OrderConfirmationModal = ({ order, onClose }) => {
-  const [isVisible, setIsVisible] = useState(true)
+export default function Component({ order, onClose }) {
+  const [isVisible, setIsVisible] = useState(true);
+  const navigate = useNavigate();
 
-  useEffect(() => {
-    const timer = setTimeout(() => setIsVisible(false), 5000)
-    return () => clearTimeout(timer)
-  }, [])
+  // useEffect(() => {
+  //   const timer = setTimeout(() => setIsVisible(false), 5000)
+  //   return () => clearTimeout(timer)
+  // }, [])
 
-  if (!isVisible) return null
+  if (!isVisible) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <Card className="w-full max-w-md">
-        <CardHeader>
-          <CardTitle className="text-center">Order Placed</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="flex justify-center">
-            <motion.div
-              initial={{ scale: 0 }}
-              animate={{ scale: 1 }}
-              transition={{ type: 'spring', stiffness: 260, damping: 20 }}
-            >
-              <div className="w-16 h-16 bg-green-500 rounded-full flex items-center justify-center">
-                <Check className="w-10 h-10 text-white" />
-              </div>
-            </motion.div>
-          </div>
-          <div className="space-y-2">
-            <p><strong>Order ID:</strong> {order.order_id}</p>
-            <p><strong>Order Date:</strong> {new Date(order.createdAt).toLocaleString()}</p>
-            <p><strong>Delivery Date:</strong> {new Date(order.delivery_by).toLocaleString()}</p>
-            <p><strong>Address:</strong> {order.shipping_address.address}, {order.shipping_address.district}</p>
-            <p><strong>Phone:</strong> {order.shipping_address.phone}</p>
-            <p><strong>Shipping Fee:</strong> ₹{order.shipping_fee}</p>
-            <p><strong>Total Amount:</strong> ₹{order.total_amount}</p>
-          </div>
-        </CardContent>
-        <CardFooter className="flex justify-between">
-          <Button onClick={() => window.location.href = '/orders'}>View Orders</Button>
-          <Button onClick={() => window.location.href = '/'}>Continue Shopping</Button>
-        </CardFooter>
-      </Card>
-    </div>
-  )
-}
+    <AnimatePresence>
+      <div className="fixed inset-0 bg-background/80 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+        <motion.div
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          exit={{ opacity: 0, scale: 0.95 }}
+          transition={{ duration: 0.2 }}
+        >
+          <Card className="w-[600px] max-h-[850vh] flex flex-col">
+            <CardHeader className="text-center py-4 space-y-2">
+              <motion.div
+                initial={{ scale: 0 }}
+                animate={{ scale: 1 }}
+                transition={{
+                  type: "spring",
+                  stiffness: 260,
+                  damping: 20,
+                  delay: 0.1,
+                }}
+                className="mx-auto"
+              >
+                <div className="w-16 h-16 bg-gradient-to-br from-green-400 to-green-600 rounded-full flex items-center justify-center">
+                  <Check className="w-8 h-8 text-white" />
+                </div>
+              </motion.div>
+              <CardTitle className="text-xl font-bold text-green-600">
+                Order Successfully Placed!
+              </CardTitle>
+              <p className="text-sm text-muted-foreground">
+                Thank you for your purchase
+              </p>
+            </CardHeader>
+            <CardContent className="flex-1 overflow-y-auto space-y-4 px-6">
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.2 }}
+                className="bg-muted/50 rounded-lg p-3"
+              >
+                <div className="flex items-center gap-2 text-sm font-semibold mb-2">
+                  <ShoppingBag className="w-4 h-4" />
+                  Order Details
+                </div>
+                <div className="grid gap-1 text-sm">
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Order ID</span>
+                    <span className="font-medium">{order.order_id}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Order Date</span>
+                    <span className="font-medium">
+                      {new Date(order.createdAt).toLocaleString()}
+                    </span>
+                  </div>
+                </div>
+              </motion.div>
 
-export default OrderConfirmationModal
+              <Separator className="my-2" />
+
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.3 }}
+                className="space-y-2"
+              >
+                <div className="flex items-center gap-2">
+                  <Calendar className="w-4 h-4 text-muted-foreground" />
+                  <span className="text-sm font-medium">
+                    Delivery Expected By
+                  </span>
+                </div>
+                <div className="pl-6 text-sm font-semibold">
+                  {new Date(order.delivery_by).toLocaleDateString()}
+                </div>
+              </motion.div>
+
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.4 }}
+                className="space-y-2"
+              >
+                <div className="flex items-center gap-2">
+                  <MapPin className="w-4 h-4 text-muted-foreground" />
+                  <span className="text-sm font-medium">Delivery Address</span>
+                </div>
+                <div className="pl-6 space-y-1 text-xs">
+                  <p>{order.shipping_address.address}</p>
+                  <p>{order.shipping_address.district}</p>
+                  <p>PIN: {order.shipping_address.pincode}</p>
+                  <div className="flex items-center gap-2 mt-1">
+                    <Phone className="w-3 h-3" />
+                    <span>{order.shipping_address.phone}</span>
+                  </div>
+                </div>
+              </motion.div>
+
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.5 }}
+                className="bg-muted/50 rounded-lg p-3"
+              >
+                <div className="flex items-center gap-2 mb-2">
+                  <CreditCard className="w-4 h-4" />
+                  <span className="text-sm font-medium">Payment Details</span>
+                </div>
+                <div className="space-y-2 text-sm">
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Shipping Fee</span>
+                    <span>₹{order.shipping_fee}</span>
+                  </div>
+                  <Separator className="my-1" />
+                  <div className="flex justify-between font-semibold">
+                    <span>Total Amount</span>
+                    <span>₹{order.total_amount}</span>
+                  </div>
+                </div>
+              </motion.div>
+            </CardContent>
+            <CardFooter className="flex gap-4 p-4 border-t">
+              <Button
+                className="flex-1 h-9"
+                variant="outline"
+                onClick={() => navigate("/profile/orders")}
+              >
+                View Orders
+              </Button>
+              <Button className="flex-1 h-9" onClick={() => navigate("/shop")}>
+                Continue Shopping
+              </Button>
+            </CardFooter>
+          </Card>
+        </motion.div>
+      </div>
+    </AnimatePresence>
+  );
+}

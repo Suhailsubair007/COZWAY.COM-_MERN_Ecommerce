@@ -10,7 +10,7 @@ export default function RelatedProducts({ id }) {
     const fetchRelatedProducts = async () => {
       try {
         const response = await axiosInstance.get(
-          `/users/products/related/${id}`
+          `/users/related/${id}`
         );
         console.log(response.data);
         setRelatedProducts(response.data);

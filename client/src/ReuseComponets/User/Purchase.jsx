@@ -43,7 +43,8 @@ const ProductDetail = () => {
   const [isInCart, setIsInCart] = useState(false);
   const { id } = useParams();
 
-  console.log("user daraaaaaaaaaa:", userId);
+
+  // console.log("user daraaaaaaaaaa:", productData.totalStock);
 
   useEffect(() => {
     const fetchProduct = async () => {
