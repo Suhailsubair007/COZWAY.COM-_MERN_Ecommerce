@@ -38,7 +38,7 @@ const getCheckoutCartItems = async (req, res) => {
     }
 };
 
-
+//cerate an order...
 const createOrder = async (req, res) => {
     try {
         const { userId, order_items, address, payment_method, subtotal } = req.body;
@@ -104,9 +104,16 @@ const createOrder = async (req, res) => {
 };
 
 
+//get the order details in the my orders page also pagination applied here...
 const getUserOrders = async (req, res) => {
     try {
         const { userId } = req.params;
+        const page = parseInt(req.query.page);
+        const limit = parseInt(req.query.limit);
+        const skip = (page - 1) * limit;
+
+        const totalOrders = await Order.countDocuments({ userId });
+        const totalPages = Math.ceil(totalOrders / limit);
 
         const orders = await Order.find({ userId })
             .populate({
@@ -117,7 +124,10 @@ const getUserOrders = async (req, res) => {
                     path: 'category',
                     select: 'name'
                 }
-            });
+            })
+            .skip(skip)
+            .limit(limit)
+            .sort({ placed_at: -1 });
 
         if (!orders.length) {
             return res.status(404).json({ success: false, message: 'No orders found for this user' });
@@ -126,7 +136,10 @@ const getUserOrders = async (req, res) => {
         res.status(200).json({
             success: true,
             message: "User orders fetched successfully",
-            orders
+            orders,
+            currentPage: page,
+            totalPages,
+            totalOrders
         });
     } catch (error) {
         console.error("Error fetching user orders:", error);
@@ -135,6 +148,8 @@ const getUserOrders = async (req, res) => {
 };
 
 
+
+//Detailed display of order......
 const getOrderById = async (req, res) => {
     try {
         const { orderId } = req.params;
@@ -170,4 +185,3 @@ module.exports = { createOrder, getCheckoutCartItems, getUserOrders, getOrderByI
 
 
 
-// module.exports = { createOrder, getCheckoutCartItems }

@@ -19,6 +19,9 @@ router.post('/logout', userController.UserLogout)
 router.post('/send-otp', userController.sendOTP);
 router.patch('/profile/:id', profileController.updateProfile);
 router.get('/user/:id', profileController.getUserData);
+router.post('/reset', userController.sendOTPForPasswordReset)
+router.post('/reset-password', userController.resetPassword);
+router.post('/verify', verifyOTP, userController.verifyResetOTP);
 
 
 
@@ -27,18 +30,15 @@ router.post('/auth/google-signup', userController.googleSignIn);
 router.post('/auth/google-login', userController.googleLoginUser);
 
 
-//products , etc...
-// router.get('/fetch_product_by_date', productController.fetchLatestProduct)
-// router.get('/fetch_all_product', productController.fetchActiveProduct)
-// router.get('/product/:id', productController.fetchProductById);
-// router.get('/products/related/:id', productController.fetchRelatedProducts);
+//products 
+
 router.get('/get_active_categories', categoryController.getActiveCategories);
 router.get('/advanced-search', productController.advancedSearch);
 router.get('/latest', productController.fetchLatestProduct);
 router.get('/active', productController.fetchActiveProduct);
 router.get('/product/:id', productController.fetchProductById);
 router.get('/related/:id', productController.fetchRelatedProducts);
-                                                                                         
+
 
 //category related..
 // router.get('/get_active_categories', categoryController.getActiveCategories);
@@ -51,7 +51,7 @@ router.delete('/address/:addressId', address.deleteUserAddress);
 router.get('/address/:id', address.getAddressById);
 router.patch('/addresses/:id', address.updateUserAddress);
 
-        
+
 //cart mangement routess...
 router.post('/add-to-cart', cartController.addToCart);
 router.get('/get-cart-details', cartController.getCartDetails);

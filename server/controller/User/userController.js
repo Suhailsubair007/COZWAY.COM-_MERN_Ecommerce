@@ -17,7 +17,7 @@ const securePassword = async (password) => {
 };
 
 
-
+//User registration controller....
 const registerUser = async (req, res) => {
     const { name, email, phone, password } = req.body;
     console.log(req.body);
@@ -47,18 +47,18 @@ const registerUser = async (req, res) => {
 };
 
 
-
+//Login user controller and setting the access and refresh tocken to the cookies..
 const login = async (req, res) => {
     try {
         const { email, password } = req.body;
         console.log(req.body)
         if (!email || !password) {
-            return res.status(400).json({ success: false, message: "All fields are required" });
+            return res.status(400).json({ success: false, message: "All fields required" });
         }
 
         const finduser = await User.findOne({ email });
         if (!finduser) {
-            return res.status(401).json({ success: false, message: "Invalid credentials" });
+            return res.status(401).json({ success: false, message: "Invalid email or password" });
         }
         if (finduser.is_blocked) {
             return res.status(403).json({ success: false, message: "User is blocked. Please contact support." });
@@ -88,7 +88,7 @@ const login = async (req, res) => {
 }
 
 
-
+//Logout the user and clear access and refresh tocken from the cookiee..
 const UserLogout = (req, res) => {
     res.clearCookie("accessTocken");
     res.clearCookie('refreshToken');
@@ -96,11 +96,13 @@ const UserLogout = (req, res) => {
 };
 
 
+//send OTP for signup....
 const sendOTP = async (req, res) => {
     try {
         const { email } = req.body;
         console.log(email);
         const userPresent = await User.findOne({ email });
+        console.log(userPresent)
 
         if (userPresent) {
             return res.status(409).json({
@@ -135,6 +137,33 @@ const sendOTP = async (req, res) => {
 }
 
 
+//send OTP for forgot password....
+const sendOTPForPasswordReset = async (req, res) => {
+    try {
+        const { email } = req.body;
+        const user = await User.findOne({ email });
+
+        if (!user) {
+            return res.status(404).json({ success: false, message: 'User not found' });
+        }
+
+        let otp = otpGenarator.generate(5, { upperCaseAlphabets: false, lowerCaseAlphabets: false, specialChars: false });
+        
+        let existingOtp = await OTP.findOne({ otp });
+        while (existingOtp) {
+            otp = otpGenarator.generate(5, { upperCaseAlphabets: false, lowerCaseAlphabets: false, specialChars: false });
+            existingOtp = await OTP.findOne({ otp });
+        }
+        await OTP.create({ email, otp });
+
+        res.status(200).json({ success: true, message: 'OTP sent successfully', otp });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ success: false, message: 'Server error' });
+    }
+};
+
+//Cntroller for google signup
 const googleSignIn = async (req, res) => {
     console.log(req.body);
 
@@ -174,6 +203,8 @@ const googleSignIn = async (req, res) => {
     }
 };
 
+
+//contorller for google login...
 const googleLoginUser = async (req, res) => {
     const { email, name } = req.body;
 
@@ -213,11 +244,54 @@ const googleLoginUser = async (req, res) => {
     }
 };
 
+// controller to verify OTP for reset passwowdd...
+const verifyResetOTP = async (req, res) => {
+    try {
+        const { email, otp } = req.body;
+        const validOtp = await OTP.findOne({ email, otp });
+
+        if (!validOtp) {
+            return res.status(400).json({ success: false, message: 'Invalid or expired OTP' });
+        }
+
+        await OTP.deleteOne({ email, otp });
+        res.status(200).json({ success: true, message: 'OTP verified successfully' });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ success: false, message: 'Server error' });
+    }
+};
+
+// update the password...
+const resetPassword = async (req, res) => {
+    try {
+        const { email, newPassword } = req.body;
+        const user = await User.findOne({ email });
+
+        if (!user) {
+            return res.status(404).json({ success: false, message: 'User not found' });
+        }
+        const hashedPassword = await securePassword(newPassword);
+        user.password = hashedPassword;
+
+        await user.save();
+        res.status(200).json({ success: true, message: 'Password reset successfully' });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ success: false, message: 'Server error' });
+    }
+};
+
+
+
 module.exports = {
     registerUser,
     sendOTP,
     login,
     UserLogout,
     googleSignIn,
-    googleLoginUser
+    googleLoginUser,
+    sendOTPForPasswordReset,
+    verifyResetOTP,
+    resetPassword
 };

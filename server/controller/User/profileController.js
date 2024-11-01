@@ -1,5 +1,6 @@
 const User = require('../../model/User')
 
+// controller for update frofile details in the profile page...
 const updateProfile = async (req, res) => {
     const userId = req.params.id;
     const { name, phone } = req.body;
@@ -36,6 +37,8 @@ const updateProfile = async (req, res) => {
 };
 
 
+
+// To get data to display in the profile page...
 const getUserData = async (req, res) => {
     const userId = req.params.id;
 

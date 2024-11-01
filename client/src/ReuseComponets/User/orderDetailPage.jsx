@@ -49,11 +49,11 @@ export default function OrderDetail() {
           <span className="ml-1">Home</span>
         </a>
         <ChevronRight className="h-4 w-4" />
-        <a href="/account" className="hover:text-gray-900">
+        <a href="/profile" className="hover:text-gray-900">
           Account
         </a>
         <ChevronRight className="h-4 w-4" />
-        <a href="/account/orders" className="hover:text-gray-900">
+        <a href="/profile/orders" className="hover:text-gray-900">
           My Orders
         </a>
         <ChevronRight className="h-4 w-4" />

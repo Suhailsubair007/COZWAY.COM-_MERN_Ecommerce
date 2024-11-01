@@ -35,12 +35,12 @@ const addCategory = async (req, res) => {
 const updateCategory = async (req, res) => {
     try {
         const { name, description } = req.body;
-        let categoryId = req.params.id;
+        const {id} = req.params;
+        console.log(id);
 
-        categoryId = categoryId.replace(/:/g, '');
-
+    
         const updatedCategory = await Category.findByIdAndUpdate(
-            categoryId,
+            id,
             { name, description },
             { new: true, runValidators: true }
         );
@@ -72,7 +72,7 @@ const getCategories = async (req, res) => {
 
 
 const fetchCategoryById = async (req, res) => {
-    const { categoryId } = req.params;  // Use params instead of body
+    const { categoryId } = req.params; 
     console.log(categoryId)
 
     try {

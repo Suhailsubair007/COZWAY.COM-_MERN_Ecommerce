@@ -1,7 +1,15 @@
-import {useNavigate} from 'react-router-dom'
+import { useNavigate } from "react-router-dom";
 import React, { useState, useEffect } from "react";
 import axiosInstance from "@/config/axiosConfig";
 import { useSelector } from "react-redux";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination";
 
 const getStatusColor = (status) => {
   switch (status.toUpperCase()) {
@@ -19,19 +27,28 @@ const getStatusColor = (status) => {
 export default function Component() {
   const navigate = useNavigate();
   const [orders, setOrders] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
   const user = useSelector((state) => state.user.userInfo.id);
 
   useEffect(() => {
-    fetchOrders();
-  }, []);
+    fetchOrders(currentPage);
+  }, [currentPage]);
 
-  const fetchOrders = async () => {
+  const fetchOrders = async (page) => {
     try {
-      const response = await axiosInstance.get(`/users/orders/${user}`);
+      const response = await axiosInstance.get(
+        `/users/orders/${user}?page=${page}&limit=2`
+      );
       setOrders(response.data.orders);
+      setTotalPages(response.data.totalPages);
     } catch (error) {
       console.error("Error fetching orders:", error);
     }
+  };
+
+  const handlePageChange = (newPage) => {
+    setCurrentPage(newPage);
   };
 
   return (
@@ -70,7 +87,7 @@ export default function Component() {
           </li>
           <li>
             <a
-              href="/account"
+              href="/profile"
               className="text-gray-500 hover:text-gray-900 transition-colors duration-200"
             >
               Account
@@ -199,6 +216,32 @@ export default function Component() {
           </div>
         ))}
       </div>
+      <Pagination className="mt-8">
+        <PaginationContent>
+          <PaginationItem>
+            <PaginationPrevious
+              onClick={() => handlePageChange(currentPage - 1)}
+              disabled={currentPage === 1}
+            />
+          </PaginationItem>
+          {[...Array(totalPages)].map((_, index) => (
+            <PaginationItem key={index}>
+              <PaginationLink
+                onClick={() => handlePageChange(index + 1)}
+                isActive={currentPage === index + 1}
+              >
+                {index + 1}
+              </PaginationLink>
+            </PaginationItem>
+          ))}
+          <PaginationItem>
+            <PaginationNext
+              onClick={() => handlePageChange(currentPage + 1)}
+              disabled={currentPage === totalPages}
+            />
+          </PaginationItem>
+        </PaginationContent>
+      </Pagination>
     </div>
   );
 }

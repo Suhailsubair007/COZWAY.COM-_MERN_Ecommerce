@@ -48,6 +48,8 @@ const addToCart = async (req, res) => {
 };
 
 
+
+
 //Getting cart detais to chek is the purticlar size of theprpduct is alredy in the cart..
 const getCartDetails = async (req, res) => {
     try {
@@ -85,6 +87,8 @@ const getCartDetails = async (req, res) => {
         res.status(500).json({ message: "Server error" });
     }
 };
+
+
 
 //Get the cart items details...
 const getAllCartItems = async (req, res) => {
@@ -136,6 +140,8 @@ const getAllCartItems = async (req, res) => {
     }
 };
 
+
+
 //To delete the purticukar item from the cart......
 const deleteItem = async (req, res) => {
     try {
@@ -160,7 +166,6 @@ const deleteItem = async (req, res) => {
             { new: true }
         );
 
-
         console.log("Ucart after delete:", updatedCart);
 
         updatedCart.totalCartPrice = updatedCart.products.reduce((acc, item) => acc + item.totalProductPrice, 0);
@@ -172,6 +177,9 @@ const deleteItem = async (req, res) => {
         res.status(500).json({ message: 'Server error' });
     }
 };
+
+
+
 
 
 //Incrse count and handle hte size - stock also incremeting the price based on the purticular quantity..
@@ -224,6 +232,10 @@ const incrementCartItemQuantity = async (req, res) => {
         res.status(500).json({ success: false, error: 'Server error' });
     }
 };
+
+
+
+
 
 //Decrese count and handle hte size - stock also decrementing the price based on the purticular quantity..
 const decrementCartItemQuantity = async (req, res) => {

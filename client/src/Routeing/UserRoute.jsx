@@ -16,6 +16,8 @@ import CartPage from "@/pages/User/HomePage/CartPage";
 import Checkout from "@/pages/User/Checkout";
 import Order_details from "@/pages/User/Order_details";
 import MyOrders from "@/ReuseComponets/User/MyOrder";
+import ForgotPassword from "@/pages/User/login/ForgotPassword";
+import ResetPassword from "@/pages/User/login/ResetPassword";
 // import DeliveryAddress from "@/ReuseComponets/User/DeliveryAddress";
 // import Orders from "@/ReuseComponets/User/Orders";
 // import Wallet from "@/ReuseComponets/User/Wallet";
@@ -35,6 +37,22 @@ const UserRoute = () => {
           element={
             <UserLoginProtect>
               <Login />
+            </UserLoginProtect>
+          }
+        />
+        <Route
+          path="/forgotPassword"
+          element={
+            <UserLoginProtect>
+              <ForgotPassword />
+            </UserLoginProtect>
+          }
+        />
+        <Route
+          path="/reset-password"
+          element={
+            <UserLoginProtect>
+              <ResetPassword />
             </UserLoginProtect>
           }
         />
