@@ -43,8 +43,9 @@ const ProductDetail = () => {
   const [isInCart, setIsInCart] = useState(false);
   const { id } = useParams();
 
-
-  // console.log("user daraaaaaaaaaa:", productData.totalStock);
+  console.log("PRODUCT ID:", id);
+  console.log("userId====>", userId);
+  console.log("size=======>", selectedSize);
 
   useEffect(() => {
     const fetchProduct = async () => {
@@ -66,12 +67,20 @@ const ProductDetail = () => {
   useEffect(() => {
     const checkCartForSize = async () => {
       try {
-        const response = await axiosInstance.get(`/users/get-cart-details`, {
-          params: { userId, productId: id, size: selectedSize },
+        console.log("==============");
+        console.log(userId);
+        console.log(id);
+        console.log(selectedSize);
+        console.log("================");
+        const response = await axiosInstance.get("/users/get-cart-details", {
+          params: {
+            userId,
+            productId: id,
+            size: selectedSize,
+          },
         });
         const cart = response.data;
         console.log("Checking size in cart..", cart);
-
         setIsInCart(cart.inCart);
       } catch (error) {
         console.error("Failed to fetch cart details:", error);

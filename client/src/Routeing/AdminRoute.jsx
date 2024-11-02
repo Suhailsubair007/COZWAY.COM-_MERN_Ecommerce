@@ -8,8 +8,10 @@ import EditCategory from "../pages/Admin/EditCategory";
 import Aside from "@/ReuseComponets/Admin/Aside";
 import UserList from "@/pages/Admin/UserList";
 import EditProduct from "@/pages/Admin/EditProduct";
-import AdminProtect from "./Protected_Routing/admin/adminProtect";
-import Cookies from "js-cookie";
+import OrderManagement from "@/pages/Admin/OrderManagement";
+// import AdminProtect from "./Protected_Routing/admin/adminProtect";
+import AdminOrderDetail from "@/pages/Admin/AdminOrderDetail";
+// import Cookies from "js-cookie";
 
 const AdminRoute = () => {
   return (
@@ -28,6 +30,8 @@ const AdminRoute = () => {
           <Route path="/product/edit/:productId" element={<EditProduct />} />
           <Route path="/product" element={<Product />} />
           <Route path="/customers" element={<UserList />} />
+          <Route path="/orders" element={<OrderManagement />} />
+          <Route path="/new/:id" element={<AdminOrderDetail />} />
         </Routes>
       </main>
       <Toaster richColors position="bottom-center" />

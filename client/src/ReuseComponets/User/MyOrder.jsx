@@ -171,10 +171,10 @@ export default function Component() {
                   <div className="shrink-0 text-right">
                     <p
                       className={`text-sm font-medium ${getStatusColor(
-                        item.order_status
+                        order.order_status
                       )}`}
                     >
-                      {item.order_status}
+                      {order.order_status}
                     </p>
                   </div>
                 </div>
@@ -204,7 +204,7 @@ export default function Component() {
                 ) && (
                   <button
                     onClick={() => {
-                      // Add your cancel order logic here
+                      // cali
                     }}
                     className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 transition-colors"
                   >

@@ -42,7 +42,7 @@ router.get('/related/:id', productController.fetchRelatedProducts);
 
 //category related..
 // router.get('/get_active_categories', categoryController.getActiveCategories);
-router.get('/:id', productController.fetchProductById);
+// router.get('/:id', productController.fetchProductById);
 
 //mage the address routes end points...
 router.post('/addresses', address.userAddAddress);
@@ -71,3 +71,4 @@ router.get('/order/:orderId', orderController.getOrderById);
 
 
 module.exports = router;
+  

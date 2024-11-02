@@ -53,24 +53,25 @@ const addToCart = async (req, res) => {
 //Getting cart detais to chek is the purticlar size of theprpduct is alredy in the cart..
 const getCartDetails = async (req, res) => {
     try {
-        const { userId, productId, size } = req.query;
-        console.log("userid", userId)
-        console.log("productid", productId)
-        console.log(size)
-
+        console.log("vannuuu")
+        const { userId, productId, size } = req.query;   
+        console.log(userId)
+        console.log(productId)
+        console.log(size);
         const cart = await Cart.findOne({ userId });
+        console.log(cart)
 
-        if (!cart) {
+        if (!cart) { 
             return res.status(404).json({ message: "Cart not found" });
         }
 
         const productInCart = cart.products.find(
             (product) =>
-                product.productId.toString() === productId &&
+                product.productId.equals(productId) &&
                 product.size === size
         );
 
-        if (productInCart) {
+        if (productInCart) { 
             return res.status(200).json({
                 inCart: true,
                 message: "Product with this size already in cart"
@@ -78,15 +79,16 @@ const getCartDetails = async (req, res) => {
         } else {
             return res.status(200).json({
                 inCart: false,
-                message: "Product with this size not in cart"
+                message: "Product with this size not in cart" 
             });
         }
 
     } catch (error) {
-        console.error("Error fetching cart details:", error);
+        console.error("Error fetching cart details:", error.message);
         res.status(500).json({ message: "Server error" });
     }
 };
+
 
 
 

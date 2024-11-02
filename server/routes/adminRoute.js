@@ -5,6 +5,7 @@ const adminController = require('../controller/Admin/adminController');
 const userController = require('../controller/Admin/userController')
 const categoryController = require('../controller/Admin/categoryController');
 const productController = require('../controller/Admin/productController')
+const orderController = require('../controller/Admin/orderController');
 
 
 //Admin login and Signup route..
@@ -33,5 +34,11 @@ router.get('/product/edit/:id', verifyAdmin, productController.fetchProductById)
 router.get('/coustmers', userController.getCoutomers);
 router.patch('/coustmers/:id', verifyAdmin, userController.updateCoustomerStatus);
 
+
+
+
+router.get('/orders', orderController.getAllOrders);
+router.patch('/orders/:orderId/status', orderController.updateOrderStatus);
+router.delete('/orders/:orderId', orderController.deleteOrder);
 
 module.exports = router;

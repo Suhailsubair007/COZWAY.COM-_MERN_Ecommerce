@@ -24,7 +24,7 @@ const fetchActiveProduct = async (req, res) => {
 
 const fetchProductById = async (req, res) => {
     const { id } = req.params;
-    console.log(id)
+    console.log("oombii")
     try {
         const product = await Product.findById(id).populate('category');
 
@@ -37,7 +37,7 @@ const fetchProductById = async (req, res) => {
         console.error('Error fetching category:', error);
         res.status(500).json({ message: 'Server error. Please try again later.' });
     }
-};
+}; 
 
 const fetchRelatedProducts = async (req, res) => {
     const { id } = req.params;
