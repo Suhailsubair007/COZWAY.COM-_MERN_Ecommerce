@@ -1,14 +1,16 @@
+'use client'
+
 import { useEffect, useState } from "react"
 import { useParams } from "react-router-dom"
-import { ChevronRight, Home } from "lucide-react"
-
+import { ChevronRight, Home, Package, CreditCard, FileText, Truck, RefreshCcw } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import { Separator } from "@/components/ui/separator"
+import { ScrollArea } from "@/components/ui/scroll-area"
+import { Badge } from "@/components/ui/badge"
 import axiosInstance from "@/config/axiosConfig"
 
 export default function AdminOrderDetail() {
-    console.log("hiiiiiiiiiiiiiiiiiiiiiiiiiiiiii")
-  const { id } = useParams();
-  console.log(id);
+  const { id } = useParams()
   const [orderData, setOrderData] = useState(null)
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState(null)
@@ -31,9 +33,9 @@ export default function AdminOrderDetail() {
     }
   }
 
-  if (isLoading) return <div className="p-6">Loading...</div>
-  if (error) return <div className="p-6 text-red-500">{error}</div>
-  if (!orderData) return <div className="p-6">No order found</div>
+  if (isLoading) return <div className="flex items-center justify-center h-screen">Loading...</div>
+  if (error) return <div className="flex items-center justify-center h-screen text-red-500">{error}</div>
+  if (!orderData) return <div className="flex items-center justify-center h-screen">No order found</div>
 
   const formatDate = (dateString) => {
     return new Date(dateString).toLocaleDateString('en-US', {
@@ -44,28 +46,48 @@ export default function AdminOrderDetail() {
   }
 
   return (
-    <div className="container mx-auto py-10 px-4 sm:px-6 lg:px-8 h-screen">
+    <div className="container mx-auto py-10 px-4 sm:px-6 lg:px-8 min-h-screen">
+      {/* Breadcrumb */}
+      <nav className="flex items-center gap-2 text-sm text-muted-foreground mb-6">
+        <a href="/admin/dashboard" className="flex items-center hover:text-foreground transition-colors">
+          <Home className="h-4 w-4 mr-1" />
+          <span>Dashboard</span>
+        </a>
+        <ChevronRight className="h-4 w-4" />
+        <a href="/admin/orders" className="hover:text-foreground transition-colors">Orders</a>
+        <ChevronRight className="h-4 w-4" />
+        <span className="text-foreground font-medium">Order Details</span>
+      </nav>
+
       {/* Header */}
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold text-gray-900">Order Details (Admin View)</h1>
+      <div className="flex justify-between items-center mb-8">
+        <h1 className="text-3xl font-bold text-foreground">Order Details (Admin View)</h1>
+        <Badge variant="outline" className="text-lg px-3 py-1">
+          {orderData.order_status}
+        </Badge>
       </div>
 
-      {/* Main Content */}
-      <div className="bg-gray-100 rounded-lg shadow-sm p-6 mb-6">
-        {/* Order Info */}
-        <div className="mb-6 text-gray-600">
-          Ordered on {formatDate(orderData.placed_at)} | Order# {orderData.order_id}
-          <a href="#" className="text-blue-600 hover:text-blue-700 float-right">
+      {/* Order Info */}
+      <div className="bg-muted/50 rounded-lg p-6 mb-8">
+        <div className="flex justify-between items-center mb-4">
+          <div className="space-y-1">
+            <p className="text-sm text-muted-foreground">Ordered on {formatDate(orderData.placed_at)}</p>
+            <p className="text-lg font-semibold">Order #{orderData.order_id}</p>
+          </div>
+          <Button variant="outline" className="gap-2">
+            <FileText className="h-4 w-4" />
             Invoice
-          </a>
+          </Button>
         </div>
-
-        {/* Order Details Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
+        <Separator className="my-4" />
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {/* Shipping Address */}
-          <div>
-            <h2 className="text-lg font-semibold mb-3">Shipping Address</h2>
-            <div className="text-gray-600 space-y-1">
+          <div className="space-y-2">
+            <div className="flex items-center gap-2 text-lg font-semibold">
+              <Truck className="h-5 w-5 text-primary" />
+              <h2>Shipping Address</h2>
+            </div>
+            <div className="text-sm text-muted-foreground space-y-1">
               <p>{orderData.shipping_address.address}</p>
               <p>{orderData.shipping_address.district}, {orderData.shipping_address.state}</p>
               <p>Pin Code - {orderData.shipping_address.pincode}</p>
@@ -74,36 +96,48 @@ export default function AdminOrderDetail() {
           </div>
 
           {/* Payment Method */}
-          <div>
-            <h2 className="text-lg font-semibold mb-3">Payment Method</h2>
-            <p className="text-gray-600">{orderData.payment_method}</p>
-            <p className="text-gray-600">Status: {orderData.payment_status}</p>
+          <div className="space-y-2">
+            <div className="flex items-center gap-2 text-lg font-semibold">
+              <CreditCard className="h-5 w-5 text-primary" />
+              <h2>Payment Method</h2>
+            </div>
+            <div className="text-sm text-muted-foreground space-y-1">
+              <p>{orderData.payment_method}</p>
+              <p>Status: {orderData.payment_status}</p>
+            </div>
           </div>
 
           {/* Order Summary */}
-          <div>
-            <h2 className="text-lg font-semibold mb-3">Order Summary</h2>
-            <div className="space-y-2">
-              <div className="flex justify-between text-gray-600">
+          <div className="space-y-2">
+            <div className="flex items-center gap-2 text-lg font-semibold">
+              <Package className="h-5 w-5 text-primary" />
+              <h2>Order Summary</h2>
+            </div>
+            <div className="text-sm space-y-2">
+              <div className="flex justify-between text-muted-foreground">
                 <span>Items Total</span>
                 <span>₹{orderData.total_amount.toFixed(2)}</span>
               </div>
-              <div className="flex justify-between text-gray-600">
+              <div className="flex justify-between text-muted-foreground">
                 <span>Shipping Charge</span>
                 <span>₹{orderData.shipping_fee.toFixed(2)}</span>
               </div>
-              <div className="flex justify-between text-gray-900 font-semibold">
+              <Separator className="my-2" />
+              <div className="flex justify-between font-semibold">
                 <span>Grand Total</span>
                 <span>₹{orderData.total_price_with_discount.toFixed(2)}</span>
               </div>
             </div>
           </div>
         </div>
+      </div>
 
-        {/* Products List */}
+      {/* Products List */}
+      <h2 className="text-2xl font-semibold mb-4">Order Items</h2>
+      <ScrollArea className="h-[400px] rounded-md border p-4">
         <div className="space-y-6">
           {orderData.order_items.map((item, index) => (
-            <div key={index} className="flex items-start gap-4">
+            <div key={index} className="flex items-start gap-4 pb-4 border-b last:border-b-0">
               <img
                 src={item.product.images[0]}
                 alt={item.product.name}
@@ -112,27 +146,28 @@ export default function AdminOrderDetail() {
                 className="rounded-lg border object-cover"
               />
               <div className="flex-1">
-                <h3 className="text-gray-900 font-medium">
-                  {item.product.name}
-                </h3>
-                <p className="text-gray-600 mt-1">
+                <h3 className="font-medium">{item.product.name}</h3>
+                <p className="text-sm text-muted-foreground mt-1">
                   Quantity: {item.quantity} x ₹{item.price.toFixed(2)}
                 </p>
-                <p className="text-gray-600">
-                  Category: {item.product.category.name}
-                </p>
+                <Badge variant="secondary" className="mt-2">
+                  {item.product.category.name}
+                </Badge>
               </div>
-              <div className="text-green-600">Status: {item.order_status}</div>
+              <div className="text-right">
+                <p className="font-semibold">₹{(item.quantity * item.price).toFixed(2)}</p>
+              </div>
             </div>
           ))}
         </div>
+      </ScrollArea>
 
-        {/* Update Order Status Button */}
-        <div className="flex justify-end mt-6">
-          <Button className="px-6 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors">
-            Update Order Status
-          </Button>
-        </div>
+      {/* Update Order Status Button */}
+      <div className="flex justify-end mt-8">
+        <Button className="gap-2">
+          <RefreshCcw className="h-4 w-4" />
+          Update Order Status
+        </Button>
       </div>
     </div>
   )

@@ -1,53 +1,56 @@
 const jwt = require("jsonwebtoken");
-const User = require("../model/User");
+const User = require('../model/User');
 
 const verifyUser = async (req, res, next) => {
-    const accessToken = req.cookies.jwt;
+    const accessToken = req.cookies.accessToken;
     const refreshToken = req.cookies.refreshToken;
 
+    
+
     if (accessToken) {
+        const decode = jwt.verify(accessToken, process.env.ACCESS_TOKEN_SECRET, (err, decoded) => {
+            if (err) {
+                if (err.name === "TokenExpiredError") {
+                    handleRefreshToken(refreshToken, req, res, next);
+                } else {
+                    res.status(401).json({ message: "User not authorized, token verification failed" });
+                }
+            } else {
+                req.user = decoded.user;
+                next();
+            }
+        });
+    } else {
+        handleRefreshToken(refreshToken, req, res, next);
+    }
+};
+
+
+//Helper function for chek refresh token and create a new asses token with refresh token
+
+const handleRefreshToken = async (refreshToken, req, res, next) => {
+    if (refreshToken) {
         try {
-            const decode = jwt.verify(accessToken, process.env.ACCESS_TOKEN_SECRET);
-            const user = await User.findById(decode.user).select("-password");
+            const decodeRefresh = jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET);
+            const newAccessToken = jwt.sign({ user: decodeRefresh.user }, process.env.ACCESS_TOKEN_SECRET, {
+                expiresIn: "2m",
+            });
+
+            res.cookie("accessToken", newAccessToken, {
+                httpOnly: true,
+                secure: false,
+                sameSite: "strict",
+                maxAge: 2 * 60 * 1000,
+            });
+
+            const user = await User.findById(decodeRefresh.user).select("-password");
             req.user = user;
             next();
         } catch (err) {
-            if (err.name === "TokenExpiredError") {
-                if (refreshToken) {
-                    try {
-                        const decodeRefresh = jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET);
-
-                        const newAccessToken = jwt.sign({ user: decodeRefresh.user }, process.env.ACCESS_TOKEN_SECRET, {
-                            expiresIn: "30d",
-                        });
-                        res.cookie("jwt", newAccessToken, {
-                            httpOnly: true,
-                            secure: false,
-                            sameSite: "strict",
-                            maxAge: 30 * 24 * 60 * 60 * 1000,
-                        });
-
-                        const user = await User.findById(decodeRefresh.user).select("-password");
-                        req.user = user; // Attaching user to the request object for later use
-                        next();
-                    } catch (refreshErr) {
-                        console.error(refreshErr);
-                        res.status(403);
-                        throw new Error("Refresh token is invalid or expired");
-                    }
-                } else {
-                    res.status(401);
-                    throw new Error("Access token expired and no refresh token provided");
-                }
-            } else {
-                console.error(err);
-                res.status(401);
-                throw new Error("User not authorized, token verification failed");
-            }
+            res.status(403).json({ message: "Refresh token is invalid or expired" });
         }
     } else {
-        res.status(401);
-        throw new Error("Not authorized, no token provided");
+        res.status(401).json({ message: "No access token and no refresh token provided" });
     }
 };
 

@@ -3,11 +3,18 @@ const User = require('../../model/User')
 // controller for update frofile details in the profile page...
 const updateProfile = async (req, res) => {
     const userId = req.params.id;
-    const { name, phone } = req.body;
+    const { fullname, phone } = req.body;
 
+    // Rename `fullname` to `name` to match the schema
+    const name = fullname;
+
+    console.log("useid==============>", userId);
+    console.log("name===========>", name);
+    console.log("phone==========>", phone);
 
     const updateFields = {};
 
+    // Use `name` instead of `fullname`
     if (name) updateFields.name = name;
     if (phone) updateFields.phone = phone;
 

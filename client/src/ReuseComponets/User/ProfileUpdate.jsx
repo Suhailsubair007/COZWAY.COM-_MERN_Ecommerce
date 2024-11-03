@@ -1,163 +1,181 @@
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
+import { useSelector } from "react-redux";
+import { Formik, Form, Field } from "formik";
+import * as Yup from "yup";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Edit } from "lucide-react";
+import { Edit, User, Mail, Phone, Check } from "lucide-react";
 import axiosInstance from "@/config/axiosConfig";
-import { useSelector } from "react-redux";
 import { toast } from "sonner";
 
+const validationSchema = Yup.object().shape({
+  fullname: Yup.string().required("Full name is required"),
+  email: Yup.string().email("Invalid email").required("Email is required"),
+  phone: Yup.string()
+    .matches(/^[0-9]+$/, "Must be only digits")
+    .min(10, "Must be exactly 10 digits")
+    .max(10, "Must be exactly 10 digits")
+    .required("Phone number is required"),
+});
+
 export default function ProfileUpdate() {
-  const [formData, setFormData] = useState({
+  const user = useSelector((state) => state.user.userInfo.id);
+  const [initialUserData, setInitialUserData] = useState({
     fullname: "",
     email: "",
     phone: "",
   });
-  const [isEditing, setIsEditing] = useState(false);
-  const user = useSelector((state) => state.user.userInfo.id);
-  // console.log("oooiiii",user)
 
   useEffect(() => {
     const fetchUserData = async () => {
       try {
         const response = await axiosInstance.get(`/users/user/${user}`);
-        console.log(response.data.user);
-        // console.log(data)
-        setFormData({
+        const userData = {
           fullname: response.data.user.name || "",
           email: response.data.user.email || "",
           phone: response.data.user.phone || "",
-        });
+        };
+        setInitialUserData(userData);
       } catch (error) {
-        toast.error("Error fetching user data:", error);
+        toast.error("Error fetching user data");
       }
     };
 
     fetchUserData();
   }, [user]);
 
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prevState) => ({
-      ...prevState,
-      [name]: value,
-    }));
-  };
-
-  const handleEditClick = () => {
-    setIsEditing(true);
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    try {
-      const response = await axiosInstance.patch(
-        `/users/profile/${user}`,
-        formData
-      );
-
-      if (response.status === 200) {
-        toast.success("Profile updated successfully");
-        setIsEditing(false);
-      } else {
-        console.error("Error updating profile");
-      }
-    } catch (error) {
-      console.error("Error submitting form:", error);
-    }
-  };
-
   return (
-    <div className="flex items-center justify-center h-screen bg-gray-100 p-4">
-      <div className="flex items-center justify-center w-[100%] h-[100%]">
-        <Card className="w-full max-w-2xl bg-white shadow-lg rounded-3xl">
-          <CardHeader className="text-center">
-            <CardTitle className="text-2xl font-normal text-gray-800">
-              Good Evening ! {formData.fullname}
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <form onSubmit={handleSubmit} className="space-y-10">
-              <Button
-                variant="ghost"
-                size="icon"
-                className="ml-[500px]"
-                onClick={handleEditClick}
-                type="button"
-              >
-                <Edit className="h-4 w-4" />
-              </Button>
+    <div className="min-h-screen flex items-center justify-center bg-white p-4">
+      <div className="w-full max-w-md bg-white shadow-2xl rounded-3xl overflow-hidden border border-gray-200">
+        <Formik
+          enableReinitialize
+          initialValues={initialUserData}
+          validationSchema={validationSchema}
+          onSubmit={async (values, { setSubmitting }) => {
+            console.log(values);
+            try {
+              const response = await axiosInstance.patch(
+                `/users/profile/${user}`,
+                values
+              );
+              console.log("Request Payload:", values);
+              console.log("Response:", response);
+              if (response.status === 200) {
+                toast.success("Profile updated successfully");
+              } else {
+                toast.error("Error updating profile");
+              }
+            } catch (error) {
+              toast.error("Error submitting form");
+            } finally {
+              setSubmitting(false);
+            }
+          }}
+        >
+          {({ errors, touched, isSubmitting, values, isValid }) => (
+            <Form className="space-y-6 p-8">
+              <div className="text-center mb-8">
+                <h1 className="text-3xl font-bold text-gray-900">
+                  Your Profile
+                </h1>
+                <p className="text-gray-600 mt-2">
+                  Good Evening, {values.fullname || "User"}!
+                </p>
+              </div>
 
-              <div className="flex justify-between items-start">
-                <div className="w-[90%] space-y-2">
+              <div className="space-y-4">
+                <div className="relative">
                   <Label
                     htmlFor="fullname"
                     className="text-sm font-medium text-gray-700"
                   >
                     Full Name
                   </Label>
-                  <Input
+                  <Field
+                    as={Input}
                     id="fullname"
                     name="fullname"
-                    value={formData.fullname}
-                    onChange={handleInputChange}
-                    className="w-full bg-blue-50 border-rounded"
-                    required
-                    disabled={!isEditing}
+                    className="pl-10 w-full bg-gray-50 border-gray-300 focus:border-black focus:ring-black"
+                    placeholder="John Doe"
                   />
+                  <User className="absolute left-3 top-9 h-5 w-5 text-gray-400" />
+                  {errors.fullname && touched.fullname && (
+                    <div className="text-red-500 text-sm mt-1">
+                      {errors.fullname}
+                    </div>
+                  )}
+                </div>
+
+                <div className="relative">
+                  <Label
+                    htmlFor="email"
+                    className="text-sm font-medium text-gray-700"
+                  >
+                    Email
+                  </Label>
+                  <Field
+                    as={Input}
+                    id="email"
+                    name="email"
+                    type="email"
+                    className="pl-10 w-full bg-gray-50 border-gray-300 focus:border-black focus:ring-black"
+                    placeholder="john@example.com"
+                    disabled
+                  />
+                  <Mail className="absolute left-3 top-9 h-5 w-5 text-gray-400" />
+                  {errors.email && touched.email && (
+                    <div className="text-red-500 text-sm mt-1">
+                      {errors.email}
+                    </div>
+                  )}
+                </div>
+
+                <div className="relative">
+                  <Label
+                    htmlFor="phone"
+                    className="text-sm font-medium text-gray-700"
+                  >
+                    Contact Number
+                  </Label>
+                  <Field
+                    as={Input}
+                    id="phone"
+                    name="phone"
+                    type="tel"
+                    className="pl-10 w-full bg-gray-50 border-gray-300 focus:border-black focus:ring-black"
+                    placeholder="1234567890"
+                  />
+                  <Phone className="absolute left-3 top-9 h-5 w-5 text-gray-400" />
+                  {errors.phone && touched.phone && (
+                    <div className="text-red-500 text-sm mt-1">
+                      {errors.phone}
+                    </div>
+                  )}
                 </div>
               </div>
 
-              <div className="space-y-2">
-                <Label
-                  htmlFor="email"
-                  className="text-sm font-medium text-gray-700"
+              <div className="flex justify-end space-x-4">
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="flex items-center space-x-2 border-black text-black hover:bg-gray-100"
                 >
-                  Email
-                </Label>
-                <Input
-                  id="email"
-                  name="email"
-                  type="email"
-                  value={formData.email}
-                  onChange={handleInputChange}
-                  className="w-[90%] bg-blue-50 border-none"
-                  required
-                  disabled // Email is always non-editable
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label
-                  htmlFor="contactNumber"
-                  className="text-sm font-medium text-gray-700"
-                >
-                  Contact Number
-                </Label>
-                <Input
-                  id="contactNumber"
-                  name="contactNumber"
-                  type="tel"
-                  value={formData.phone}
-                  onChange={handleInputChange}
-                  className="w-[90%] bg-blue-50 border-none"
-                  required
-                  disabled={!isEditing}
-                />
-              </div>
-
-              {isEditing && (
+                  <Edit className="h-4 w-4" />
+                  <span>Edit</span>
+                </Button>
                 <Button
                   type="submit"
-                  className="py-4  w-[90%] bg-gray-700 text-white"
+                  className="bg-black text-white hover:bg-gray-800 flex items-center space-x-2"
+                  disabled={isSubmitting || !isValid}
                 >
-                  Update Profile
+                  <Check className="h-4 w-4" />
+                  <span>{isSubmitting ? "Updating..." : "Update Profile"}</span>
                 </Button>
-              )}
-            </form>
-          </CardContent>
-        </Card>
+              </div>
+            </Form>
+          )}
+        </Formik>
       </div>
     </div>
   );

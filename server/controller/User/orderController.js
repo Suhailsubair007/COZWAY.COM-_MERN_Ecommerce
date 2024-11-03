@@ -180,7 +180,38 @@ const getOrderById = async (req, res) => {
     }
 };
 
-module.exports = { createOrder, getCheckoutCartItems, getUserOrders, getOrderById };
+
+const cancelOrder = async (req, res) => {
+    try {
+        const { orderId } = req.params;
+        // const newStatus = req.body;
+        console.log(orderId)
+        // console.log(newStatus)
+
+        const order = await Order.findById(orderId);
+        if (!orderId) {
+            return res.status(400).json({ mesage: "Order id not found." })
+        }
+        console.log(order);
+
+        order.order_status = 'cancelled';
+        console.log(order)
+        await order.save();
+        res.status(200).json({ sucess: true, message: "Status updated sucessfylly.." })
+
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: error.message });
+    }
+}
+
+module.exports = {
+    createOrder,
+    getCheckoutCartItems,
+    getUserOrders,
+    getOrderById,
+    cancelOrder
+};
 
 
 

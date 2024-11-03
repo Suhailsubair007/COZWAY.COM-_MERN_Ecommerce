@@ -124,7 +124,6 @@ const ProductDetail = () => {
       if (response.status === 200) {
         setIsInCart(true);
         toast.success("The product has been added to your cart.");
-        navigate("/cart");
       } else if (response.data.message === "Product is already in cart") {
         setIsInCart(true);
         toast.warning("This item is already in your cart.");

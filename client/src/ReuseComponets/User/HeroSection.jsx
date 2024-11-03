@@ -7,7 +7,7 @@ import { useNavigate } from "react-router-dom";
 const HeroSection = () => {
   const images = [
     {
-      src: "https://res.cloudinary.com/dupo7yv88/image/upload/v1729519788/2_WebBanner_1920x1080_5_1400x_ifn7km.jpg",
+      src: "https://res.cloudinary.com/dupo7yv88/image/upload/v1729429246/main1_mq6mhj.png",
       alt: "Mens Collection - Exclusive",
       title: "Classic Exclusive",
       subtitle: "Mens Collection",

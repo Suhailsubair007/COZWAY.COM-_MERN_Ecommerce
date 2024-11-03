@@ -17,7 +17,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
-import { Package, Eye } from "lucide-react";
+import { Package, Eye, ChevronRight, Home } from "lucide-react";
 import axiosInstance from "@/config/axiosConfig";
 import {
   AlertDialog,
@@ -28,7 +28,6 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-  AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { toast } from "sonner";
 
@@ -95,6 +94,21 @@ export default function OrderManagement() {
 
   return (
     <div className="container mx-auto py-10 px-4 sm:px-6 lg:px-8 h-screen">
+      <nav className="flex items-center gap-2 text-sm text-gray-600 mb-4">
+        <a
+          href="/admin/dashboard"
+          className="flex items-center hover:text-gray-900"
+        >
+          <Home className="h-4 w-4" />
+          <span className="ml-1">Dashboard</span>
+        </a>
+        <ChevronRight className="h-4 w-4" />
+        <a href="/profile" className="hover:text-gray-900">
+          My orders
+        </a>
+       
+       
+      </nav>
       <h1 className="text-2xl font-bold mb-6">Orders Management</h1>
 
       <div className="mb-6">
@@ -176,15 +190,21 @@ export default function OrderManagement() {
                 </TableCell>
                 <TableCell className="text-right">
                   <div className="flex justify-end gap-2">
-                    <Button onClick={() => navigate(`/admin/new/${order._id}`)} variant="outline" size="icon">
-                      <Eye className="h-4 w-4"  />
+                    <Button
+                      onClick={() => navigate(`/admin/new/${order._id}`)}
+                      variant="outline"
+                      size="icon"
+                    >
+                      <Eye className="h-4 w-4" />
                       <span className="sr-only">View Details</span>
                     </Button>
                     <Button
                       variant="destructive"
                       size="sm"
                       onClick={() => handleCancel(order)}
-                      disabled={order.order_status.toLowerCase() === "cancelled"}
+                      disabled={
+                        order.order_status.toLowerCase() === "cancelled"
+                      }
                     >
                       Cancel
                     </Button>
@@ -206,14 +226,17 @@ export default function OrderManagement() {
               Are you sure you want to cancel this order?
             </AlertDialogTitle>
             <AlertDialogDescription>
-              Cancelling this order will change its status to "Cancelled". This action cannot be undone.
+              Cancelling this order will change its status to "Cancelled". This
+              action cannot be undone.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel onClick={() => setIsCancelDialogOpen(false)}>
               No, keep the order
             </AlertDialogCancel>
-            <AlertDialogAction onClick={confirmCancel}>Yes, cancel the order</AlertDialogAction>
+            <AlertDialogAction onClick={confirmCancel}>
+              Yes, cancel the order
+            </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>

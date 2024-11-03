@@ -1,9 +1,21 @@
-import React from "react";
-import { NavLink, useNavigate } from "react-router-dom";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-import { Separator } from "@/components/ui/separator";
+'use client'
+
+import React from "react"
+import { NavLink, useNavigate, useLocation } from "react-router-dom"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { Button } from "@/components/ui/button"
+import { Separator } from "@/components/ui/separator"
+import {
+  Sidebar,
+  SidebarContent,
+  SidebarFooter,
+  SidebarHeader,
+  SidebarMenu,
+  SidebarMenuButton,
+  SidebarMenuItem,
+  SidebarProvider,
+  SidebarTrigger,
+} from "@/components/ui/sidebar"
 import {
   User,
   MapPin,
@@ -12,76 +24,81 @@ import {
   Ticket,
   Key,
   LogOut,
-} from "lucide-react";
+  Menu,
+} from "lucide-react"
 
 export default function UserProfileSidebar({ userName = "Suhail Subair" }) {
-  const navigate = useNavigate();
+  const navigate = useNavigate()
+  const location = useLocation()
 
   const menuItems = [
     { icon: User, label: "My Profile", path: "/profile" },
-    {
-      icon: MapPin,
-      label: "Delivery Address",
-      path: "/profile/delivery-address",
-    },
+    { icon: MapPin, label: "Delivery Address", path: "/profile/delivery-address" },
     { icon: ShoppingBag, label: "My Orders", path: "/profile/orders" },
     { icon: Wallet, label: "My Wallet", path: "/profile/wallet" },
     { icon: Ticket, label: "My Coupon", path: "/profile/coupons" },
     { icon: Key, label: "Change Password", path: "/profile/change-password" },
-  ];
+  ]
 
   const handleLogout = () => {
     // Implement logout logic here
-    console.log("Logging out...");
-    navigate("/login");
-  };
+    console.log("Logging out...")
+    navigate("/login")
+  }
 
   return (
-    <Card className="w-[290px] h-screen bg-white shadow-lg rounded-none overflow-hidden">
-      <CardContent className="p-6">
-        <div className="flex flex-col items-center mb-6">
-          <Avatar className="w-20 h-20 mb-4">
-            <AvatarImage
-              src="/placeholder.svg?height=80&width=80"
-              alt={userName}
-            />
-            <AvatarFallback>{userName.charAt(0)}</AvatarFallback>
-          </Avatar>
-          <h2 className="text-xl font-semibold text-gray-800">{userName}</h2>
-        </div>
-        <Separator className="mb-6" />
-        <nav>
-          <ul className="space-y-2">
+    <SidebarProvider>
+      <Sidebar className="border-r">
+        <SidebarHeader className="border-b px-6 py-4">
+          <div className="flex items-center gap-4">
+            <Avatar className="h-10 w-10">
+              <AvatarImage src="/placeholder.svg?height=40&width=40" alt={userName} />
+              <AvatarFallback>{userName.charAt(0)}</AvatarFallback>
+            </Avatar>
+            <div className="flex flex-col">
+              <span className="text-sm font-medium">{userName}</span>
+              <span className="text-xs text-muted-foreground">View Profile</span>
+            </div>
+          </div>
+        </SidebarHeader>
+        <SidebarContent>
+          <SidebarMenu>
             {menuItems.map((item, index) => (
-              <li key={index}>
-                <NavLink
-                  to={item.path}
-                  end={item.path === "/profile"}
-                  className={({ isActive }) =>
-                    `flex items-center w-full px-4 py-2 text-sm font-medium rounded-md ${
-                      isActive
-                        ? "bg-gray-500 text-primary-foreground"
-                        : "text-gray-600 hover:text-gray-900 hover:bg-gray-100"
-                    }`
-                  }
+              <SidebarMenuItem key={index}>
+                <SidebarMenuButton
+                  asChild
+                  isActive={location.pathname === item.path || (item.path === "/profile" && location.pathname === item.path)}
                 >
-                  <item.icon className="mr-2 h-4 w-4" />
-                  {item.label}
-                </NavLink>
-              </li>
+                  <NavLink
+                    to={item.path}
+                    end={item.path === "/profile"}
+                    className="flex items-center gap-3 px-3 py-2"
+                  >
+                    <item.icon className="h-4 w-4" />
+                    <span>{item.label}</span>
+                  </NavLink>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
             ))}
-          </ul>
-        </nav>
-        <Separator className="my-6" />
-        <Button
-          variant=""
-          className="w-full justify-start"
-          onClick={handleLogout}
-        >
-          <LogOut className="mr-2 h-4 w-4" />
-          Log out
-        </Button>
-      </CardContent>
-    </Card>
-  );
+          </SidebarMenu>
+        </SidebarContent>
+        <SidebarFooter className="border-t p-6">
+          <Button
+            variant="outline"
+            className="w-full justify-start"
+            onClick={handleLogout}
+          >
+            <LogOut className="mr-2 h-4 w-4" />
+            Log out
+          </Button>
+        </SidebarFooter>
+      </Sidebar>
+      <div className="flex items-center border-b px-4 py-2 lg:hidden">
+        <SidebarTrigger>
+          <Menu className="h-6 w-6" />
+        </SidebarTrigger>
+        <span className="ml-2 text-lg font-semibold">User Profile</span>
+      </div>
+    </SidebarProvider>
+  )
 }

@@ -8,7 +8,7 @@ const productController = require('../controller/User/productController')
 const profileController = require('../controller/User/profileController')
 const cartController = require('../controller/User/cartController')
 const orderController = require('../controller/User/orderController')
-// const userAuth = require('../middleware/userAuth');
+const verifyUser = require('../middleware/userAuth')
 
 
 
@@ -32,12 +32,12 @@ router.post('/auth/google-login', userController.googleLoginUser);
 
 //products 
 
-router.get('/get_active_categories', categoryController.getActiveCategories);
-router.get('/advanced-search', productController.advancedSearch);
-router.get('/latest', productController.fetchLatestProduct);
-router.get('/active', productController.fetchActiveProduct);
-router.get('/product/:id', productController.fetchProductById);
-router.get('/related/:id', productController.fetchRelatedProducts);
+router.get('/get_active_categories', verifyUser, categoryController.getActiveCategories);
+router.get('/advanced-search', verifyUser, productController.advancedSearch);
+router.get('/latest', verifyUser, productController.fetchLatestProduct);
+router.get('/active', verifyUser, productController.fetchActiveProduct);
+router.get('/product/:id', verifyUser, productController.fetchProductById);
+router.get('/related/:id', verifyUser, productController.fetchRelatedProducts);
 
 
 //category related..
@@ -45,30 +45,30 @@ router.get('/related/:id', productController.fetchRelatedProducts);
 // router.get('/:id', productController.fetchProductById);
 
 //mage the address routes end points...
-router.post('/addresses', address.userAddAddress);
-router.get('/addresses/:userId', address.getUserAddresses);
-router.delete('/address/:addressId', address.deleteUserAddress);
-router.get('/address/:id', address.getAddressById);
-router.patch('/addresses/:id', address.updateUserAddress);
+router.post('/addresses', verifyUser, address.userAddAddress);
+router.get('/addresses/:userId', verifyUser, address.getUserAddresses);
+router.delete('/address/:addressId', verifyUser, address.deleteUserAddress);
+router.get('/address/:id', verifyUser, address.getAddressById);
+router.patch('/addresses/:id', verifyUser, address.updateUserAddress);
 
 
 //cart mangement routess...
-router.post('/add-to-cart', cartController.addToCart);
-router.get('/get-cart-details', cartController.getCartDetails);
-router.get('/cart/:userId', cartController.getAllCartItems);
-router.get('/cartLength/:id', cartController.getUserCartProductCount);
-router.delete('/delete/:id/:pr_id', cartController.deleteItem);
+router.post('/add-to-cart', verifyUser, cartController.addToCart);
+router.get('/get-cart-details', verifyUser, cartController.getCartDetails);
+router.get('/cart/:userId', verifyUser, cartController.getAllCartItems);
+router.get('/cartLength/:id', verifyUser, cartController.getUserCartProductCount);
+router.delete('/delete/:id/:pr_id', verifyUser, cartController.deleteItem);
 // router.patch('/quantity/:userId/:itemId', cartController.updateCartItemQuantity);
-router.patch('/quantity/add/:userId/:itemId', cartController.incrementCartItemQuantity);
-router.patch('/quantity/min/:userId/:itemId', cartController.decrementCartItemQuantity);
+router.patch('/quantity/add/:userId/:itemId', verifyUser, cartController.incrementCartItemQuantity);
+router.patch('/quantity/min/:userId/:itemId', verifyUser, cartController.decrementCartItemQuantity);
 
 
 //order
-router.get('/items/:userId', orderController.getCheckoutCartItems);
-router.post('/order', orderController.createOrder);
-router.get('/orders/:userId', orderController.getUserOrders);
-router.get('/order/:orderId', orderController.getOrderById);
+router.get('/items/:userId', verifyUser, orderController.getCheckoutCartItems);
+router.post('/order', verifyUser, orderController.createOrder);
+router.get('/orders/:userId', verifyUser, orderController.getUserOrders);
+router.get('/order/:orderId', verifyUser, orderController.getOrderById);
+router.patch('/order/:orderId', verifyUser, orderController.cancelOrder);
 
 
 module.exports = router;
-  

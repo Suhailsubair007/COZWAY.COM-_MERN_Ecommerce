@@ -18,11 +18,7 @@ import Order_details from "@/pages/User/Order_details";
 import MyOrders from "@/ReuseComponets/User/MyOrder";
 import ForgotPassword from "@/pages/User/login/ForgotPassword";
 import ResetPassword from "@/pages/User/login/ResetPassword";
-// import DeliveryAddress from "@/ReuseComponets/User/DeliveryAddress";
-// import Orders from "@/ReuseComponets/User/Orders";
-// import Wallet from "@/ReuseComponets/User/Wallet";
-// import Coupons from "@/ReuseComponets/User/Coupons";
-// import ChangePassword from "@/ReuseComponets/User/ChangePassword";
+
 
 const UserRoute = () => {
   return (
