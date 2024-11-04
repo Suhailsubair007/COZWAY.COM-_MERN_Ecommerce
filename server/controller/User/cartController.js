@@ -3,7 +3,7 @@ const Cart = require('../../model/cart');
 // Controller to add a product to the cart.....
 const addToCart = async (req, res) => {
     try {
-        console.log("vannu njnnnnn")
+        console.log("Arrivedd....")
         const { userId, product } = req.body;
         if (product.quantity <= 0 || product.quantity > product.stock) {
             return res.status(400).json({ error: 'Invalid quantity' });
@@ -50,18 +50,18 @@ const addToCart = async (req, res) => {
 
 
 
-//Getting cart detais to chek is the purticlar size of theprpduct is alredy in the cart..
+//Getting cart detais to chek is the purticlar size of theprpduct is alredy in the cart.. Go to cart checking
 const getCartDetails = async (req, res) => {
     try {
         console.log("vannuuu")
-        const { userId, productId, size } = req.query;   
+        const { userId, productId, size } = req.query;
         console.log(userId)
         console.log(productId)
         console.log(size);
         const cart = await Cart.findOne({ userId });
         console.log(cart)
 
-        if (!cart) { 
+        if (!cart) {
             return res.status(404).json({ message: "Cart not found" });
         }
 
@@ -71,7 +71,7 @@ const getCartDetails = async (req, res) => {
                 product.size === size
         );
 
-        if (productInCart) { 
+        if (productInCart) {
             return res.status(200).json({
                 inCart: true,
                 message: "Product with this size already in cart"
@@ -79,7 +79,7 @@ const getCartDetails = async (req, res) => {
         } else {
             return res.status(200).json({
                 inCart: false,
-                message: "Product with this size not in cart" 
+                message: "Product with this size not in cart"
             });
         }
 
@@ -99,6 +99,7 @@ const getAllCartItems = async (req, res) => {
         const cartItems = await Cart.findOne({ userId })
             .populate({
                 path: 'products.productId',
+                match: { is_active: true },
                 populate: {
                     path: 'category',
                     select: 'name'
@@ -107,6 +108,8 @@ const getAllCartItems = async (req, res) => {
         if (!cartItems) {
             return res.status(404).json({ message: 'Cart not found' });
         }
+
+        cartItems.products = cartItems.products.filter(item => item.productId);
 
         cartItems.products.forEach((item) => {
 
@@ -184,7 +187,7 @@ const deleteItem = async (req, res) => {
 
 
 
-//Incrse count and handle hte size - stock also incremeting the price based on the purticular quantity..
+//Increse count and handle hte size - stock also incremeting the price based on the purticular quantity..
 const incrementCartItemQuantity = async (req, res) => {
     try {
         const { userId, itemId } = req.params;
@@ -303,4 +306,11 @@ const getUserCartProductCount = async (req, res) => {
     }
 };
 
-module.exports = { addToCart, getCartDetails, getAllCartItems, deleteItem, incrementCartItemQuantity, decrementCartItemQuantity, getUserCartProductCount };
+module.exports = {
+    addToCart,
+    getCartDetails, getAllCartItems,
+    deleteItem,
+    incrementCartItemQuantity,
+    decrementCartItemQuantity,
+    getUserCartProductCount
+};

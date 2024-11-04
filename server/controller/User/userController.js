@@ -3,7 +3,7 @@ const bcrypt = require("bcrypt");
 const otpGenarator = require('otp-generator');
 const OTP = require('../../model/otpModel')
 const { OAuth2Client } = require('google-auth-library');
-const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID); ('google-auth-library');
+// const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID); ('google-auth-library');
 const genarateAccesTocken = require('../../utils/genarateAccesTocken')
 const genarateRefreshTocken = require('../../utils/genarateRefreshTocken')
 
@@ -251,7 +251,7 @@ const verifyResetOTP = async (req, res) => {
         const validOtp = await OTP.findOne({ email, otp });
 
         if (!validOtp) {
-            return res.status(400).json({ success: false, message: 'Invalid or expired OTP' });
+            return res.status(400).json({ success: false, message: 'Invalid OTP' });
         }
 
         await OTP.deleteOne({ email, otp });

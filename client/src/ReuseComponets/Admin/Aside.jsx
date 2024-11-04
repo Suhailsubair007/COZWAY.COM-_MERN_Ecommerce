@@ -44,7 +44,7 @@ const Aside = () => {
       <aside className="  w-64 h-full bg-white shadow-md overflow-y-auto">
         <div className="pl-10 p-4 border-b">
           <img
-            src="https://res.cloudinary.com/dupo7yv88/image/upload/v1728535931/logo-no-background_dx8qjo.png"
+            src="https://res.cloudinary.com/dupo7yv88/image/upload/v1730692045/logo-no-background_poots9.png"
             alt="Logo"
             className="w-32 h-auto"
           />

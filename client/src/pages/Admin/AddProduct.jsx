@@ -383,9 +383,9 @@ export default function AddProduct() {
                     <SelectValue placeholder="Select Fit Type" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="regular">Regular Fit</SelectItem>
-                    <SelectItem value="slim">Slim Fit</SelectItem>
-                    <SelectItem value="loose">Loose Fit</SelectItem>
+                    <SelectItem value="Regular Fit">Regular Fit</SelectItem>
+                    <SelectItem value="Slim Fit">Slim Fit</SelectItem>
+                    <SelectItem value="Loose Fit">Loose Fit</SelectItem>
                   </SelectContent>
                 </Select>
                 {errors.fit && (
@@ -401,9 +401,9 @@ export default function AddProduct() {
                     <SelectValue placeholder="Select Sleeve" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="full">Full Sleeve</SelectItem>
-                    <SelectItem value="half">Half Sleeve</SelectItem>
-                    <SelectItem value="sleeveless">Elbow Sleeve</SelectItem>
+                    <SelectItem value="Full Sleeve">Full Sleeve</SelectItem>
+                    <SelectItem value="Half Sleeve">Half Sleeve</SelectItem>
+                    <SelectItem value="Elbow Sleeve">Elbow Sleeve</SelectItem>
                   </SelectContent>
                 </Select>
                 {errors.sleeve && (

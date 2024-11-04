@@ -1,5 +1,7 @@
 const Product = require('../../model/Product')
 
+
+///controller for fetch the lstest products...
 const fetchLatestProduct = async (req, res) => {
     try {
 
@@ -12,6 +14,8 @@ const fetchLatestProduct = async (req, res) => {
     }
 };
 
+
+// Fetch the active products....
 const fetchActiveProduct = async (req, res) => {
     try {
         const products = await Product.find({ is_active: true }).populate('category', 'name');;
@@ -22,9 +26,10 @@ const fetchActiveProduct = async (req, res) => {
     }
 };
 
+
+//Fetch the products by purticular id...
 const fetchProductById = async (req, res) => {
     const { id } = req.params;
-    console.log("oombii")
     try {
         const product = await Product.findById(id).populate('category');
 
@@ -37,8 +42,10 @@ const fetchProductById = async (req, res) => {
         console.error('Error fetching category:', error);
         res.status(500).json({ message: 'Server error. Please try again later.' });
     }
-}; 
+};
 
+
+//Reatated products recomentation....
 const fetchRelatedProducts = async (req, res) => {
     const { id } = req.params;
     try {
@@ -54,11 +61,13 @@ const fetchRelatedProducts = async (req, res) => {
     }
 };
 
-
+//The main products searching and filtering controller...
 const advancedSearch = async (req, res) => {
     try {
-        const { searchTerm, categories, sizes, page = 1, limit = 8, sortBy = 'createdAt' } = req.query;
+        const { searchTerm, categories, fits, sleeves, page = 1, limit = 8, sortBy = 'createdAt' } = req.query;
 
+        console.log(fits)
+        console.log(sleeves)
         let query = { is_active: true };
 
         if (searchTerm) {
@@ -72,12 +81,13 @@ const advancedSearch = async (req, res) => {
             query.category = { $in: categories.split(',') };
         }
 
-        if (sizes && sizes.length > 0) {
-            query.sizes = { $in: sizes.split(',') };
+        if (fits && fits.length > 0) {
+            query.fit = { $in: fits.split(',') };
         }
 
-        const totalProducts = await Product.countDocuments(query);
-        const totalPages = Math.ceil(totalProducts / limit);
+        if (sleeves && sleeves.length > 0) {
+            query.sleeve = { $in: sleeves.split(',') };
+        }
 
         let sortOption = {};
         switch (sortBy) {
@@ -91,14 +101,22 @@ const advancedSearch = async (req, res) => {
                 sortOption = { createdAt: -1 };
                 break;
             default:
-                sortOption = { createdAt: -1 }; 
+                sortOption = { createdAt: -1 };
         }
 
-        const products = await Product.find(query)
-            .populate('category', 'name')
-            .sort(sortOption)
-            .skip((page - 1) * limit)
-            .limit(Number(limit));
+        const [totalProducts,products] = await Promise.all([
+            Product.countDocuments(query),
+            Product.find(query)
+                .populate('category', 'name')
+                .sort(sortOption)
+                .skip((page - 1) * limit)
+                .limit(Number(limit)),
+
+        ])
+
+        const totalPages = Math.ceil(totalProducts / limit);
+
+        console.log("products==============>",products)
 
         res.status(200).json({
             products,

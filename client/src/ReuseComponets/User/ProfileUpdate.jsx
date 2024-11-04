@@ -32,9 +32,9 @@ export default function ProfileUpdate() {
       try {
         const response = await axiosInstance.get(`/users/user/${user}`);
         const userData = {
-          fullname: response.data.user.name || "",
-          email: response.data.user.email || "",
-          phone: response.data.user.phone || "",
+          fullname: response.data.user.name,
+          email: response.data.user.email,
+          phone: response.data.user.phone,
         };
         setInitialUserData(userData);
       } catch (error) {
@@ -80,7 +80,7 @@ export default function ProfileUpdate() {
                   Your Profile
                 </h1>
                 <p className="text-gray-600 mt-2">
-                  Good Evening, {values.fullname || "User"}!
+                  Good Evening, {values.fullname}!
                 </p>
               </div>
 

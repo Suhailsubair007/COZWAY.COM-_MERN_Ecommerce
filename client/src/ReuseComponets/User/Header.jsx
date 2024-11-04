@@ -66,7 +66,7 @@ const Header = () => {
         dispatch(logoutUser());
         localStorage.removeItem("userInfo");
         navigate("/");
-        toast.success("User Logged out successfully.."); // Success toast
+        toast.success("User Logged out successfully..");
       } else {
         toast.error("Failed to log out. Please try again.");
       }
@@ -90,7 +90,7 @@ const Header = () => {
           <div className="flex items-center">
             <Link to="/" className="font-bold text-xl tracking-wide px-4 py-2">
               <img
-                src="https://res.cloudinary.com/dupo7yv88/image/upload/v1728535931/logo-no-background_dx8qjo.png"
+                src="https://res.cloudinary.com/dupo7yv88/image/upload/v1730692045/logo-no-background_poots9.png"
                 alt="Logo"
                 style={{ width: "100px", height: "auto" }}
               />

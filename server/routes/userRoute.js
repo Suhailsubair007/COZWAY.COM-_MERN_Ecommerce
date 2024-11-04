@@ -23,16 +23,13 @@ router.post('/reset', userController.sendOTPForPasswordReset)
 router.post('/reset-password', userController.resetPassword);
 router.post('/verify', verifyOTP, userController.verifyResetOTP);
 
-
-
 //Google auth login
 router.post('/auth/google-signup', userController.googleSignIn);
 router.post('/auth/google-login', userController.googleLoginUser);
 
 
-//products 
+//products reataed routes..
 
-router.get('/get_active_categories', verifyUser, categoryController.getActiveCategories);
 router.get('/advanced-search', verifyUser, productController.advancedSearch);
 router.get('/latest', verifyUser, productController.fetchLatestProduct);
 router.get('/active', verifyUser, productController.fetchActiveProduct);
@@ -41,8 +38,8 @@ router.get('/related/:id', verifyUser, productController.fetchRelatedProducts);
 
 
 //category related..
-// router.get('/get_active_categories', categoryController.getActiveCategories);
-// router.get('/:id', productController.fetchProductById);
+router.get('/get_active_categories', verifyUser, categoryController.getActiveCategories);
+
 
 //mage the address routes end points...
 router.post('/addresses', verifyUser, address.userAddAddress);
@@ -63,7 +60,7 @@ router.patch('/quantity/add/:userId/:itemId', verifyUser, cartController.increme
 router.patch('/quantity/min/:userId/:itemId', verifyUser, cartController.decrementCartItemQuantity);
 
 
-//order
+//Route that mange order related API....
 router.get('/items/:userId', verifyUser, orderController.getCheckoutCartItems);
 router.post('/order', verifyUser, orderController.createOrder);
 router.get('/orders/:userId', verifyUser, orderController.getUserOrders);

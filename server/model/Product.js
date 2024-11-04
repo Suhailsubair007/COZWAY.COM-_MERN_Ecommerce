@@ -24,10 +24,12 @@ const productSchema = new mongoose.Schema({
     },
     fit: {
         type: String,
+        enum: ['Slim Fit', 'Regular Fit', 'Loose Fit'],
         required: true,
     },
     sleeve: {
         type: String,
+        enum: ['Full Sleeve', 'Half Sleeve', 'Elbow Sleeve'],
         required: true,
     },
     sizes: [
