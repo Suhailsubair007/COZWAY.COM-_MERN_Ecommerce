@@ -42,10 +42,12 @@ const getCheckoutCartItems = async (req, res) => {
 const createOrder = async (req, res) => {
     try {
         const { userId, order_items, address, payment_method, subtotal } = req.body;
+        console.log("order itemsssss======>>>>..>>>>>>",order_items);
         const products = order_items.map(item => ({
             product: item.productId,
             quantity: item.quantity,
             price: item.offerPrice,
+            selectedSize:item.size,
             discount: 0,
             totalProductPrice: item.totalProductPrice,
             order_status: "Pending",
@@ -184,26 +186,37 @@ const getOrderById = async (req, res) => {
 const cancelOrder = async (req, res) => {
     try {
         const { orderId } = req.params;
-        // const newStatus = req.body;
-        console.log(orderId)
-        // console.log(newStatus)
-
-        const order = await Order.findById(orderId);
-        if (!orderId) {
-            return res.status(400).json({ mesage: "Order id not found." })
+        const order = await Order.findById(orderId).populate('order_items.product');
+        if (!order) {
+            return res.status(404).json({ success: false, message: "Order not found." });
         }
-        console.log(order);
+        if (order.order_status === 'cancelled') {
+            return res.status(400).json({ success: false, message: "Order is already canceled." });
+        }
 
         order.order_status = 'cancelled';
-        console.log(order)
         await order.save();
-        res.status(200).json({ sucess: true, message: "Status updated sucessfylly.." })
 
+        for (const item of order.order_items) {
+            const product = await Product.findById(item.product);
+            if (product) {
+                const sizeIndex = product.sizes.findIndex(s => s.size === item.selectedSize);
+                if (sizeIndex !== -1) {
+                    product.sizes[sizeIndex].stock += item.quantity;
+                    product.totalStock += item.quantity;
+                    await product.save();
+                }
+            }
+        }
+        res.status(200).json({ success: true, message: "Order canceled and stock updated successfully." });
     } catch (error) {
-        console.error(error);
-        res.status(500).json({ error: error.message });
+        console.error("Error canceling order:", error);
+        res.status(500).json({ success: false, message: "Failed to cancel order", error: error.message });
     }
-}
+};
+
+
+
 
 module.exports = {
     createOrder,

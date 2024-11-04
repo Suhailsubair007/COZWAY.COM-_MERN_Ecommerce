@@ -2,10 +2,10 @@ const jwt = require("jsonwebtoken");
 const User = require('../model/User');
 
 const verifyUser = async (req, res, next) => {
-    const accessToken = req.cookies.accessToken;
-    const refreshToken = req.cookies.refreshToken;
+    const accessToken = req.cookies.userAccessTocken;
+    const refreshToken = req.cookies.userRefreshTocken;
 
-    
+
 
     if (accessToken) {
         const decode = jwt.verify(accessToken, process.env.ACCESS_TOKEN_SECRET, (err, decoded) => {
@@ -36,7 +36,7 @@ const handleRefreshToken = async (refreshToken, req, res, next) => {
                 expiresIn: "2m",
             });
 
-            res.cookie("accessToken", newAccessToken, {
+            res.cookie("userAccessTocken", newAccessToken, {
                 httpOnly: true,
                 secure: false,
                 sameSite: "strict",

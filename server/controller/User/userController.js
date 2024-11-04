@@ -4,8 +4,8 @@ const otpGenarator = require('otp-generator');
 const OTP = require('../../model/otpModel')
 const { OAuth2Client } = require('google-auth-library');
 // const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID); ('google-auth-library');
-const genarateAccesTocken = require('../../utils/genarateAccesTocken')
-const genarateRefreshTocken = require('../../utils/genarateRefreshTocken')
+const { genarateAccesTockenUser } = require('../../utils/genarateAccesTocken')
+const { genarateRefreshTockenUser } = require('../../utils/genarateRefreshTocken')
 
 
 const securePassword = async (password) => {
@@ -66,8 +66,8 @@ const login = async (req, res) => {
         const PasswordMatching = await bcrypt.compare(password, finduser.password);
         console.log(PasswordMatching)
         if (PasswordMatching) {
-            genarateAccesTocken(res, finduser._id);
-            genarateRefreshTocken(res, finduser._id);
+            genarateAccesTockenUser(res, finduser._id);
+            genarateRefreshTockenUser(res, finduser._id);
             res.status(200).json({
                 success: true,
                 message: "User logged in successfully...",
@@ -90,8 +90,8 @@ const login = async (req, res) => {
 
 //Logout the user and clear access and refresh tocken from the cookiee..
 const UserLogout = (req, res) => {
-    res.clearCookie("accessTocken");
-    res.clearCookie('refreshToken');
+    res.clearCookie("userAccessTocken");
+    res.clearCookie('userRefreshTocken');
     res.status(200).json("User logged out successfully");
 };
 
@@ -126,7 +126,7 @@ const sendOTP = async (req, res) => {
         const otpBody = await OTP.create(otpPayload);
         res.status(200).json({
             success: true,
-            message: 'OTP sent successfully',                              
+            message: 'OTP sent successfully',
             otp,
         });
         console.log(res.data)
@@ -148,7 +148,7 @@ const sendOTPForPasswordReset = async (req, res) => {
         }
 
         let otp = otpGenarator.generate(5, { upperCaseAlphabets: false, lowerCaseAlphabets: false, specialChars: false });
-        
+
         let existingOtp = await OTP.findOne({ otp });
         while (existingOtp) {
             otp = otpGenarator.generate(5, { upperCaseAlphabets: false, lowerCaseAlphabets: false, specialChars: false });
@@ -185,8 +185,8 @@ const googleSignIn = async (req, res) => {
 
             await user.save();
         }
-        genarateAccesTocken(res, user._id);
-        genarateRefreshTocken(res, user._id);
+        genarateAccesTockenUser(res, user._id);
+        genarateRefreshTockenUser(res, user._id);
 
         return res.status(200).json({
             message: 'User successfully signed in',
@@ -227,8 +227,8 @@ const googleLoginUser = async (req, res) => {
             await user.save();
         }
 
-        genarateAccesTocken(res, user._id);
-        genarateRefreshTocken(res, user._id);
+        genarateAccesTockenUser(res, user._id);
+        genarateRefreshTockenUser(res, user._id);
         return res.status(200).json({
             success: true,
             message: "Login successful",

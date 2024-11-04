@@ -17,6 +17,10 @@ const orderSchema = new mongoose.Schema({
                 ref: "Product",
                 required: true,
             },
+            selectedSize: {
+                type: String,
+                required: true,
+            },
             quantity: {
                 type: Number,
                 required: true,
@@ -62,7 +66,7 @@ const orderSchema = new mongoose.Schema({
         enum: ["pending", "shipped", "delivered", "cancelled"],
         default: "pending",
     },
-    payment_status: {       
+    payment_status: {
         type: String,
         required: true,
         enum: ["Pending", "Paid", "Failed", "Refunded"],

@@ -12,7 +12,19 @@ function genarateAccesTocken(res, admin) {
     maxAge: 1 * 60 * 1000,
   });
 }
+function genarateAccesTockenUser(res, user) {
+  const token = jwt.sign({ user }, process.env.ACCESS_TOKEN_SECRET, {
+    expiresIn: "1m",
+  });
+
+  res.cookie("userAccessTocken", token, {
+    httpOnly: true,
+    secure: false,
+    sameSite: "strict",
+    maxAge: 1 * 60 * 1000,
+  });
+}
 
 
 
-module.exports = genarateAccesTocken;
+module.exports = { genarateAccesTocken, genarateAccesTockenUser };
