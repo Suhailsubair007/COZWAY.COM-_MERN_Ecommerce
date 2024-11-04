@@ -66,8 +66,8 @@ const advancedSearch = async (req, res) => {
     try {
         const { searchTerm, categories, fits, sleeves, page = 1, limit = 8, sortBy = 'createdAt' } = req.query;
 
-        console.log(fits)
-        console.log(sleeves)
+        // console.log(fits)
+        // console.log(sleeves)
         let query = { is_active: true };
 
         if (searchTerm) {
@@ -116,7 +116,7 @@ const advancedSearch = async (req, res) => {
 
         const totalPages = Math.ceil(totalProducts / limit);
 
-        console.log("products==============>",products)
+        // console.log("products==============>",products)
 
         res.status(200).json({
             products,

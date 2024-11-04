@@ -36,7 +36,7 @@ const updateCategory = async (req, res) => {
     try {
         const { name, description } = req.body;
         const {id} = req.params;
-        console.log(id);
+        // console.log(id);
 
     
         const updatedCategory = await Category.findByIdAndUpdate(
@@ -73,7 +73,7 @@ const getCategories = async (req, res) => {
 
 const fetchCategoryById = async (req, res) => {
     const { categoryId } = req.params; 
-    console.log(categoryId)
+    // console.log(categoryId)
 
     try {
         const category = await Category.findById(categoryId);

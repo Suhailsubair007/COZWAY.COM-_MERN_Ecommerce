@@ -1,5 +1,3 @@
-'use client'
-
 import { useEffect, useState } from "react"
 import { useParams } from "react-router-dom"
 import { ChevronRight, Home, Package, CreditCard, FileText, Truck, RefreshCcw } from "lucide-react"
@@ -22,7 +20,7 @@ export default function AdminOrderDetail() {
   const fetchOrderDetail = async () => {
     try {
       setIsLoading(true)
-      const response = await axiosInstance.get(`/users/order/${id}`)
+      const response = await axiosInstance.get(`/admin/order/${id}`)
       setOrderData(response.data.order)
       setError(null)
     } catch (error) {

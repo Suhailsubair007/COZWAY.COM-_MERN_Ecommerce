@@ -1,7 +1,7 @@
 const bcrypt = require("bcrypt");
 const Admin = require('../../model/Admin')
-const genarateAccesTocken = require('../../utils/genarateAccesTocken')
-const genarateRefreshTocken = require('../../utils/genarateRefreshTocken')
+const {genarateAccesTocken} = require('../../utils/genarateAccesTocken')
+const {genarateRefreshTocken} = require('../../utils/genarateRefreshTocken')
 
 const registerAdmin = async (req, res) => {
     const { name, email, password } = req.body;

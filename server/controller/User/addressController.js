@@ -8,7 +8,7 @@ const userAddAddress = async (req, res) => {
     try {
         const { name, phone, address, district, state, city, pincode, alternatePhone, landmark, user } = req.body;
         // console.log(name, phone, address, district, state, city, pincode, alternatePhone, landmark, user);
-        console.log(user)
+        // console.log(user)
 
         if (!name || !phone || !address || !district || !state || !city || !pincode || !user) {
             return res.status(400).json({ message: 'All required fields must be provided' });
@@ -28,7 +28,7 @@ const userAddAddress = async (req, res) => {
         });
 
         const savedAddress = await newAddress.save();
-        console.log("Address save ayyiii..",savedAddress);                  
+        // console.log("Address save ayyiii..",savedAddress);                  
 
         res.status(201).json({
             message: 'Address added successfully',
@@ -79,7 +79,7 @@ const getUserAddresses = async (req, res) => {
 const deleteUserAddress = async (req, res) => {
     try {
         const { addressId } = req.params;
-        console.log(addressId)
+        // console.log(addressId)
 
         if (!addressId) {
             return res.status(400).json({ message: 'Address ID is required' });
@@ -138,14 +138,14 @@ const getAddressById = async (req, res) => {
 
 const updateUserAddress = async (req, res) => {
     try {
-        console.log("request vannuu......")
+        // console.log("request vannuu......")
         const { id } = req.params;
-        console.log(id)
+        // console.log(id)
         const { name, phone, address, district, state, city, pincode, alternatePhone, landmark } = req.body;
-        console.log(name)
+        // console.log(name)
 
         if (!id) {
-            console.log("id illaaa------>>>>>>");
+            // console.log("id illaaa------>>>>>>");
             return res.status(400).json({ message: 'Address ID is required' });
         }
 
@@ -162,14 +162,14 @@ const updateUserAddress = async (req, res) => {
         if (alternatePhone) updateFields.alternatePhone = alternatePhone;
         if (landmark) updateFields.landmark = landmark;
 
-        console.log("updated fieldsssss......",updateFields)
+        // console.log("updated fieldsssss......",updateFields)
 
         const updatedAddress = await Address.findByIdAndUpdate(
             id,
             { $set: updateFields },
             { new: true } 
         );
-        console.log("updated fieldsssss......",updateUserAddress)
+        // console.log("updated fieldsssss......",updateUserAddress)
 
         if (!updatedAddress) {
             return res.status(404).json({ message: 'Address not found' });

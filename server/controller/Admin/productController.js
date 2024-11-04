@@ -140,7 +140,7 @@ const updateProduct = async (req, res) => {
 
 const fetchProductById = async (req, res) => {
     const { id } = req.params;
-    console.log(id)
+    // console.log(id)
     try {
         const product = await Product.findById(id).populate('category');
 

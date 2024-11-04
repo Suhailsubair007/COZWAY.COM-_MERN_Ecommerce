@@ -16,8 +16,8 @@ const updateOrderStatus = async (req, res) => {
     try {
         const { orderId } = req.params;
         const { newStatus } = req.body;
-        console.log(orderId, newStatus);
-        console.log("testingggggg......");
+        // console.log(orderId, newStatus);
+        // console.log("testingggggg......");
 
         const order = await Order.findById(orderId);
         if (!orderId) {
@@ -42,15 +42,35 @@ const updateOrderStatus = async (req, res) => {
     }
 }
 
-const deleteOrder = async (req, res) => {
+const getOrderById = async (req, res) => {
     try {
         const { orderId } = req.params;
-        await Order.findByIdAndDelete(orderId);
-        res.status(200).json({ sucess: true, message: "Order deleted..." })
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ message: "internal server error" })
-    }
-}
 
-module.exports = { getAllOrders, updateOrderStatus, deleteOrder };
+        const order = await Order.findOne({ _id: orderId })
+            .populate({
+                path: 'order_items.product',
+                model: 'Product',
+                select: 'name price images category',
+                populate: {
+                    path: 'category',
+                    select: 'name'
+                }
+            });
+
+        if (!order) {
+            return res.status(404).json({ success: false, message: 'Order not found' });
+        }
+
+        res.status(200).json({
+            success: true,
+            message: "Order fetched successfully",
+            order
+        });
+    } catch (error) {
+        console.error("Error fetching order:", error);
+        res.status(500).json({ success: false, message: 'Server error', error: error.message });
+    }
+};
+
+
+module.exports = { getAllOrders, updateOrderStatus,getOrderById};

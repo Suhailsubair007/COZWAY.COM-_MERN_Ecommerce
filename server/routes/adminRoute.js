@@ -13,14 +13,12 @@ router.post('/signup', adminController.registerAdmin);
 router.post('/login', adminController.AdminLogin);
 router.post('/logout', adminController.AdminLogout);
 
-
 //Category related routes..
 router.post('/add_category', verifyAdmin, categoryController.addCategory);
 router.put('/edit-category/:id', verifyAdmin, categoryController.updateCategory);
 router.get('/categories', verifyAdmin, categoryController.getCategories);
 router.get('/categories/edit/:categoryId', verifyAdmin, categoryController.fetchCategoryById);
 router.patch('/categories/:id', verifyAdmin, categoryController.updateCategoryStatus);
-
 
 //Product related routes..                                                  
 router.post('/add_product', verifyAdmin, productController.addProduct);
@@ -29,16 +27,14 @@ router.patch('/get_product/:id', verifyAdmin, productController.updateProductSta
 router.put('/update_product/:id', verifyAdmin, productController.updateProduct);
 router.get('/product/edit/:id', verifyAdmin, productController.fetchProductById);
 
-
 //User related details for display the uses and block and unblock the user..
 router.get('/coustmers', userController.getCoutomers);
 router.patch('/coustmers/:id', verifyAdmin, userController.updateCoustomerStatus);
 
-
-
-
+//order related routes..
 router.get('/orders', orderController.getAllOrders);
-router.patch('/orders/:orderId/status', orderController.updateOrderStatus);
-router.delete('/orders/:orderId', orderController.deleteOrder);
+router.patch('/orders/:orderId/status', verifyAdmin, orderController.updateOrderStatus);
+// router.delete('/orders/:orderId', verifyAdmin, orderController.deleteOrder);
+router.get('/order/:orderId', verifyAdmin, orderController.getOrderById);
 
 module.exports = router;

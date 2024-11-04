@@ -7,9 +7,9 @@ const updateProfile = async (req, res) => {
 
     const name = fullname;
 
-    console.log("useid==============>", userId);
-    console.log("name===========>", name);
-    console.log("phone==========>", phone);
+    // console.log("useid==============>", userId);
+    // console.log("name===========>", name);
+    // console.log("phone==========>", phone);
 
     const updateFields = {};
 

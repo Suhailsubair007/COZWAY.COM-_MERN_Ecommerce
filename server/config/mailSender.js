@@ -103,7 +103,7 @@ const mailSender = async (email, title, bodyContent) => {
             html: emailTemplate,
         });
 
-        console.log("Email info: ", info);
+        // console.log("Email info: ", info);
         return info;
     } catch (error) {
         console.log(error.message);

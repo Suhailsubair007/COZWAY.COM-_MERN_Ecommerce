@@ -1,5 +1,3 @@
-'use client'
-
 import React from "react"
 import { NavLink, useNavigate, useLocation } from "react-router-dom"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"

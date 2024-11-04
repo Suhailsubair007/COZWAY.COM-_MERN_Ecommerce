@@ -1,6 +1,6 @@
 const OTP = require('../model/otpModel');
 
-
+//OTP verification middleware.....
 const verifyOTP = async (req, res, next) => {
     
     const { email, otp } = req.body;

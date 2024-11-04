@@ -42,7 +42,7 @@ const getCheckoutCartItems = async (req, res) => {
 const createOrder = async (req, res) => {
     try {
         const { userId, order_items, address, payment_method, subtotal } = req.body;
-        console.log("order itemsssss======>>>>..>>>>>>",order_items);
+        // console.log("order itemsssss======>>>>..>>>>>>",order_items);
         const products = order_items.map(item => ({
             product: item.productId,
             quantity: item.quantity,
@@ -65,18 +65,18 @@ const createOrder = async (req, res) => {
             shipping_fee: 0,
         });
 
-        console.log("order itemss=====>>>>", order_items)
+        // console.log("order itemss=====>>>>", order_items)
 
 
         for (const item of order_items) {
             const product = await Product.findById(item.productId._id);
-            console.log("prouct =======================>", product)
+            // console.log("prouct =======================>", product)
             if (product) {
                 const sizeIndex = product.sizes.findIndex(s => s.size === item.size);
                 if (sizeIndex !== -1) {
                     product.sizes[sizeIndex].stock -= item.quantity;
                     await product.save();
-                    console.log("size updatedddddd")
+                    // console.log("size updatedddddd")
                 }
             }
         }
@@ -94,7 +94,7 @@ const createOrder = async (req, res) => {
             cart.totalCartPrice = cart.products.reduce((total, item) => total + item.totalProductPrice, 0);
 
             await cart.save();
-            console.log("Updated cart:", cart);
+            // console.log("Updated cart:", cart);
         }
 
         return res.status(201).json({ order, success: true, message: "Order Placed" });

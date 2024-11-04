@@ -1,5 +1,3 @@
-'use client'
-
 import { useEffect, useState } from "react"
 import { useParams } from "react-router-dom"
 import { ChevronRight, Home, Package, CreditCard, FileText, Truck } from "lucide-react"
