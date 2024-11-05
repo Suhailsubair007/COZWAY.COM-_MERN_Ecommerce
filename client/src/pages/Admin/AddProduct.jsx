@@ -336,19 +336,19 @@ export default function AddProduct() {
                 error={errors.price}
                 type="number"
                 min="0"
-                step="0.01"
+                step="1"
               />
 
               <Input
                 placeholder="Offer price of product"
                 label="Offer Price"
-                name="offerPrice" 
+                name="offerPrice"
                 value={product.offerPrice}
                 onChange={handleChange}
                 error={errors.offerPrice}
                 type="number"
                 min="0"
-                step="0.01"
+                step="1"
               />
             </div>
 

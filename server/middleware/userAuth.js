@@ -9,6 +9,7 @@ const verifyUser = async (req, res, next) => {
 
     if (accessToken) {
         const decode = jwt.verify(accessToken, process.env.ACCESS_TOKEN_SECRET, (err, decoded) => {
+
             if (err) {
                 if (err.name === "TokenExpiredError") {
                     handleRefreshToken(refreshToken, req, res, next);
@@ -19,7 +20,9 @@ const verifyUser = async (req, res, next) => {
                 req.user = decoded.user;
                 next();
             }
+
         });
+        console.log("decodedddd",decode)
     } else {
         handleRefreshToken(refreshToken, req, res, next);
     }

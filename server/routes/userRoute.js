@@ -15,7 +15,7 @@ const verifyUser = require('../middleware/userAuth')
 //Login and signup , otp
 router.post('/login', userController.login)
 router.post('/signup', verifyOTP, userController.registerUser);
-router.post('/logout', userController.UserLogout)
+router.post('/logout', userController.UserLogout);
 router.post('/send-otp', userController.sendOTP);
 
 //profie based contoller..
@@ -33,7 +33,7 @@ router.post('/auth/google-login', userController.googleLoginUser);
 
 //products reataed routes..
 router.get('/advanced-search', verifyUser, productController.advancedSearch);
-router.get('/latest', verifyUser, productController.fetchLatestProduct);
+router.get('/latest', productController.fetchLatestProduct);
 router.get('/active', verifyUser, productController.fetchActiveProduct);
 router.get('/product/:id', verifyUser, productController.fetchProductById);
 router.get('/related/:id', verifyUser, productController.fetchRelatedProducts);

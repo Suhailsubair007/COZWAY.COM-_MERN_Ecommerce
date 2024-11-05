@@ -41,6 +41,7 @@ export default function Component() {
       const response = await axiosInstance.get(
         `/users/orders/${user}?page=${page}&limit=2`
       );
+      console.log("dataaaa=================>",response.data)
       setOrders(response.data.orders);
       setTotalPages(response.data.totalPages);
     } catch (error) {

@@ -36,7 +36,7 @@ export default function Footer() {
           <div className="space-y-4">
             <img
               className="h-6 w-auto"
-              src="https://res.cloudinary.com/dupo7yv88/image/upload/v1728535931/logo-no-background_dx8qjo.png"
+              src="https://res.cloudinary.com/dupo7yv88/image/upload/v1730692045/logo-no-background_poots9.png"
               alt="Company logo"
             />
             <p className="text-sm text-muted-foreground">

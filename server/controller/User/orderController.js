@@ -15,12 +15,16 @@ const getCheckoutCartItems = async (req, res) => {
                 }
             });
 
+
+
         if (!cartItems) {
             return res.status(404).json({ message: 'Cart not found' });
         }
 
-        const filtered = cartItems.products.filter((item) => item.quantity > 0);
-
+        const filtered = cartItems.products.filter((item) =>
+            item.quantity > 0 && item.productId.is_active
+        );
+        console.log("cartItems========================>", filtered);
 
         const totalCartPrice = filtered.reduce((total, item) => {
             return total + item.totalProductPrice;
@@ -47,7 +51,7 @@ const createOrder = async (req, res) => {
             product: item.productId,
             quantity: item.quantity,
             price: item.offerPrice,
-            selectedSize:item.size,
+            selectedSize: item.size,
             discount: 0,
             totalProductPrice: item.totalProductPrice,
             order_status: "Pending",

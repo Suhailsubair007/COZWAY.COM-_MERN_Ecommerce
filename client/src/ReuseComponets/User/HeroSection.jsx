@@ -7,21 +7,21 @@ import { useNavigate } from "react-router-dom";
 const HeroSection = () => {
   const images = [
     {
-      src: "https://res.cloudinary.com/dupo7yv88/image/upload/v1729429246/main1_mq6mhj.png",
+      src: "https://res.cloudinary.com/dupo7yv88/image/upload/v1730812184/Designer_Shirt_a6b2d60b-a84c-465a-b181-b75473b2c765_r5llks.jpg",
       alt: "Mens Collection - Exclusive",
       title: "Classic Exclusive",
       subtitle: "Mens Collection",
       offer: "UPTO 40% OFF",
     },
     {
-      src: "https://www.snitch.co.in/cdn/shop/files/2_WebBanner_1920x1080_4_1400x.jpg?v=1728458033",
+      src: "https://res.cloudinary.com/dupo7yv88/image/upload/v1730812184/cuff_Print_30ceb91e-6456-4762-b8e7-122a8081a51d_j0qjoq.jpg",
       alt: "Summer Sale",
       title: "Summer Sale",
       subtitle: "Hot Deals",
       offer: "UP TO 50% OFF",
     },
     {
-      src: "https://res.cloudinary.com/dupo7yv88/image/upload/v1729519788/3_WebBanner_1920x1080_4_1400x_x3nts5.jpg",
+      src: "https://res.cloudinary.com/dupo7yv88/image/upload/v1730812281/Cuff_print_1_bkl0ws.jpg",
       alt: "Weekend Chill",
       title: "Weekend Chill",
       subtitle: "Casual Collection",

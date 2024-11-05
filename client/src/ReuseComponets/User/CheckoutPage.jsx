@@ -147,7 +147,6 @@ const CheckoutPage = () => {
               ))}
             </RadioGroup>
             <Button
-              variant="outline"
               className="w-full mt-4"
               onClick={() => setIsAddModalOpen(true)}
             >

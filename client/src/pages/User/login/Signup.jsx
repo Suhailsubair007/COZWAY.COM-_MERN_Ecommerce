@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { Formik, Form, Field, ErrorMessage } from "formik";
-import * as Yup from "yup";
 import axiosInstance from "../../../config/axiosConfig";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -13,23 +12,7 @@ import { GoogleLogin } from "@react-oauth/google";
 import { jwtDecode } from "jwt-decode";
 import { setUserDetails } from "../../../redux/UserSlice";
 import { useDispatch } from "react-redux";
-const validationSchema = Yup.object({
-  name: Yup.string()
-    .required("Full name is required")
-    .min(2, "Full name must be at least 2 characters"),
-  email: Yup.string()
-    .email("Invalid email address")
-    .required("Email is required"),
-  phone: Yup.string()
-    .matches(/^\d{10}$/, "Phone number must be 10 digits")
-    .required("Mobile Number is required"),
-  password: Yup.string()
-    .required("Password is required")
-    .min(6, "Password must be at least 6 characters"),
-  confirmPassword: Yup.string()
-    .oneOf([Yup.ref("password"), null], "Passwords must match")
-    .required("Confirm password is required"),
-});
+import {SignupValidation} from '../../../utils/Validations'
 
 export default function SignUp() {
   const [showPassword, setShowPassword] = useState(false);
@@ -182,7 +165,7 @@ export default function SignUp() {
             password: "",
             confirmPassword: "",
           }}
-          validationSchema={validationSchema}
+          validationSchema={SignupValidation}
           onSubmit={handleSignUp}
         >
           {({ isSubmitting, values }) => (

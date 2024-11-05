@@ -231,9 +231,9 @@ const ProductDetail = () => {
         <div className="flex-1 space-y-5">
           <h1 className="text-3xl font-bold">{name}</h1>
           <div className="flex items-center space-x-2">
-            <p className="text-2xl font-semibold">₹{offerPrice.toFixed(2)}</p>
+            <p className="text-2xl font-semibold">₹{offerPrice}</p>
             <p className="text-[16px] font-thin line-through text-gray-500">
-              ₹{price.toFixed(2)}
+              ₹{price}
             </p>
           </div>
           {productData.totalStock === 0 ? (
@@ -317,7 +317,6 @@ const ProductDetail = () => {
           </div>
         </div>
       </div>
-      {/* Rest of the component (Tabs, Reviews, Zoom Modal)... */}
 
       <div className="mt-8 mb-8 max-w-4xl mx-auto">
         <Tabs defaultValue="details" className="w-full">

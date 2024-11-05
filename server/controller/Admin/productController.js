@@ -44,14 +44,30 @@ const addProduct = async (req, res) => {
 
 const getProduct = async (req, res) => {
     try {
+        const page = parseInt(req.query.page) || 1; 
+        const limit = parseInt(req.query.limit) || 10; 
+        const skip = (page - 1) * limit;
 
-        const products = await Product.find({}).populate('category', 'name');
+        const totalProducts = await Product.countDocuments({}); 
+        const totalPages = Math.ceil(totalProducts / limit);
+
+        const products = await Product.find({})
+            .populate('category', 'name')
+            .skip(skip)
+            .limit(limit)
+            .sort({ createdAt: -1 });
 
         const formattedProducts = products.map(product => ({
             ...product.toObject(),
-            category: product.category.name,
+            category: product.category ? product.category.name : null,
         }));
-        res.status(200).json(formattedProducts);
+
+        res.status(200).json({
+            products: formattedProducts,
+            currentPage: page,
+            totalPages,
+            totalProducts,
+        });
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: 'Server error' });
@@ -108,7 +124,7 @@ const updateProduct = async (req, res) => {
             }
         }
 
-        // Update fields only if they are provided in the request
+        // Update fields only if they are provided in the request...
         existingProduct.name = name || existingProduct.name;
         existingProduct.description = description || existingProduct.description;
         existingProduct.price = price || existingProduct.price;

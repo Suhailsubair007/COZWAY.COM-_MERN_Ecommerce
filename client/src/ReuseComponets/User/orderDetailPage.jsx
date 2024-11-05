@@ -1,11 +1,19 @@
-import { useEffect, useState } from "react"
-import { useParams } from "react-router-dom"
-import { ChevronRight, Home, Package, CreditCard, FileText, Truck } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Separator } from "@/components/ui/separator"
-import { ScrollArea } from "@/components/ui/scroll-area"
-import { Badge } from "@/components/ui/badge"
-import axiosInstance from "@/config/axiosConfig"
+import { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
+import {
+  ChevronRight,
+  Home,
+  Package,
+  CreditCard,
+  FileText,
+  Truck,
+} from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Separator } from "@/components/ui/separator";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Badge } from "@/components/ui/badge";
+import axiosInstance from "@/config/axiosConfig";
+import { toast } from "sonner";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -15,77 +23,103 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from "@/components/ui/alert-dialog"
+} from "@/components/ui/alert-dialog";
 
 export default function OrderDetail() {
-  const { id } = useParams()
-  const [orderData, setOrderData] = useState(null)
-  const [isLoading, setIsLoading] = useState(true)
-  const [isCancelDialogOpen, setIsCancelDialogOpen] = useState(false)
-  const [error, setError] = useState(null)
+  const { id } = useParams();
+  const [orderData, setOrderData] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isCancelDialogOpen, setIsCancelDialogOpen] = useState(false);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
-    fetchOrderDetail()
-  }, [id])
+    fetchOrderDetail();
+  }, [id]);
 
   const fetchOrderDetail = async () => {
     try {
-      setIsLoading(true)
-      const response = await axiosInstance.get(`/users/order/${id}`)
-      setOrderData(response.data.order)
-      setError(null)
+      setIsLoading(true);
+      const response = await axiosInstance.get(`/users/order/${id}`);
+      setOrderData(response.data.order);
+      setError(null);
     } catch (error) {
-      console.error("Error fetching order:", error)
-      setError("Failed to fetch order details")
+      console.error("Error fetching order:", error);
+      setError("Failed to fetch order details");
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }
+  };
 
   const handleCancel = () => {
-    setIsCancelDialogOpen(true)
-  }
+    setIsCancelDialogOpen(true);
+  };
 
   const confirmCancel = async () => {
     try {
       const response = await axiosInstance.patch(`/users/order/${id}`, {
         status: "Cancelled",
-      })
+      });
       if (response.status === 200) {
-        fetchOrderDetail()
-        setIsCancelDialogOpen(false)
+        fetchOrderDetail();
+        toast.success("Order cacelled..");
+        setIsCancelDialogOpen(false);
       } else {
-        console.log("Order cancellation failed")
+        console.log("Order cancellation failed");
       }
     } catch (error) {
-      console.error("Error cancelling order:", error)
+      console.error("Error cancelling order:", error);
     }
-  }
+  };
 
-  if (isLoading) return <div className="flex items-center justify-center h-screen">Loading...</div>
-  if (error) return <div className="flex items-center justify-center h-screen text-red-500">{error}</div>
-  if (!orderData) return <div className="flex items-center justify-center h-screen">No order found</div>
+  if (isLoading)
+    return (
+      <div className="flex items-center justify-center h-screen">
+        Loading...
+      </div>
+    );
+  if (error)
+    return (
+      <div className="flex items-center justify-center h-screen text-red-500">
+        {error}
+      </div>
+    );
+  if (!orderData)
+    return (
+      <div className="flex items-center justify-center h-screen">
+        No order found
+      </div>
+    );
 
   const formatDate = (dateString) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric'
-    })
-  }
+    return new Date(dateString).toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    });
+  };
 
   return (
     <div className="container mx-auto py-10 px-4 sm:px-6 lg:px-8 min-h-screen">
       {/* Breadcrumb */}
       <nav className="flex items-center gap-2 text-sm text-muted-foreground mb-6">
-        <a href="/" className="flex items-center hover:text-foreground transition-colors">
+        <a
+          href="/"
+          className="flex items-center hover:text-foreground transition-colors"
+        >
           <Home className="h-4 w-4 mr-1" />
           <span>Home</span>
         </a>
         <ChevronRight className="h-4 w-4" />
-        <a href="/profile" className="hover:text-foreground transition-colors">Account</a>
+        <a href="/profile" className="hover:text-foreground transition-colors">
+          Account
+        </a>
         <ChevronRight className="h-4 w-4" />
-        <a href="/profile/orders" className="hover:text-foreground transition-colors">My Orders</a>
+        <a
+          href="/profile/orders"
+          className="hover:text-foreground transition-colors"
+        >
+          My Orders
+        </a>
         <ChevronRight className="h-4 w-4" />
         <span className="text-foreground font-medium">Order Details</span>
       </nav>
@@ -102,7 +136,9 @@ export default function OrderDetail() {
       <div className="bg-muted/50 rounded-lg p-6 mb-8">
         <div className="flex justify-between items-center mb-4">
           <div className="space-y-1">
-            <p className="text-sm text-muted-foreground">Ordered on {formatDate(orderData.placed_at)}</p>
+            <p className="text-sm text-muted-foreground">
+              Ordered on {formatDate(orderData.placed_at)}
+            </p>
             <p className="text-lg font-semibold">Order #{orderData.order_id}</p>
           </div>
           <Button variant="outline" className="gap-2">
@@ -120,7 +156,10 @@ export default function OrderDetail() {
             </div>
             <div className="text-sm text-muted-foreground space-y-1">
               <p>{orderData.shipping_address.address}</p>
-              <p>{orderData.shipping_address.district}, {orderData.shipping_address.state}</p>
+              <p>
+                {orderData.shipping_address.district},{" "}
+                {orderData.shipping_address.state}
+              </p>
               <p>Pin Code - {orderData.shipping_address.pincode}</p>
               <p>Contact Number - {orderData.shipping_address.phone}</p>
             </div>
@@ -168,7 +207,10 @@ export default function OrderDetail() {
       <ScrollArea className="h-[400px] rounded-md border p-4">
         <div className="space-y-6">
           {orderData.order_items.map((item, index) => (
-            <div key={index} className="flex items-start gap-4 pb-4 border-b last:border-b-0">
+            <div
+              key={index}
+              className="flex items-start gap-4 pb-4 border-b last:border-b-0"
+            >
               <img
                 src={item.product.images[0]}
                 alt={item.product.name}
@@ -186,7 +228,9 @@ export default function OrderDetail() {
                 </Badge>
               </div>
               <div className="text-right">
-                <p className="font-semibold">₹{(item.quantity * item.price).toFixed(2)}</p>
+                <p className="font-semibold">
+                  ₹{(item.quantity * item.price).toFixed(2)}
+                </p>
               </div>
             </div>
           ))}
@@ -198,27 +242,44 @@ export default function OrderDetail() {
         <Button
           variant="destructive"
           onClick={handleCancel}
-          disabled={orderData.order_status === "cancelled"}
+          disabled={
+            orderData.order_status === "cancelled" ||
+            orderData.order_status === "delivered"
+          }
         >
-          {orderData.order_status === "cancelled" ? "Order Cancelled" : "Cancel Order"}
+          {orderData.order_status === "cancelled"
+            ? "Order Cancelled"
+            : orderData.order_status === "delivered"
+            ? "Order Delivered"
+            : "Cancel Order"}
         </Button>
       </div>
 
       {/* Cancel Dialog */}
-      <AlertDialog open={isCancelDialogOpen} onOpenChange={setIsCancelDialogOpen}>
+      <AlertDialog
+        open={isCancelDialogOpen}
+        onOpenChange={setIsCancelDialogOpen}
+      >
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Are you sure you want to cancel this order?</AlertDialogTitle>
+            <AlertDialogTitle>
+              Are you sure you want to cancel this order?
+            </AlertDialogTitle>
             <AlertDialogDescription>
-              Cancelling this order will change its status to "Cancelled". This action cannot be undone.
+              Cancelling this order will change its status to "Cancelled". This
+              action cannot be undone.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel onClick={() => setIsCancelDialogOpen(false)}>No, keep the order</AlertDialogCancel>
-            <AlertDialogAction onClick={confirmCancel}>Yes, cancel the order</AlertDialogAction>
+            <AlertDialogCancel onClick={() => setIsCancelDialogOpen(false)}>
+              No, keep the order
+            </AlertDialogCancel>
+            <AlertDialogAction onClick={confirmCancel}>
+              Yes, cancel the order
+            </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
     </div>
-  )
+  );
 }

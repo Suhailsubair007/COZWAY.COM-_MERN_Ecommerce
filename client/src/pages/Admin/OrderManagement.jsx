@@ -53,7 +53,17 @@ export default function OrderManagement() {
     }
   };
 
-  const handleStatusChange = async (orderId, newStatus) => {
+  const handleStatusChange = async (orderId, newStatus, currentStatus) => {
+    // Prevent changing status to a previous state
+    const statusOrder = ['pending', 'shipped', 'delivered', 'cancelled'];
+    const currentIndex = statusOrder.indexOf(currentStatus.toLowerCase());
+    const newIndex = statusOrder.indexOf(newStatus);
+
+    if (newIndex < currentIndex) {
+      toast.error("Cannot change to a previous status.");
+      return;
+    }
+
     try {
       await axiosInstance.patch(`/admin/orders/${orderId}/status`, {
         newStatus,
@@ -75,7 +85,7 @@ export default function OrderManagement() {
     if (!orderToCancel) return;
 
     try {
-      await handleStatusChange(orderToCancel._id, "cancelled");
+      await handleStatusChange(orderToCancel._id, "cancelled", orderToCancel.order_status);
       toast.success("Order cancelled successfully.");
     } catch (error) {
       console.error("Error cancelling order:", error);
@@ -92,6 +102,12 @@ export default function OrderManagement() {
       order.userId.email.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
+  const getAvailableStatuses = (currentStatus) => {
+    const statusOrder = ['pending', 'shipped', 'delivered', 'cancelled'];
+    const currentIndex = statusOrder.indexOf(currentStatus.toLowerCase());
+    return statusOrder.slice(currentIndex);
+  };
+
   return (
     <div className="container mx-auto py-10 px-4 sm:px-6 lg:px-8 h-screen">
       <nav className="flex items-center gap-2 text-sm text-gray-600 mb-4">
@@ -106,8 +122,6 @@ export default function OrderManagement() {
         <a href="/profile" className="hover:text-gray-900">
           My orders
         </a>
-       
-       
       </nav>
       <h1 className="text-2xl font-bold mb-6">Orders Management</h1>
 
@@ -157,7 +171,7 @@ export default function OrderManagement() {
                   <Select
                     value={order.order_status.toLowerCase()}
                     onValueChange={(value) =>
-                      handleStatusChange(order._id, value)
+                      handleStatusChange(order._id, value, order.order_status)
                     }
                     disabled={order.order_status.toLowerCase() === "cancelled"}
                   >
@@ -165,26 +179,18 @@ export default function OrderManagement() {
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="pending">
-                        <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
-                          Pending
-                        </span>
-                      </SelectItem>
-                      <SelectItem value="shipped">
-                        <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                          Shipped
-                        </span>
-                      </SelectItem>
-                      <SelectItem value="delivered">
-                        <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                          Delivered
-                        </span>
-                      </SelectItem>
-                      <SelectItem value="cancelled">
-                        <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800">
-                          Cancelled
-                        </span>
-                      </SelectItem>
+                      {getAvailableStatuses(order.order_status).map((status) => (
+                        <SelectItem key={status} value={status}>
+                          <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
+                            status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
+                            status === 'shipped' ? 'bg-blue-100 text-blue-800' :
+                            status === 'delivered' ? 'bg-green-100 text-green-800' :
+                            'bg-red-100 text-red-800'
+                          }`}>
+                            {status.charAt(0).toUpperCase() + status.slice(1)}
+                          </span>
+                        </SelectItem>
+                      ))}
                     </SelectContent>
                   </Select>
                 </TableCell>
@@ -203,7 +209,8 @@ export default function OrderManagement() {
                       size="sm"
                       onClick={() => handleCancel(order)}
                       disabled={
-                        order.order_status.toLowerCase() === "cancelled"
+                        order.order_status.toLowerCase() === "cancelled" ||
+                        order.order_status.toLowerCase() === "delivered"
                       }
                     >
                       Cancel

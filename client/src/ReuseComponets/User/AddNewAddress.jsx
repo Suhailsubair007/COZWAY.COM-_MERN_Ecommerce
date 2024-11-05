@@ -1,7 +1,6 @@
 import React from "react";
 import { useSelector } from "react-redux";
 import { Formik, Form, Field } from "formik";
-import * as Yup from "yup";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -13,28 +12,7 @@ import {
   DialogTitle,
   DialogFooter,
 } from "@/components/ui/dialog";
-
-const validationSchema = Yup.object().shape({
-  name: Yup.string().required("Name is required"),
-  phone: Yup.string()
-    .matches(/^[0-9]+$/, "Must be only digits")
-    .min(10, "Must be exactly 10 digits")
-    .max(10, "Must be exactly 10 digits")
-    .required("Phone number is required"),
-  address: Yup.string().required("Address is required"),
-  district: Yup.string().required("District is required"),
-  state: Yup.string().required("State is required"),
-  city: Yup.string().required("City is required"),
-  pincode: Yup.string()
-    .matches(/^[0-9]+$/, "Must be only digits")
-    .length(6, "Must be exactly 6 digits")
-    .required("Pincode is required"),
-  alternatePhone: Yup.string()
-    .matches(/^[0-9]+$/, "Must be only digits")
-    .min(10, "Must be exactly 10 digits")
-    .max(10, "Must be exactly 10 digits"),
-  landmark: Yup.string(),
-});
+import { addressValidationSchema } from "../../utils/Validations";
 
 function AddAddressModal({ isOpen, onClose, onAdd }) {
   const user = useSelector((state) => state.user.userInfo.id);
@@ -80,7 +58,7 @@ function AddAddressModal({ isOpen, onClose, onAdd }) {
         </DialogHeader>
         <Formik
           initialValues={initialValues}
-          validationSchema={validationSchema}
+          validationSchema={addressValidationSchema}
           onSubmit={handleSubmit}
         >
           {({ errors, touched, isSubmitting }) => (

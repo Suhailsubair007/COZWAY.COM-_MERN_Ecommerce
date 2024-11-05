@@ -2,7 +2,7 @@ const Order = require('../../model/order');
 
 const getAllOrders = async (req, res) => {
     try {
-        console.log("Reached");
+        // console.log("Reached");
         const orders = await Order.find({}).populate('userId');
         console.log("Orders:", orders);
         res.status(200).json(orders);
@@ -63,7 +63,7 @@ const getOrderById = async (req, res) => {
 
         res.status(200).json({
             success: true,
-            message: "Order fetched successfully",
+            message: "Order fetched...",
             order
         });
     } catch (error) {

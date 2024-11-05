@@ -100,18 +100,23 @@ const advancedSearch = async (req, res) => {
             case 'newest':
                 sortOption = { createdAt: -1 };
                 break;
+            case 'a_z':
+                sortOption = { name: 1 };
+                break;
+            case 'z_a':
+                sortOption = { name: -1 };
+                break;
             default:
                 sortOption = { createdAt: -1 };
         }
 
-        const [totalProducts,products] = await Promise.all([
+        const [totalProducts, products] = await Promise.all([
             Product.countDocuments(query),
             Product.find(query)
                 .populate('category', 'name')
                 .sort(sortOption)
                 .skip((page - 1) * limit)
                 .limit(Number(limit)),
-
         ])
 
         const totalPages = Math.ceil(totalProducts / limit);
