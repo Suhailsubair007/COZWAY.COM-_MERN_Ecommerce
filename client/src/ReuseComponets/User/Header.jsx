@@ -28,40 +28,38 @@ import {
   ShoppingCart,
 } from "lucide-react";
 
-const Header = () => {
+export default function Header() {
   const [isSearchVisible, setSearchVisible] = useState(false);
-  const [count, setCount] = useState([]);
+  const [count, setCount] = useState(0);
   const userId = useSelector((state) => state.user.userInfo);
-  // const id = useSelector((state) => state.user.userInfo.id);
   const dispatch = useDispatch();
+  const navigate = useNavigate();
 
-  // useEffect(() => {
-  //   fetchCart();
-  // }, [id]);
+  useEffect(() => {
+    if (userId) {
+      fetchCart();
+    }
+  }, [userId]);
 
-  // const fetchCart = async () => {
-  //   try {
-  //     const response = await axiosInstance.get(`/users/cartLength/${id}`);
-  //     setCount(response.data.productCount);
-  //     console.log(response.data);
-  //   } catch (error) {
-  //     console.error("Error fetching cart:", error);
-  //     if (error.response) {
-  //       toast.error(error.response.data.message);
-  //     }
-  //   }
-  // };
-  // console.log(count);
+  const fetchCart = async () => {
+    try {
+      const response = await axiosInstance.get(`/users/cartLength/${userId.id}`);
+      setCount(response.data.productCount);
+    } catch (error) {
+      console.error("Error fetching cart:", error);
+      if (error.response) {
+        console.log(error.response.data.message);
+      }
+    }
+  };
+
   const toggleSearch = () => {
     setSearchVisible(!isSearchVisible);
   };
-  const navigate = useNavigate();
 
   const handleLogout = async () => {
     try {
       const response = await axiosInstance.post("/users/logout");
-
-      console.log(response);
       if (response.status === 200) {
         dispatch(logoutUser());
         localStorage.removeItem("userInfo");
@@ -79,9 +77,15 @@ const Header = () => {
   const handleProfileClick = () => {
     navigate("/profile");
   };
+
   const handleCartClick = () => {
     navigate("/cart");
   };
+
+  const handleOrderClick = () => {
+    navigate("/profile/orders");
+  };
+
   return (
     <header className="sticky top-0 z-50 w-full bg-white/95 shadow-md">
       <div className="container mx-auto px-4">
@@ -156,7 +160,7 @@ const Header = () => {
               >
                 <ShoppingCart className="h-5 w-5" />
               </Button>
-              {count > 0 && (
+              {userId && count > 0 && (
                 <Badge
                   variant="destructive"
                   className="absolute -top-2 -right-2 px-2 py-1 text-xs font-bold rounded-full"
@@ -184,7 +188,7 @@ const Header = () => {
                     className="relative h-8 w-8 rounded-full"
                   >
                     <Avatar className="h-8 w-8">
-                      <AvatarImage src={userId.name} alt={"no name"} />
+                      <AvatarImage src={userId.name} alt={userId.name} />
                       <AvatarFallback>{userId.name.charAt(0)}</AvatarFallback>
                     </Avatar>
                   </Button>
@@ -194,7 +198,7 @@ const Header = () => {
                     <User className="mr-2 h-4 w-4" />
                     <span>Account</span>
                   </DropdownMenuItem>
-                  <DropdownMenuItem>
+                  <DropdownMenuItem onClick={handleOrderClick}>
                     <ShoppingBag className="mr-2 h-4 w-4" />
                     <span>My Orders</span>
                   </DropdownMenuItem>
@@ -244,17 +248,6 @@ const Header = () => {
                   >
                     Contact Us
                   </Link>
-                  {/* {userId ? (
-                    <div className="flex items-center space-x-2">
-                      <Avatar className="h-8 w-8">
-                        <AvatarImage src={userId.avatarUrl} alt={userId.name} />
-                        <AvatarFallback>{userId.name.charAt(0)}</AvatarFallback>
-                      </Avatar>
-                      <span className="text-sm font-medium">{userId.name}</span>
-                    </div>
-                  ) : (
-                    <Button className="w-full">Login</Button>
-                  )} */}
                 </nav>
               </SheetContent>
             </Sheet>
@@ -263,6 +256,4 @@ const Header = () => {
       </div>
     </header>
   );
-};
-
-export default Header;
+}

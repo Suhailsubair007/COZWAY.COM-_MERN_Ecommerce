@@ -45,7 +45,7 @@ export default function OrderManagement() {
   const fetchOrders = async () => {
     try {
       const response = await axiosInstance.get("/admin/orders");
-      console.log(response.data);
+      console.log("data===============>",response.data);
       setOrders(response.data);
     } catch (error) {
       console.error(error);

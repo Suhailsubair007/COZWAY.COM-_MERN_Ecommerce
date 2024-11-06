@@ -1,8 +1,10 @@
-import React from "react"
-import { NavLink, useNavigate, useLocation } from "react-router-dom"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Button } from "@/components/ui/button"
-import { Separator } from "@/components/ui/separator"
+import React from "react";
+import { NavLink, useNavigate, useLocation } from "react-router-dom";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Button } from "@/components/ui/button";
+import axiosInstance from "@/config/axiosConfig";
+import { logoutUser } from "../../redux/UserSlice";
+import { useDispatch } from "react-redux";
 import {
   Sidebar,
   SidebarContent,
@@ -13,7 +15,7 @@ import {
   SidebarMenuItem,
   SidebarProvider,
   SidebarTrigger,
-} from "@/components/ui/sidebar"
+} from "@/components/ui/sidebar";
 import {
   User,
   MapPin,
@@ -23,26 +25,47 @@ import {
   Key,
   LogOut,
   Menu,
-} from "lucide-react"
+} from "lucide-react";
 
 export default function UserProfileSidebar({ userName = "Suhail Subair" }) {
-  const navigate = useNavigate()
-  const location = useLocation()
+  const navigate = useNavigate();
+  const location = useLocation();
+  const dispatch = useDispatch();
+
+
+
+
+  const handleLogout = async () => {
+    try {
+      const response = await axiosInstance.post("/users/logout");
+
+      console.log(response);
+      if (response.status === 200) {
+        dispatch(logoutUser());
+        localStorage.removeItem("userInfo");
+        navigate("/");
+        toast.success("User Logged out successfully..");
+      } else {
+        toast.error("Failed to log out. Please try again.");
+      }
+    } catch (err) {
+      console.error("Logout error:", err);
+      toast.error("An error occurred during logout.");
+    }
+  };
 
   const menuItems = [
     { icon: User, label: "My Profile", path: "/profile" },
-    { icon: MapPin, label: "Delivery Address", path: "/profile/delivery-address" },
+    {
+      icon: MapPin,
+      label: "Delivery Address",
+      path: "/profile/delivery-address",
+    },
     { icon: ShoppingBag, label: "My Orders", path: "/profile/orders" },
     { icon: Wallet, label: "My Wallet", path: "/profile/wallet" },
     { icon: Ticket, label: "My Coupon", path: "/profile/coupons" },
     { icon: Key, label: "Change Password", path: "/profile/change-password" },
-  ]
-
-  const handleLogout = () => {
-    // Implement logout logic here
-    console.log("Logging out...")
-    navigate("/login")
-  }
+  ];
 
   return (
     <SidebarProvider>
@@ -50,12 +73,17 @@ export default function UserProfileSidebar({ userName = "Suhail Subair" }) {
         <SidebarHeader className="border-b px-6 py-4">
           <div className="flex items-center gap-4">
             <Avatar className="h-10 w-10">
-              <AvatarImage src="/placeholder.svg?height=40&width=40" alt={userName} />
+              <AvatarImage
+                src="/placeholder.svg?height=40&width=40"
+                alt={userName}
+              />
               <AvatarFallback>{userName.charAt(0)}</AvatarFallback>
             </Avatar>
             <div className="flex flex-col">
               <span className="text-sm font-medium">{userName}</span>
-              <span className="text-xs text-muted-foreground">View Profile</span>
+              <span className="text-xs text-muted-foreground">
+                View Profile
+              </span>
             </div>
           </div>
         </SidebarHeader>
@@ -65,7 +93,11 @@ export default function UserProfileSidebar({ userName = "Suhail Subair" }) {
               <SidebarMenuItem key={index}>
                 <SidebarMenuButton
                   asChild
-                  isActive={location.pathname === item.path || (item.path === "/profile" && location.pathname === item.path)}
+                  isActive={
+                    location.pathname === item.path ||
+                    (item.path === "/profile" &&
+                      location.pathname === item.path)
+                  }
                 >
                   <NavLink
                     to={item.path}
@@ -98,5 +130,5 @@ export default function UserProfileSidebar({ userName = "Suhail Subair" }) {
         <span className="ml-2 text-lg font-semibold">User Profile</span>
       </div>
     </SidebarProvider>
-  )
+  );
 }

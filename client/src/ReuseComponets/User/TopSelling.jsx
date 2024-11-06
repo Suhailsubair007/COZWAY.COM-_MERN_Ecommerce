@@ -3,7 +3,6 @@ import axiosInstance from "@/config/axiosConfig";
 import { useNavigate } from "react-router-dom";
 
 const TopSelling = () => {
-    // Example products data
     const [trendingItems, setTrendingItems] = useState([]);
     const navigate = useNavigate();
   

@@ -113,7 +113,7 @@ export default function ShoppingCart() {
   const removeItem = async (item) => {
     try {
       const response = await axiosInstance.delete(`/users/delete/${userId}/${item._id}`)
-      toast.success(response.data.message)
+      toast.success("Item removed from cart..")
       fetchCart()
     } catch (error) {
       console.error("Error removing item from cart:", error)

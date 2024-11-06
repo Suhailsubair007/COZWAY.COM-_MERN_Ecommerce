@@ -69,7 +69,7 @@ const CheckoutPage = () => {
 
   const handlePlaceOrder = async () => {
     if (!selectedAddress || !selectedPaymentMethod) {
-      toast(
+      toast.warning(
         "Please select both a delivery address and a payment method before placing your order."
       );
       return;

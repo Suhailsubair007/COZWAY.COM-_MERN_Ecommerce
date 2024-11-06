@@ -159,14 +159,6 @@ export default function AdminOrderDetail() {
           ))}
         </div>
       </ScrollArea>
-
-      {/* Update Order Status Button */}
-      <div className="flex justify-end mt-8">
-        <Button className="gap-2">
-          <RefreshCcw className="h-4 w-4" />
-          Update Order Status
-        </Button>
-      </div>
     </div>
   )
 }

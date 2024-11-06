@@ -11,7 +11,6 @@ const orderController = require('../controller/User/orderController')
 const verifyUser = require('../middleware/userAuth')
 
 
-
 //Login and signup , otp
 router.post('/login', userController.login)
 router.post('/signup', verifyOTP, userController.registerUser);

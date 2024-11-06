@@ -8,7 +8,7 @@ const PurchasePage = () => {
   return (
     <div>
       <Header />
-      <div className="px-[200px] py-[50px]">
+      <div className="">
         <ProductDetail />
       </div>
       <RelatedProducts />

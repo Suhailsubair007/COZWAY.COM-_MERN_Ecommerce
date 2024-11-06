@@ -22,12 +22,12 @@ const verifyUser = async (req, res, next) => {
             }
 
         });
-        console.log("decodedddd",decode)
+        // console.log("decodedddd",decode)
     } else {
         handleRefreshToken(refreshToken, req, res, next);
     }
 };
-
+             
 
 //Helper function for chek refresh token and create a new asses token with refresh token
 

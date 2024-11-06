@@ -171,10 +171,6 @@ const googleSignIn = async (req, res) => {
 
     try {
         let user = await User.findOne({ email });
-        if (user.is_blocked) {
-            return res.status(403).json({ success: false, message: "User is blocked. Please contact support." });
-        }
-
         if (!user) {
             user = new User({
                 name,
