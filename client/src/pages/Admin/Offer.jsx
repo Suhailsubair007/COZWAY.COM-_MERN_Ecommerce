@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Plus, Trash2, Edit } from "lucide-react";
+import { Plus, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import axiosInstance from "@/config/axiosConfig";
@@ -13,12 +13,24 @@ import {
 } from "@/components/ui/table";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import AddOfferDialog from "@/ReuseComponets/Admin/AddOfferDialog";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 export default function Component() {
   const [isOpen, setIsOpen] = useState(false);
   const [activeTab, setActiveTab] = useState("product");
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
+  const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
+  const [offerToDelete, setOfferToDelete] = useState(null);
 
   useEffect(() => {
     fetchOffers();
@@ -34,8 +46,33 @@ export default function Component() {
       toast.error("Failed to load offers");
     }
   };
+
   const handleOfferAdded = () => {
     fetchOffers();
+  };
+
+  console.log("offer to delete----------->", offerToDelete);
+  const handleDeleteClick = (offer) => {
+    setOfferToDelete(offer);
+    setDeleteConfirmOpen(true);
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (!offerToDelete) return;
+
+    try {
+      await axiosInstance.delete("/admin/offer", {
+        data: { offerId: offerToDelete._id },
+      });
+      toast.success("Offer deleted successfully");
+      fetchOffers();
+    } catch (error) {
+      console.error("Error deleting offer:", error);
+      toast.error("Failed to delete offer");
+    } finally {
+      setDeleteConfirmOpen(false);
+      setOfferToDelete(null);
+    }
   };
 
   return (
@@ -90,7 +127,11 @@ export default function Component() {
                     </TableCell>
                     <TableCell>
                       <div className="flex gap-2">
-                        <Button variant="ghost" size="icon">
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => handleDeleteClick(product)}
+                        >
                           <Trash2 className="w-4 h-4 text-destructive" />
                         </Button>
                       </div>
@@ -134,7 +175,11 @@ export default function Component() {
                     </TableCell>
                     <TableCell>
                       <div className="flex gap-2">
-                        <Button variant="ghost" size="icon">
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => handleDeleteClick(category)}
+                        >
                           <Trash2 className="w-4 h-4 text-destructive" />
                         </Button>
                       </div>
@@ -153,6 +198,26 @@ export default function Component() {
         activeTab={activeTab}
         onOfferAdded={handleOfferAdded}
       />
+
+      <AlertDialog open={deleteConfirmOpen} onOpenChange={setDeleteConfirmOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>
+              Are you sure you want to delete this offer?
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              This action cannot be undone. This will permanently delete the
+              offer.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDeleteConfirm}>
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

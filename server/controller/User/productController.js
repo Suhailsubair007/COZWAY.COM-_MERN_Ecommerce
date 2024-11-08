@@ -31,7 +31,7 @@ const fetchActiveProduct = async (req, res) => {
 const fetchProductById = async (req, res) => {
     const { id } = req.params;
     try {
-        const product = await Product.findById(id).populate('category');
+        const product = await Product.findById(id).populate('category').populate('offer');
 
         if (!product) {
             return res.status(404).json({ message: 'Product not found' });
@@ -113,7 +113,7 @@ const advancedSearch = async (req, res) => {
         const [totalProducts, products] = await Promise.all([
             Product.countDocuments(query),
             Product.find(query)
-                .populate('category', 'name')
+                .populate('category', 'name' ).populate('offer')
                 .sort(sortOption)
                 .skip((page - 1) * limit)
                 .limit(Number(limit)),

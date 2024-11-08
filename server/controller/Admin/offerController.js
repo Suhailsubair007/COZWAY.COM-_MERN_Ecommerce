@@ -3,9 +3,6 @@ const Product = require('../../model/Product');
 const Category = require('../../model/Category')
 
 
-
-
-
 const getOffers = async (req, res) => {
     try {
         const offers = await Offer.find({});
@@ -28,14 +25,15 @@ const getOffers = async (req, res) => {
     }
 }
 
-//Contoller for add a new offfer.....
+
+//API for add a new offfer.....
 const addOffer = async (req, res) => {
     console.log("reachedddd---------------------")
     try {
         const { name, value, target, targetId, targetName, endDate } = req.body;
 
-        console.log("target id------>",target)
-        console.log("target -------->",targetId)
+        console.log("target id------>", target)
+        console.log("target -------->", targetId)
 
         const new_offer = await Offer.create({
             name,
@@ -61,14 +59,14 @@ const addOffer = async (req, res) => {
         } else if (target === "category") {
             const products = await Product.find({ category: targetId }).populate("offer");
             for (const product of products) {
-                const originalOfferId = product.offer ? product.offer._id : null;
+                // const originalOfferId = product.offer ? product.offer._id : null;
 
                 if (value > product?.offer?.offer_value || product?.offer?.offer_value == undefined) {
                     product.offer = new_offer._id;
                 }
                 await product.save();
 
-                product.originalOfferId = originalOfferId;
+
                 await product.save();
             }
         }
@@ -83,10 +81,13 @@ const addOffer = async (req, res) => {
 }
 
 
-//controller for delete the order
+//API for delete the order
 const deleteOffer = async (req, res) => {
+
+    console.log("--------------------------------------------------------------------")
     try {
         const { offerId } = req.body;
+        console.log(offerId)
         const existingOffer = await Offer.findById(offerId);
 
         if (!existingOffer) {
@@ -121,13 +122,21 @@ const deleteOffer = async (req, res) => {
         if (existingOffer.target_type === "category") {
             const products = await Product.find({ category: existingOffer.target_id }).populate("offer");
 
-            for (const product of products) {
-                if (product.originalOfferId) {
-                    product.offer = product.originalOfferId;
-                } else {
-                    product.offer = null;
-                }
-                await product.save();
+            // for (const product of products) {
+            //     if (product.originalOfferId) {
+            //         product.offer = product.originalOfferId;
+            //     } else {
+            //         product.offer = null;
+            //     }
+            //     await product.save();
+            // }
+
+            if (
+                products &&
+                products.offer &&
+                products.offer.target_type === "category"
+            ) {
+                products.offer = null;
             }
         }
 
@@ -142,6 +151,8 @@ const deleteOffer = async (req, res) => {
     }
 }
 
+
+//API for fetch the categories in the add category dropdown dynamically...
 const getCategoriesForOffer = async (req, res) => {
     console.log("reachedddddddddddddddddddddddddddd ")
     try {

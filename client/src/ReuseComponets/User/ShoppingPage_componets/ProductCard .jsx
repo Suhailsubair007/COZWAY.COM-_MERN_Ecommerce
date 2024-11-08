@@ -1,6 +1,6 @@
-import React from "react"
-import { Card, CardContent } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
+import React from "react";
+import { Card, CardContent } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 
 export const ProductCard = ({ product, onNavigate }) => (
   <Card
@@ -20,25 +20,17 @@ export const ProductCard = ({ product, onNavigate }) => (
         {product.name}
       </p>
 
-      <p className="text-sm text-gray-500 truncate">
-        {product.category.name}
-      </p>
+      <p className="text-sm text-gray-500 truncate">{product.category.name}</p>
       {product.totalStock === 0 ? (
         <div className="flex pt-2 justify-end">
-          <Badge
-            variant="destructive"
-            className="group-hover:animate-pulse"
-          >
+          <Badge variant="destructive" className="group-hover:animate-pulse">
             Out of stock!
           </Badge>
         </div>
       ) : (
         product.totalStock <= 5 && (
           <div className="flex pt-2 justify-end">
-            <Badge
-              variant="destructive"
-              className="group-hover:animate-pulse"
-            >
+            <Badge variant="destructive" className="group-hover:animate-pulse">
               Only {product.totalStock} left!
             </Badge>
           </div>
@@ -46,8 +38,12 @@ export const ProductCard = ({ product, onNavigate }) => (
       )}
 
       <p className="text-sm font-bold mt-2 group-hover:text-primary transition-colors duration-300">
-        ₹{product.offerPrice}
+        ₹
+        {product?.offer?.offer_value
+          ? product?.offerPrice -
+            (product?.offerPrice * product?.offer?.offer_value) / 100
+          : product?.offerPrice}
       </p>
     </CardContent>
   </Card>
-)
+);

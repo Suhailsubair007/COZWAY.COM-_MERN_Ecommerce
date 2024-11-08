@@ -214,8 +214,16 @@ const ProductDetail = () => {
     return <div>Product not found</div>;
   }
 
-  const { name, price, offerPrice, images, sizes, description, category } =
-    productData;
+  const {
+    name,
+    price,
+    offerPrice,
+    images,
+    sizes,
+    description,
+    category,
+    offer,
+  } = productData;
 
   const dummyCoupons = [
     { code: "SUMMER10", discount: "10% off" },
@@ -280,7 +288,12 @@ const ProductDetail = () => {
         <div className="flex-1 space-y-5">
           <h1 className="text-3xl font-bold">{name}</h1>
           <div className="flex items-center space-x-2">
-            <p className="text-2xl font-semibold">₹{offerPrice}</p>
+            <p className="text-2xl font-semibold">
+              ₹
+              {offer?.offer_value
+                ? offerPrice - (offerPrice * offer?.offer_value) / 100
+                : offerPrice}
+            </p>
             <p className="text-[16px] font-thin line-through text-gray-500">
               ₹{price}
             </p>
