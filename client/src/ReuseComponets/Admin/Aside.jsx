@@ -14,6 +14,7 @@ import {
   Ticket,
   Settings,
   LogOut,
+  CirclePercent,
 } from "lucide-react";
 
 const Aside = () => {
@@ -79,14 +80,19 @@ const Aside = () => {
                 label: "Orders",
               },
               {
-                path: "/admin/banner",
-                icon: <ImageIcon size={20} />,
-                label: "Banner",
-              },
-              {
                 path: "/admin/coupons",
                 icon: <Ticket size={20} />,
                 label: "Coupon",
+              },
+              {
+                path: "/admin/offer",
+                icon: <CirclePercent size={20} />,
+                label: "Offers",
+              },
+              {
+                path: "/admin/banner",
+                icon: <ImageIcon size={20} />,
+                label: "Banner",
               },
               {
                 path: "/admin/settings",

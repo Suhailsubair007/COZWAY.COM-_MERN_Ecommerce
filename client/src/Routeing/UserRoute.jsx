@@ -18,7 +18,7 @@ import Order_details from "@/pages/User/Order_details";
 import MyOrders from "@/ReuseComponets/User/MyOrder";
 import ForgotPassword from "@/pages/User/login/ForgotPassword";
 import ResetPassword from "@/pages/User/login/ResetPassword";
-
+import WishlistPage from "@/pages/User/WishlistPage";
 
 const UserRoute = () => {
   return (
@@ -86,6 +86,14 @@ const UserRoute = () => {
           element={
             <UserPrivate>
               <MainShoppingPage />
+            </UserPrivate>
+          }
+        />
+        <Route
+          path="/wishlist"
+          element={
+            <UserPrivate>
+              <WishlistPage />
             </UserPrivate>
           }
         />

@@ -43,7 +43,9 @@ export default function Header() {
 
   const fetchCart = async () => {
     try {
-      const response = await axiosInstance.get(`/users/cartLength/${userId.id}`);
+      const response = await axiosInstance.get(
+        `/users/cartLength/${userId.id}`
+      );
       setCount(response.data.productCount);
     } catch (error) {
       console.error("Error fetching cart:", error);
@@ -84,6 +86,10 @@ export default function Header() {
 
   const handleOrderClick = () => {
     navigate("/profile/orders");
+  };
+
+  const handleWishlistClick = () => {
+    navigate("/wishlist");
   };
 
   return (
@@ -172,6 +178,7 @@ export default function Header() {
 
             {/* Wishlist Icon */}
             <Button
+              onClick={handleWishlistClick}
               variant="ghost"
               size="icon"
               className="text-muted-foreground hover:text-primary"

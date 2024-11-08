@@ -17,6 +17,11 @@ const productSchema = new mongoose.Schema({
         type: Number,
         required: true,
     },
+    offer: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Offer",
+        default: null,
+    },
     category: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Category',

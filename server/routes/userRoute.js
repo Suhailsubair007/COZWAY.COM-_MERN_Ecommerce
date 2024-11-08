@@ -8,6 +8,7 @@ const productController = require('../controller/User/productController')
 const profileController = require('../controller/User/profileController')
 const cartController = require('../controller/User/cartController')
 const orderController = require('../controller/User/orderController')
+const wishlistController = require('../controller/User/wishlistController')
 const verifyUser = require('../middleware/userAuth')
 
 
@@ -64,6 +65,15 @@ router.post('/order', verifyUser, orderController.createOrder);
 router.get('/orders/:userId', verifyUser, orderController.getUserOrders);
 router.get('/order/:orderId', verifyUser, orderController.getOrderById);
 router.patch('/order/:orderId', verifyUser, orderController.cancelOrder);
+
+
+
+
+router.post('/wishlist/add', wishlistController.AddItemToWishlist);
+router.post('/wishlist/remove', wishlistController.removeItemFromWishlist);
+router.get('/wishlist/:userId', wishlistController.getAllWishlistItems);
+router.get('/inwishlist', wishlistController.isInWishlist);
+router.post('/movetocart', wishlistController.moveToCart);
 
 
 module.exports = router;

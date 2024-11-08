@@ -12,6 +12,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import axiosInstance from "@/config/axiosConfig";
 import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
+
 import {
   Star,
   MessageSquare,
@@ -41,11 +42,8 @@ const ProductDetail = () => {
   const [productData, setProductData] = useState(null);
   const [isZoomModalOpen, setIsZoomModalOpen] = useState(false);
   const [isInCart, setIsInCart] = useState(false);
+  const [inWishList, setInWishlist] = useState(false);
   const { id } = useParams();
-
-  console.log("PRODUCT ID:", id);
-  console.log("userId====>", userId);
-  console.log("size=======>", selectedSize);
 
   useEffect(() => {
     const fetchProduct = async () => {
@@ -65,32 +63,45 @@ const ProductDetail = () => {
   }, [id]);
 
   useEffect(() => {
-    const checkCartForSize = async () => {
-      try {
-        console.log("==============");
-        console.log(userId);
-        console.log(id);
-        console.log(selectedSize);
-        console.log("================");
-        const response = await axiosInstance.get("/users/get-cart-details", {
-          params: {
-            userId,
-            productId: id,
-            size: selectedSize,
-          },
-        });
-        const cart = response.data;
-        console.log("Checking size in cart..", cart);
-        setIsInCart(cart.inCart);
-      } catch (error) {
-        console.error("Failed to fetch cart details:", error);
-      }
-    };
+    checkWishlistStatus();
+  }, [userId, id]);
+
+  useEffect(() => {
+    checkCartForSize();
 
     if (userId && selectedSize) {
       checkCartForSize();
     }
   }, [userId, selectedSize, id]);
+
+  const checkCartForSize = async () => {
+    try {
+      const response = await axiosInstance.get("/users/get-cart-details", {
+        params: {
+          userId,
+          productId: id,
+          size: selectedSize,
+        },
+      });
+      const cart = response.data;
+      setIsInCart(cart.inCart);
+    } catch (error) {
+      console.error("Failed to fetch cart details:", error);
+    }
+  };
+
+  const checkWishlistStatus = async () => {
+    try {
+      const response = await axiosInstance.get("/users/inwishlist", {
+        params: { userId, id },
+      });
+      setInWishlist(response.data.isInWishlist);
+    } catch (error) {
+      console.error("Failed to fetch wishlist status:", error);
+    }
+  };
+
+  console.log("in wishlist varable----------->>>>>>>>", inWishList);
 
   const handleAddToCart = async () => {
     if (!selectedSize) {
@@ -134,7 +145,45 @@ const ProductDetail = () => {
     }
   };
 
-  console.log("size vannu:", selectedSize);
+  const addToWishlist = async () => {
+    try {
+      const response = await axiosInstance.post("/users/wishlist/add", {
+        userId,
+        id,
+      });
+      if (response.status === 200) {
+        setInWishlist(true);
+        toast.success("Item added to your wishlist!");
+      }
+    } catch (error) {
+      console.error("Error adding to wishlist:", error);
+      toast.error("Failed to add item to wishlist. Please try again.");
+    }
+  };
+
+  const removeFromWishlist = async () => {
+    try {
+      const response = await axiosInstance.post("/users/wishlist/remove", {
+        userId,
+        id,
+      });
+      if (response.status === 200) {
+        setInWishlist(false);
+        toast.success("Item removed from your wishlist!");
+      }
+    } catch (error) {
+      console.error("Error removing from wishlist:", error);
+      toast.error("Failed to remove item from wishlist. Please try again.");
+    }
+  };
+
+  const handleWishlistClick = () => {
+    if (inWishList) {
+      removeFromWishlist();
+    } else {
+      addToWishlist();
+    }
+  };
 
   const handleSubmitReview = (e) => {
     e.preventDefault();
@@ -308,11 +357,16 @@ const ProductDetail = () => {
               Go to Cart
             </Button>
             <Button
+              onClick={handleWishlistClick}
               variant="outline"
               className="w-[400px] py-3 flex items-center justify-center"
             >
-              <Heart className="w-4 h-4 mr-2" />
-              Wishlist
+              <Heart
+                className={`w-4 h-4 mr-2 ${
+                  inWishList ? "fill-red-500 text-red-500" : ""
+                }`}
+              />
+              {inWishList ? "Remove from Wishlist" : "Add to Wishlist"}
             </Button>
           </div>
         </div>

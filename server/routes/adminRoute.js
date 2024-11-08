@@ -6,6 +6,7 @@ const userController = require('../controller/Admin/userController')
 const categoryController = require('../controller/Admin/categoryController');
 const productController = require('../controller/Admin/productController')
 const orderController = require('../controller/Admin/orderController');
+const offerController = require('../controller/Admin/offerController')
 
 
 //Admin login and Signup route..
@@ -36,5 +37,15 @@ router.get('/orders', orderController.getAllOrders);
 router.patch('/orders/:orderId/status', verifyAdmin, orderController.updateOrderStatus);
 // router.delete('/orders/:orderId', verifyAdmin, orderController.deleteOrder);
 router.get('/order/:orderId', verifyAdmin, orderController.getOrderById);
+
+
+router.get('/offers', offerController.getOffers);
+router.post('/addoffer', offerController.addOffer);
+router.delete('/offer', offerController.deleteOffer);
+router.get('/products', productController.get_product_offer);
+router.get('/getCategories', offerController.getCategoriesForOffer);
+
+
+
 
 module.exports = router;

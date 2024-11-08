@@ -44,11 +44,11 @@ const addProduct = async (req, res) => {
 
 const getProduct = async (req, res) => {
     try {
-        const page = parseInt(req.query.page) || 1; 
-        const limit = parseInt(req.query.limit) || 10; 
+        const page = parseInt(req.query.page) || 1;
+        const limit = parseInt(req.query.limit) || 10;
         const skip = (page - 1) * limit;
 
-        const totalProducts = await Product.countDocuments({}); 
+        const totalProducts = await Product.countDocuments({});
         const totalPages = Math.ceil(totalProducts / limit);
 
         const products = await Product.find({})
@@ -172,10 +172,31 @@ const fetchProductById = async (req, res) => {
 };
 
 
+const get_product_offer = async (req, res) => {
+    try {
+        const { searchTerm } = req.query;
+        const products = await Product.find(
+            {
+                name: { $regex: new RegExp(searchTerm, "i") },
+                is_active: true
+            },
+            { name: true }
+        );
+
+        console.log(products);
+        res.status(200).json({ success: true, products });
+
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({ success: false });
+    }
+}
+
 module.exports = {
     addProduct,
     getProduct,
     updateProductStatus,
     updateProduct,
     fetchProductById,
+    get_product_offer
 };
