@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
+import { useSelector } from "react-redux";
 import {
   ChevronRight,
   Home,
@@ -27,6 +28,7 @@ import {
 
 export default function OrderDetail() {
   const { id } = useParams();
+  const userId = useSelector((state) => state.user.userInfo.id);
   const [orderData, setOrderData] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isCancelDialogOpen, setIsCancelDialogOpen] = useState(false);
@@ -58,6 +60,7 @@ export default function OrderDetail() {
     try {
       const response = await axiosInstance.patch(`/users/order/${id}`, {
         status: "Cancelled",
+        userId,
       });
       if (response.status === 200) {
         fetchOrderDetail();

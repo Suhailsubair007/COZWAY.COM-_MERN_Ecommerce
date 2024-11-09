@@ -82,7 +82,6 @@ export default function ShoppingPage() {
         sortBy,
         ...filters,
       });
-      console.log("oooooooo",queryParams);
       const response = await axiosInstance.get(
         `/users/advanced-search?${queryParams}`
       );

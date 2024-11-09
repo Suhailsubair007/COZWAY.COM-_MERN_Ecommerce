@@ -21,6 +21,8 @@ import {
 import { Separator } from "@/components/ui/separator";
 
 export default function Component({ order, onClose }) {
+
+  console.log("order--------------->>>>>>>",order)
   const [isVisible, setIsVisible] = useState(true);
   const navigate = useNavigate();
 
@@ -28,6 +30,7 @@ export default function Component({ order, onClose }) {
   //   const timer = setTimeout(() => setIsVisible(false), 5000)
   //   return () => clearTimeout(timer)
   // }, [])
+
 
   if (!isVisible) return null;
 
@@ -78,12 +81,12 @@ export default function Component({ order, onClose }) {
                 <div className="grid gap-1 text-sm">
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">Order ID</span>
-                    <span className="font-medium">{order.order_id}</span>
+                    <span className="font-medium">{order?.order_id}</span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">Order Date</span>
                     <span className="font-medium">
-                      {new Date(order.createdAt).toLocaleString()}
+                      {new Date(order?.createdAt).toLocaleString()}
                     </span>
                   </div>
                 </div>
@@ -104,7 +107,7 @@ export default function Component({ order, onClose }) {
                   </span>
                 </div>
                 <div className="pl-6 text-sm font-semibold">
-                  {new Date(order.delivery_by).toLocaleDateString()}
+                  {new Date(order?.delivery_by).toLocaleDateString()}
                 </div>
               </motion.div>
 
@@ -119,12 +122,12 @@ export default function Component({ order, onClose }) {
                   <span className="text-sm font-medium">Delivery Address</span>
                 </div>
                 <div className="pl-6 space-y-1 text-xs">
-                  <p>{order.shipping_address.address}</p>
-                  <p>{order.shipping_address.district}</p>
-                  <p>PIN: {order.shipping_address.pincode}</p>
+                  <p>{order?.shipping_address?.address}</p>
+                  <p>{order?.shipping_address?.district}</p>
+                  <p>PIN: {order?.shipping_address?.pincode}</p>
                   <div className="flex items-center gap-2 mt-1">
                     <Phone className="w-3 h-3" />
-                    <span>{order.shipping_address.phone}</span>
+                    <span>{order?.shipping_address?.phone}</span>
                   </div>
                 </div>
               </motion.div>
@@ -142,12 +145,12 @@ export default function Component({ order, onClose }) {
                 <div className="space-y-2 text-sm">
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">Shipping Fee</span>
-                    <span>₹{order.shipping_fee}</span>
+                    <span>₹{order?.shipping_fee}</span>
                   </div>
                   <Separator className="my-1" />
                   <div className="flex justify-between font-semibold">
                     <span>Total Amount</span>
-                    <span>₹{order.total_amount}</span>
+                    <span>₹{order?.total_amount}</span>
                   </div>
                 </div>
               </motion.div>

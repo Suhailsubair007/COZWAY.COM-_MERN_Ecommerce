@@ -9,11 +9,12 @@ import { useSelector } from "react-redux";
 import axiosInstance from "@/config/axiosConfig";
 import AddAddressModal from "./AddNewAddress";
 import paypal from "../../assets/image/pay.png";
-import { CreditCard, Smartphone, Banknote, Wallet } from "lucide-react";
+import { Banknote, Wallet } from "lucide-react";
 import { toast } from "sonner";
 import OrderConfirmationModal from "./OrderConfirmModal";
+import RazorpayX from "./Payment/Razorpay";
 
-const CheckoutPage = () => {
+export default function CheckoutPage() {
   const [addresses, setAddresses] = useState([]);
   const [showConfirmation, setShowConfirmation] = useState(false);
   const [placedOrder, setPlacedOrder] = useState(null);
@@ -21,7 +22,9 @@ const CheckoutPage = () => {
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [selectedAddress, setSelectedAddress] = useState("");
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState("");
-  const user = useSelector((state) => state.user.userInfo.id);
+  const user = useSelector((state) => state.user.userInfo);
+  // console.log("user--------->>>>>",user)
+  // const
 
   useEffect(() => {
     fetchAddresses();
@@ -30,7 +33,7 @@ const CheckoutPage = () => {
 
   const fetchAddresses = async () => {
     try {
-      const response = await axiosInstance.get(`/users/addresses/${user}`);
+      const response = await axiosInstance.get(`/users/addresses/${user.id}`);
       setAddresses(response.data.addresses);
     } catch (error) {
       console.error("Error fetching addresses:", error);
@@ -39,7 +42,7 @@ const CheckoutPage = () => {
 
   const fetchItems = async () => {
     try {
-      const response = await axiosInstance.get(`/users/items/${user}`);
+      const response = await axiosInstance.get(`/users/items/${user.id}`);
       setItems(response.data.products);
     } catch (error) {
       console.error("Error fetching items:", error);
@@ -79,8 +82,6 @@ const CheckoutPage = () => {
       (address) => address._id === selectedAddress
     );
 
-    console.log("selected addresss============================", addressToSend);
-
     if (!addressToSend) {
       toast("Selected address not found.");
       return;
@@ -95,17 +96,26 @@ const CheckoutPage = () => {
         subtotal,
       });
 
-      console.log("Response received:", response.data);
       setPlacedOrder(response.data.order);
       setShowConfirmation(true);
-      setItems([]); // Clear cart items after successful order
+      setItems([]);
     } catch (error) {
       console.error("Error placing order:", error);
-      toast("Error placing order. Please try again.");
+      toast.error(error.response.data.message);
     }
   };
 
-  // const handlePlcaceOrder = async () => {};
+  const getButtonText = () => {
+    switch (selectedPaymentMethod) {
+      case "Cash on Delivery":
+      case "Wallet":
+        return "Place Order";
+      case "RazoryPay":
+        return "Pay with RazoryPay";
+      default:
+        return "Place Order";
+    }
+  };
 
   return (
     <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 max-w-7xl">
@@ -169,32 +179,24 @@ const CheckoutPage = () => {
               className="space-y-4"
             >
               <div className="flex items-center space-x-3 p-3 border rounded-md hover:bg-gray-50 transition-colors">
-                <RadioGroupItem value="Credit Card/ Debit Card" id="card" />
-                <CreditCard className="h-6 w-6 text-blue-500" />
-                <Label htmlFor="card" className="flex-grow">
-                  Credit Card/ Debit Card
-                </Label>
-              </div>
-              <div className="flex items-center space-x-3 p-3 border rounded-md hover:bg-gray-50 transition-colors">
-                <RadioGroupItem value="Wallet" />
-                {/* <Landmark /> */}
-                <Wallet className="h-6 w-6 text-green-500" />
-                <Label htmlFor="bank" className="flex-grow">
-                  Wallet
-                </Label>
-              </div>
-              <div className="flex items-center space-x-3 p-3 border rounded-md hover:bg-gray-50 transition-colors">
-                <RadioGroupItem value="UPI" id="upi" />
-                <Smartphone className="h-6 w-6 text-purple-500" />
-                <Label htmlFor="UPI" className="flex-grow">
-                  UPI
-                </Label>
-              </div>
-              <div className="flex items-center space-x-3 p-3 border rounded-md hover:bg-gray-50 transition-colors">
                 <RadioGroupItem value="Cash on Delivery" id="cod" />
                 <Banknote className="h-6 w-6 text-yellow-500" />
                 <Label htmlFor="cod" className="flex-grow">
                   Cash on Delivery
+                </Label>
+              </div>
+              <div className="flex items-center space-x-3 p-3 border rounded-md hover:bg-gray-50 transition-colors">
+                <RadioGroupItem value="Wallet" id="wallet" />
+                <Wallet className="h-6 w-6 text-green-500" />
+                <Label htmlFor="wallet" className="flex-grow">
+                  Wallet
+                </Label>
+              </div>
+              <div className="flex items-center space-x-3 p-3 border rounded-md hover:bg-gray-50 transition-colors">
+                <RadioGroupItem value="RazoryPay" id="paypal" />
+                <img src={paypal} alt="RazoryPay" className="h-6 mr-2" />
+                <Label htmlFor="paypal" className="flex-grow">
+                  RazoryPay
                 </Label>
               </div>
             </RadioGroup>
@@ -254,18 +256,33 @@ const CheckoutPage = () => {
             <Input placeholder="Apply coupon code" className="flex-grow" />
             <Button variant="outline">Apply</Button>
           </div>
-          <Button
-            className="w-full mb-4"
-            size="lg"
-            onClick={handlePlaceOrder}
-            // disabled={!selectedAddress || !selectedPaymentMethod}
-          >
-            Place Order
-          </Button>
-          <Button variant="outline" className="w-full" size="lg">
-            <img src={paypal} alt="PayPal" className="h-10 mr-2" />
-            Pay with PayPal
-          </Button>
+          {getButtonText() == "Place Order" ? (
+            <Button
+              className="w-full mb-4"
+              size="lg"
+              onClick={handlePlaceOrder}
+              disabled={!selectedAddress || !selectedPaymentMethod}
+            >
+              {getButtonText()}
+            </Button>
+          ) : (
+            <RazorpayX
+              name={user.name}
+              addresses={addresses}
+              email={user.email}
+              selectedAddress={selectedAddress}
+              selectedPaymentMethod={selectedPaymentMethod}
+              amount={total}
+              buttonName={getButtonText()}
+              userId={user.id}
+              items={items}
+              onSuccess={(order) => {
+                setPlacedOrder(order);
+                setShowConfirmation(true);
+                setItems([]);
+              }}
+            />
+          )}
         </div>
       </div>
       {showConfirmation && (
@@ -276,6 +293,4 @@ const CheckoutPage = () => {
       )}
     </div>
   );
-};
-
-export default CheckoutPage;
+}

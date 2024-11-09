@@ -19,12 +19,16 @@ import MyOrders from "@/ReuseComponets/User/MyOrder";
 import ForgotPassword from "@/pages/User/login/ForgotPassword";
 import ResetPassword from "@/pages/User/login/ResetPassword";
 import WishlistPage from "@/pages/User/WishlistPage";
+import UserWallet from "@/pages/User/UserWallet";
+
 
 const UserRoute = () => {
   return (
     <>
       <Routes>
         {/* Public route */}
+        
+
         <Route path="/" element={<Landing />} />
 
         {/* Login routes */}
@@ -126,6 +130,7 @@ const UserRoute = () => {
           <Route index element={<ProfileUpdate />} />
           <Route path="delivery-address" element={<Address />} />
           <Route path="orders" element={<MyOrders />} />
+          <Route path="wallet" element={<UserWallet />} />
           {/* <Route path="wallet" element={<Wallet />} />
           <Route path="coupons" element={<Coupons />} />
           <Route path="change-password" element={<ChangePassword />} />  */}

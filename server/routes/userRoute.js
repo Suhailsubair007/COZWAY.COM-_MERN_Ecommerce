@@ -9,7 +9,9 @@ const profileController = require('../controller/User/profileController')
 const cartController = require('../controller/User/cartController')
 const orderController = require('../controller/User/orderController')
 const wishlistController = require('../controller/User/wishlistController')
+const walletController = require('../controller/User/walletController')
 const verifyUser = require('../middleware/userAuth')
+
 
 
 //Login and signup , otp
@@ -66,14 +68,16 @@ router.get('/orders/:userId', verifyUser, orderController.getUserOrders);
 router.get('/order/:orderId', verifyUser, orderController.getOrderById);
 router.patch('/order/:orderId', verifyUser, orderController.cancelOrder);
 
-
-
-
+//API endpoints for wishlist endpoints...
 router.post('/wishlist/add', wishlistController.AddItemToWishlist);
 router.post('/wishlist/remove', wishlistController.removeItemFromWishlist);
 router.get('/wishlist/:userId', wishlistController.getAllWishlistItems);
 router.get('/inwishlist', wishlistController.isInWishlist);
 router.post('/movetocart', wishlistController.moveToCart);
+
+//API end points for wallet..
+router.post('/wallet', walletController.addAmountToWallet)
+router.get('/wallet', walletController.getUserWallet)
 
 
 module.exports = router;
