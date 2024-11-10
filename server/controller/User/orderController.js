@@ -75,6 +75,7 @@ const createOrder = async (req, res) => {
             total_amount: subtotal,
             shipping_address: address,
             payment_method: payment_method,
+            payment_status: "Paid",
             total_price_with_discount: subtotal,
             shipping_fee: 0,
         });
@@ -236,7 +237,7 @@ const cancelOrder = async (req, res) => {
         console.log("updated order---------->", order)
 
 
-        if (order.payment_method === "Wallet" && order.payment_method === "RazoryPay") {
+        if (order.payment_method === "Wallet" || order.payment_method === "RazorPay") {
             const wallet = await Wallet.findOne({ user: userId });
             if (wallet) {
                 wallet.balance += order.total_amount;

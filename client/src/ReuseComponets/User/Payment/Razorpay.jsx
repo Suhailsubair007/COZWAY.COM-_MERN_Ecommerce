@@ -20,7 +20,7 @@ const RazorpayX = ({
 
   const handlePayment = () => {
     const options = {
-      key: "rzp_test_koaeP7VUui0qt4",
+      key: import.meta.env.VITE_RAZORPAY_API_KEY,      
       amount: amount * 100,
       currency: "INR",
       name: "",
@@ -28,7 +28,6 @@ const RazorpayX = ({
       order_id: "",
       handler: async (response) => {
         console.log(response);
-        // alert("Payment Successful!");
         await handlePlaceOrder();
       },
       prefill: {

@@ -55,7 +55,7 @@ const orderSchema = new mongoose.Schema({
         enum: [
             "Wallet",
             "Cash on Delivery",
-            "RazoryPay",
+            "RazorPay",
         ],
     },
     order_status: {

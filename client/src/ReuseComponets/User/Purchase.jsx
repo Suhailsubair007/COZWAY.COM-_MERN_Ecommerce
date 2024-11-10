@@ -488,7 +488,7 @@ const ProductDetail = () => {
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.5, opacity: 0 }}
               transition={{ type: "spring", damping: 25, stiffness: 300 }}
-              className="relative max-w-[30vw] max-h-[100vh]"
+              className="relative max-w-[30vw] max-h-[100vh] overflow-hidden"
               onClick={(e) => e.stopPropagation()}
             >
               <Button
@@ -499,11 +499,24 @@ const ProductDetail = () => {
               >
                 <X className="h-6 w-6" />
               </Button>
-              <img
-                src={images[selectedImage]}
-                alt="Zoomed product view"
-                className="w-full h-full object-contain"
-              />
+
+              <div className="relative w-full h-full">
+                <img
+                  src={images[selectedImage]}
+                  alt="Zoomed product view"
+                  className="w-full h-full object-contain transition-transform duration-300"
+                />
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <div className="relative w-full h-full overflow-hidden">
+                    <img
+                      src={images[selectedImage]}
+                      alt="Zoomed product view"
+                      className="w-full h-full object-contain transition-transform duration-300 transform hover:scale-150"
+                      style={{ transformOrigin: "center" }}
+                    />
+                  </div>
+                </div>
+              </div>
             </motion.div>
           </motion.div>
         )}

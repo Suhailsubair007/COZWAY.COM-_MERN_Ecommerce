@@ -7,6 +7,7 @@ const categoryController = require('../controller/Admin/categoryController');
 const productController = require('../controller/Admin/productController')
 const orderController = require('../controller/Admin/orderController');
 const offerController = require('../controller/Admin/offerController')
+const couponController = require('../controller/Admin/couponController')
 
 
 //Admin login and Signup route..
@@ -44,6 +45,9 @@ router.post('/addoffer', offerController.addOffer);
 router.delete('/offer', offerController.deleteOffer);
 router.get('/products', productController.get_product_offer);
 router.get('/getCategories', offerController.getCategoriesForOffer);
+
+
+router.post('/coupon', couponController.addCoupon);
 
 
 

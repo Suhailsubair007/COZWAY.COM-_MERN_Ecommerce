@@ -89,7 +89,7 @@ export default function CheckoutPage() {
 
     try {
       const response = await axiosInstance.post(`/users/order/`, {
-        userId: user,
+        userId: user.id,
         order_items: items,
         address: addressToSend,
         payment_method: selectedPaymentMethod,
@@ -110,8 +110,8 @@ export default function CheckoutPage() {
       case "Cash on Delivery":
       case "Wallet":
         return "Place Order";
-      case "RazoryPay":
-        return "Pay with RazoryPay";
+      case "RazorPay":
+        return "Pay with RazorPay";
       default:
         return "Place Order";
     }
@@ -193,10 +193,10 @@ export default function CheckoutPage() {
                 </Label>
               </div>
               <div className="flex items-center space-x-3 p-3 border rounded-md hover:bg-gray-50 transition-colors">
-                <RadioGroupItem value="RazoryPay" id="paypal" />
-                <img src={paypal} alt="RazoryPay" className="h-6 mr-2" />
-                <Label htmlFor="paypal" className="flex-grow">
-                  RazoryPay
+                <RadioGroupItem value="RazorPay" id="RazorPay" />
+                <img src={paypal} alt="RazorPay" className="h-6 mr-2" />
+                <Label htmlFor="RazorPay" className="flex-grow">
+                  RazorPay
                 </Label>
               </div>
             </RadioGroup>

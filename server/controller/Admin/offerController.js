@@ -1,6 +1,7 @@
 const Offer = require('../../model/Offer');
 const Product = require('../../model/Product');
 const Category = require('../../model/Category')
+const { applyCategoryOffer, applyProductOffer, removeCategoryOffer, removeProductOffer } = require('../../Helper/offerHelperFunctiions')
 
 
 const getOffers = async (req, res) => {
@@ -25,17 +26,11 @@ const getOffers = async (req, res) => {
     }
 }
 
-
-//API for add a new offfer.....
 const addOffer = async (req, res) => {
-    console.log("reachedddd---------------------")
     try {
         const { name, value, target, targetId, targetName, endDate } = req.body;
 
-        console.log("target id------>", target)
-        console.log("target -------->", targetId)
-
-        const new_offer = await Offer.create({
+        const newOffer = await Offer.create({
             name,
             offer_value: value,
             target_type: target,
@@ -45,49 +40,22 @@ const addOffer = async (req, res) => {
         });
 
         if (target === "product") {
-            const product = await Product.findById(targetId);
-            if (!product) {
-                return res.status(404).json({
-                    success: false,
-                    message: "Product not found.."
-                });
-            }
-            if (value > product?.offer?.offer_value || product?.offer?.offer_value == undefined) {
-                product.offer = new_offer._id;
-            }
-            await product.save();
+            await applyProductOffer(targetId, newOffer);
         } else if (target === "category") {
-            const products = await Product.find({ category: targetId }).populate("offer");
-            for (const product of products) {
-                // const originalOfferId = product.offer ? product.offer._id : null;
-
-                if (value > product?.offer?.offer_value || product?.offer?.offer_value == undefined) {
-                    product.offer = new_offer._id;
-                }
-                await product.save();
-
-
-                await product.save();
-            }
+            await applyCategoryOffer(targetId, newOffer);
         }
-        console.log("offerrrr added ==>", new_offer);
 
-        res.status(201).json({ success: true, new_offer });
-
+        res.status(201).json({ success: true, newOffer });
     } catch (err) {
-        console.log(err);
+        console.error(err);
         return res.status(500).json({ success: false, message: "Server error" });
     }
-}
+};
 
-
-//API for delete the order
 const deleteOffer = async (req, res) => {
-
-    console.log("--------------------------------------------------------------------")
     try {
         const { offerId } = req.body;
-        console.log(offerId)
+        console.log("offer id----->", offerId)
         const existingOffer = await Offer.findById(offerId);
 
         if (!existingOffer) {
@@ -97,64 +65,28 @@ const deleteOffer = async (req, res) => {
             });
         }
 
-        const offer = await Offer.deleteOne({ _id: offerId });
-
-        if (!offer) {
-            return res.status(404).json({
-                success: false,
-                message: "Offer not found"
-            });
-        }
+        await Offer.deleteOne({ _id: offerId });
 
         if (existingOffer.target_type === "product") {
-            const product_data = await Product.find({
-                category: existingOffer.target_id,
-            }).populate("offer");
-
-            for (const product of product_data) {
-                if (product.offer && product.offer.target_type === "product") {
-                    product.offer = null;
-                }
-                await product.save();
-            }
-        }
-
-        if (existingOffer.target_type === "category") {
-            const products = await Product.find({ category: existingOffer.target_id }).populate("offer");
-
-            // for (const product of products) {
-            //     if (product.originalOfferId) {
-            //         product.offer = product.originalOfferId;
-            //     } else {
-            //         product.offer = null;
-            //     }
-            //     await product.save();
-            // }
-
-            if (
-                products &&
-                products.offer &&
-                products.offer.target_type === "category"
-            ) {
-                products.offer = null;
-            }
+            await removeProductOffer(existingOffer.target_id);
+        } else if (existingOffer.target_type === "category") {
+            await removeCategoryOffer(existingOffer.target_id);
         }
 
         return res.status(200).json({
             success: true,
             message: "Offer deleted successfully"
         });
-
     } catch (err) {
-        console.log(err);
-        return res.status(500)
+        console.error(err);
+        return res.status(500).json({ success: false, message: "Server error" });
     }
-}
+};
+
 
 
 //API for fetch the categories in the add category dropdown dynamically...
 const getCategoriesForOffer = async (req, res) => {
-    console.log("reachedddddddddddddddddddddddddddd ")
     try {
         const categories = await Category.find({ is_active: true }, 'name');
         res.status(200).json(categories);

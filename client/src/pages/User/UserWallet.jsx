@@ -2,13 +2,19 @@ import { useState, useEffect } from "react";
 import axiosInstance from "@/config/axiosConfig";
 import { toast } from "sonner";
 import { useSelector } from "react-redux";
-import { Wallet, ArrowUpRight, ArrowDownLeft, Plus, RefreshCw } from "lucide-react";
+import {
+  Wallet,
+  ArrowUpRight,
+  ArrowDownLeft,
+  Plus,
+  RefreshCw,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import WalletPopup from "@/ReuseComponets/User/WalletPopup";
 
 export default function UserWallet() {
   const [isPopupOpen, setIsPopupOpen] = useState(false);
-  const[balance,SetBalance] = useState(null);
+  const [balance, SetBalance] = useState(null);
   const [amount, setAmount] = useState(0);
   const user = useSelector((state) => state.user.userInfo);
   const userId = user.id;
@@ -24,12 +30,11 @@ export default function UserWallet() {
         params: { userId },
       });
       setTransactions(response.data.wallet.transactions);
-      SetBalance(response.data.wallet.balance)
+      SetBalance(response.data.wallet.balance);
     } catch (error) {
       console.error("Error fetching wallet:", error);
     }
   };
-
 
   const handleAddFunds = async () => {
     try {
@@ -40,7 +45,7 @@ export default function UserWallet() {
       toast.success(response.data.message);
       setTransactions(response.data.wallet.transactions);
       SetBalance(response.data.wallet.balance);
-      setIsPopupOpen(false); 
+      setIsPopupOpen(false);
     } catch (error) {
       console.error("Error adding funds:", error);
       toast.error("Failed to add funds.");
@@ -73,7 +78,10 @@ export default function UserWallet() {
                 <p className="text-sm text-gray-600 mb-1">Wallet Balance</p>
                 <h3 className="text-3xl md:text-4xl font-bold">{balance}</h3>
               </div>
-              <Button onClick={() => setIsPopupOpen(true)} className="bg-primary hover:bg-primary/90">
+              <Button
+                onClick={() => setIsPopupOpen(true)}
+                className="bg-primary hover:bg-primary/90"
+              >
                 <Plus className="w-4 h-4 mr-2" />
                 Add Funds
               </Button>
@@ -86,36 +94,72 @@ export default function UserWallet() {
               <table className="w-full">
                 <thead>
                   <tr className="border-b">
-                    <th className="text-left py-3 px-4 text-sm font-medium text-gray-600">Type</th>
-                    <th className="text-left py-3 px-4 text-sm font-medium text-gray-600">Amount</th>
-                    <th className="text-left py-3 px-4 text-sm font-medium text-gray-600">Date</th>
-                    <th className="text-left py-3 px-4 text-sm font-medium text-gray-600">Status</th>
+                    <th className="text-left py-3 px-4 text-sm font-medium text-gray-600">
+                      Type
+                    </th>
+                    <th className="text-left py-3 px-4 text-sm font-medium text-gray-600">
+                      Amount
+                    </th>
+                    <th className="text-left py-3 px-4 text-sm font-medium text-gray-600">
+                      Date
+                    </th>
+                    <th className="text-left py-3 px-4 text-sm font-medium text-gray-600">
+                      Status
+                    </th>
                   </tr>
                 </thead>
                 <tbody>
                   {transactions.map((transaction) => {
-                    const Icon = transaction.transaction_type === "credit" ? ArrowUpRight : ArrowDownLeft;
-                    const statusColor = transaction.transaction_type === "credit" ? "text-green-500" : "text-red-500";
+                    const Icon =
+                      transaction.transaction_type === "credit"
+                        ? ArrowUpRight
+                        : ArrowDownLeft;
+                    const statusColor =
+                      transaction.transaction_type === "credit"
+                        ? "text-green-500"
+                        : "text-red-500";
 
                     return (
-                      <tr key={transaction._id} className="border-b last:border-0 hover:bg-gray-50">
+                      <tr
+                        key={transaction._id}
+                        className="border-b last:border-0 hover:bg-gray-50"
+                      >
                         <td className="py-3 px-4">
                           <div className="flex items-center gap-2">
                             <div
                               className={`p-1.5 rounded-full ${
-                                transaction.transaction_type === "credit" ? "bg-green-100" : "bg-red-100"
+                                transaction.transaction_type === "credit"
+                                  ? "bg-green-100"
+                                  : "bg-red-100"
                               }`}
                             >
                               <Icon className={`w-4 h-4 ${statusColor}`} />
                             </div>
-                            <span className="font-medium">{transaction.transaction_type}</span>
+                            <span className="font-medium">
+                              {transaction.transaction_type}
+                            </span>
                           </div>
                         </td>
-                        <td className="py-3 px-4 font-medium">{transaction.amount}</td>
-                        <td className="py-3 px-4 text-gray-600">{transaction.transaction_date}</td>
+                        <td className="py-3 px-4 font-medium">
+                          {transaction.amount}
+                        </td>
+                        <td className="py-3 px-4 text-gray-600">
+                          {new Date(
+                            transaction.transaction_date
+                          ).toLocaleString("en-US")}
+                        </td>
+
                         <td className="py-3 px-4">
-                          <span className={`flex items-center gap-1 ${transaction.transaction_status === "Pending" ? "text-orange-500" : statusColor}`}>
-                            {transaction.transaction_status === "pending" && <RefreshCw className="w-3 h-3 animate-spin" />}
+                          <span
+                            className={`flex items-center gap-1 ${
+                              transaction.transaction_status === "Pending"
+                                ? "text-orange-500"
+                                : statusColor
+                            }`}
+                          >
+                            {transaction.transaction_status === "pending" && (
+                              <RefreshCw className="w-3 h-3 animate-spin" />
+                            )}
                             {transaction.transaction_status}
                           </span>
                         </td>
@@ -129,15 +173,20 @@ export default function UserWallet() {
         </div>
 
         <WalletPopup isOpen={isPopupOpen} onClose={() => setIsPopupOpen(false)}>
-          <p className="text-gray-700">Enter the amount to add to your wallet.</p>
+          <p className="text-gray-700">
+            Enter the amount to add to your wallet.
+          </p>
           <input
             type="number"
             placeholder="Amount"
             className="mt-4 w-full p-2 border rounded-lg"
             value={amount}
-            onChange={(e) => setAmount(e.target.value)}  // Set the amount
+            onChange={(e) => setAmount(e.target.value)} // Set the amount
           />
-          <Button className="mt-4 w-full bg-primary hover:bg-primary/90" onClick={handleAddFunds}>
+          <Button
+            className="mt-4 w-full bg-primary hover:bg-primary/90"
+            onClick={handleAddFunds}
+          >
             Add Funds
           </Button>
         </WalletPopup>
