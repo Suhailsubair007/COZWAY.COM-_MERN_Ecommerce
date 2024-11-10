@@ -48,6 +48,7 @@ router.get('/getCategories', offerController.getCategoriesForOffer);
 
 
 router.post('/coupon', couponController.addCoupon);
+router.post('/coupon/apply', couponController.applyCoupon);
 
 
 

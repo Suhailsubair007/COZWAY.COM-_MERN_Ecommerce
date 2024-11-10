@@ -1,5 +1,6 @@
 const Category = require('../../model/Category');
 const Product = require('../../model/Product')
+const Offer = require('../../model/Offer')
 
 
 const addProduct = async (req, res) => {
@@ -15,6 +16,19 @@ const addProduct = async (req, res) => {
             return res.status(400).json({ message: 'Category not found.' });
         }
 
+
+        const offers = await Offer.find({
+            target_type: 'category',
+            target_id: category,
+        });
+
+        let highestOffer = null;
+        if (offers.length > 0) {
+            highestOffer = offers.reduce((prev, current) => {
+                return (prev.offer_value > current.offer_value) ? prev : current;
+            });
+        }
+
         const newProduct = new Product({
             name,
             description,
@@ -26,6 +40,7 @@ const addProduct = async (req, res) => {
             sizes,
             totalStock,
             images,
+            offer: highestOffer ? highestOffer._id : null, 
         });
         console.log(newProduct);
 
@@ -40,7 +55,6 @@ const addProduct = async (req, res) => {
         res.status(500).json({ message: 'Server error. Please try again later.' });
     }
 };
-
 
 const getProduct = async (req, res) => {
     try {
