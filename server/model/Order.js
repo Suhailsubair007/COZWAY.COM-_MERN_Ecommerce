@@ -73,22 +73,20 @@ const orderSchema = new mongoose.Schema({
     total_discount: {
         type: Number,
         default: 0,
-        min: [0, "Discount cannot be negative"],
-        max: [100, "Discount cannot exceed 100%"],
     },
     coupon_discount: {
         type: Number,
         default: 0,
+    },
+    total_price_with_discount: {
+        type: Number,
+        required: true,
     },
     shipping_fee: {
         type: Number,
         required: true,
         default: 0,
         min: [0, "Shipping fee cannot be negative"],
-    },
-    total_price_with_discount: {
-        type: Number,
-        required: true,
     },
     placed_at: {
         type: Date,

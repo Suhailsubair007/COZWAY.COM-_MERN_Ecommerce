@@ -1,7 +1,6 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Plus, Trash2, Link2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import {
   Table,
   TableBody,
@@ -11,37 +10,36 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import AdminCouponModal from "@/ReuseComponets/Admin/AdminCouponModal";
+import axiosInstance from "@/config/axiosConfig";
 
 export default function Coupon() {
   const [isOpen, setIsOpen] = useState(false);
-  const [coupons] = useState([
-    {
-      code: "SUMMER10",
-      discount: "10%",
-      validPeriod: "12/31/2024",
-      usageLimit: 10,
-      eligibleCategories: ["Casual Shirts", "Formal Shirts", "Premium Shirts"],
-      status: "Active",
-    },
-    {
-      code: "PREMIUM500",
-      discount: "₹500",
-      validPeriod: "12/31/2024",
-      usageLimit: 3,
-      eligibleCategories: ["Premium Shirts"],
-      status: "Active",
-    },
-    {
-      code: "FORMAL20",
-      discount: "20%",
-      validPeriod: "12/31/2024",
-      usageLimit: 5,
-      eligibleCategories: ["Formal Shirts"],
-      status: "Active",
-    },
-  ]);
+  const [coupons, setCoupons] = useState([]);
 
-  const categories = ["Casual Shirts", "Formal Shirts", "Premium Shirts"];
+  useEffect(() => {
+    fetchCoupons();
+  }, []);
+
+  const fetchCoupons = async () => {
+    try {
+      const responce = await axiosInstance.get("/admin/getCoupon");
+      console.log("dataaa--->", responce.data);
+      setCoupons(responce.data.coupons);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const handleDelete = async (id) => {
+    try {
+      console.log("id------->",id);
+      console.log("================")
+      await axiosInstance.delete(`/admin/deleteCoupon/${id}`);
+      fetchCoupons();
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   return (
     <div className="container mx-auto py-10 px-4 sm:px-6 lg:px-8 h-screen">
@@ -61,50 +59,31 @@ export default function Coupon() {
               <TableHead>DISCOUNT</TableHead>
               <TableHead>VALID PERIOD</TableHead>
               <TableHead>USAGE LIMIT</TableHead>
-              <TableHead className="max-w-[300px]">
-                ELIGIBLE CATEGORIES
-              </TableHead>
-              <TableHead>STATUS</TableHead>
+              <TableHead>MIN PURCHASE AMOUNT</TableHead>
               <TableHead>ACTIONS</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {coupons.map((coupon) => (
-              <TableRow key={coupon.code}>
+              <TableRow key={coupon._id}>
                 <TableCell className="font-medium">{coupon.code}</TableCell>
-                <TableCell>{coupon.discount}</TableCell>
-                <TableCell>{coupon.validPeriod}</TableCell>
-                <TableCell>{coupon.usageLimit}</TableCell>
-                <TableCell className="max-w-[300px]">
-                  <div className="flex flex-wrap gap-1">
-                    {coupon.eligibleCategories.map((category) => (
-                      <span
-                        key={category}
-                        className="text-sm text-muted-foreground"
-                      >
-                        • {category}
-                      </span>
-                    ))}
-                  </div>
+                <TableCell>
+                  {coupon.discount_value}{" "}
+                  {coupon.discount_type === "percentage" ? "%" : "₹"}
                 </TableCell>
                 <TableCell>
-                  <Badge
-                    variant={
-                      coupon.status === "Active" ? "success" : "secondary"
-                    }
+                  {new Date(coupon.expiration_date).toLocaleDateString()}{" "}
+                </TableCell>
+                <TableCell>{coupon.usage_limit}</TableCell>
+                <TableCell>{coupon.min_purchase_amount} ₹</TableCell>{" "}
+                <TableCell>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => handleDelete(coupon._id)}
                   >
-                    {coupon.status}
-                  </Badge>
-                </TableCell>
-                <TableCell>
-                  <div className="flex gap-2">
-                    <Button variant="ghost" size="icon">
-                      <Trash2 className="w-4 h-4 text-destructive" />
-                    </Button>
-                    <Button variant="ghost" size="icon">
-                      <Link2 className="w-4 h-4" />
-                    </Button>
-                  </div>
+                    <Trash2 className="w-4 h-4 text-destructive" />
+                  </Button>
                 </TableCell>
               </TableRow>
             ))}
@@ -112,11 +91,7 @@ export default function Coupon() {
         </Table>
       </div>
 
-      <AdminCouponModal
-        isOpen={isOpen}
-        onClose={() => setIsOpen(false)}
-        categories={categories}
-      />
+      <AdminCouponModal isOpen={isOpen} onClose={() => setIsOpen(false)} onCouponAdded={fetchCoupons} />
     </div>
   );
 }

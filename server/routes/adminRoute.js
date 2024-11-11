@@ -48,8 +48,8 @@ router.get('/getCategories', offerController.getCategoriesForOffer);
 
 
 router.post('/coupon', couponController.addCoupon);
-router.post('/coupon/apply', couponController.applyCoupon);
-
+router.delete('/deleteCoupon/:id', couponController.deleteCoupon);
+router.get('/getCoupon', couponController.getAllCoupons);
 
 
 

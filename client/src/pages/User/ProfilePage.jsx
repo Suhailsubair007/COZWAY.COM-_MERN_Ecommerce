@@ -8,7 +8,7 @@ const ProfilePage = () => {
     <>
       <Header />
       <div className="flex h-screen">
-        <div className="sticky top-0z h-screen overflow-y-auto">
+        <div className="sticky top-0 h-screen overflow-y-auto">
           <UserProfileSidebar />
         </div>
         <main className="flex-grow overflow-y-auto">

@@ -2,6 +2,7 @@ const Order = require('../../model/order');
 const Cart = require('../../model/cart')
 const Product = require('../../model/Product');
 const Wallet = require('../../model/Wallet')
+const Coupon = require('../../model/coupun')
 
 
 const getCheckoutCartItems = async (req, res) => {
@@ -47,13 +48,38 @@ const getCheckoutCartItems = async (req, res) => {
 //cerate an order...
 const createOrder = async (req, res) => {
     try {
-        const { userId, order_items, address, payment_method, subtotal } = req.body;
-        // console.log("payment method------>>>>", payment_method);
+        const {
+            userId,
+            order_items,
+            address,
+            payment_method,
+            subtotal,
+            total_discount,
+            coupon_discount,
+            total_price_with_discount,
+            shipping_fee,
+            coupon
+        } = req.body;
+
+        console.log("User ID:", userId);
+        console.log("Order Items:", order_items);
+        console.log("Payment Method:", payment_method);
+        console.log("Address:", address);
+        console.log("Subtotal:", subtotal);
+        console.log("Total Discount:", total_discount);
+        console.log("Coupon Discount:", coupon_discount);
+        console.log("Shipping Fee:", shipping_fee);
+        console.log("Coupon:", coupon);
+        console.log("Total with Discount:", total_price_with_discount);
+
+        const discountAmount = (subtotal * total_discount) / 100;
+        const calculatedTotal = subtotal - discountAmount + shipping_fee;
+
 
         // Check if payment method is wallet
         if (payment_method === 'Wallet') {
             const wallet = await Wallet.findOne({ user: userId });
-            if (!wallet || wallet.balance < subtotal) {
+            if (!wallet || wallet.balance < total_price_with_discount) {
                 return res.status(400).json({ success: false, message: "Insufficient wallet balance" });
             }
         }
@@ -63,7 +89,7 @@ const createOrder = async (req, res) => {
             quantity: item.quantity,
             price: item.offerPrice,
             selectedSize: item.size,
-            discount: 0,
+            discount: item.discount,
             totalProductPrice: item.totalProductPrice,
             order_status: "Pending",
             size: item.size
@@ -75,9 +101,12 @@ const createOrder = async (req, res) => {
             total_amount: subtotal,
             shipping_address: address,
             payment_method: payment_method,
-            payment_status: "Paid",
-            total_price_with_discount: subtotal,
-            shipping_fee: 0,
+            payment_status: payment_method === "Cash on Delivery" ? "Pending" : "Paid",
+            total_discount,
+            coupon_discount,
+            total_price_with_discount,
+            shipping_fee,
+            coupon
         });
 
         // Update product stock
@@ -108,22 +137,34 @@ const createOrder = async (req, res) => {
         // Update wallet if payment method is wallet
         if (payment_method === 'Wallet') {
             const wallet = await Wallet.findOne({ user: userId });
-            wallet.balance -= subtotal;
+            wallet.balance -= total_price_with_discount;
             wallet.transactions.push({
                 order_id: order._id,
                 transaction_date: new Date(),
                 transaction_type: "debit",
                 transaction_status: "completed",
-                amount: subtotal
+                amount: total_price_with_discount
             });
             await wallet.save();
+        }
+
+        // Update coupon usage
+        if (coupon) {
+            await Coupon.findOneAndUpdate(
+                { code: coupon },
+                { $inc: { 'users_applied.$[elem].used_count': 1 } },
+                {
+                    arrayFilters: [{ 'elem.user': userId }],
+                    new: true
+                }
+            );
         }
 
         return res.status(201).json({ order, success: true, message: "Order Placed" });
 
     } catch (error) {
         console.error(error);
-        return res.status(500).json({ success: false, message: "Failed to place order", error });
+        return res.status(500).json({ success: false, message: "Failed to place order", error: error.message });
     }
 };
 

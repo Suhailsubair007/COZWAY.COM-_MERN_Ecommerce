@@ -21,10 +21,10 @@ export default function CheckoutPage() {
   const [items, setItems] = useState([]);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [selectedAddress, setSelectedAddress] = useState("");
+  const [couponCode, setCouponCode] = useState("");
+  const [appliedCoupon, setAppliedCoupon] = useState(null);
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState("");
   const user = useSelector((state) => state.user.userInfo);
-  // console.log("user--------->>>>>",user)
-  // const
 
   useEffect(() => {
     fetchAddresses();
@@ -37,6 +37,7 @@ export default function CheckoutPage() {
       setAddresses(response.data.addresses);
     } catch (error) {
       console.error("Error fetching addresses:", error);
+      toast.error("Failed to fetch addresses");
     }
   };
 
@@ -46,6 +47,7 @@ export default function CheckoutPage() {
       setItems(response.data.products);
     } catch (error) {
       console.error("Error fetching items:", error);
+      toast.error("Failed to fetch cart items");
     }
   };
 
@@ -54,11 +56,24 @@ export default function CheckoutPage() {
     setIsAddModalOpen(false);
   };
 
+  const calculateTotalDiscountPercentage = () => {
+    const totalOriginalPrice = items.reduce(
+      (acc, item) => acc + item.price * item.quantity,
+      0
+    );
+    const totalDiscountedPrice = items.reduce(
+      (acc, item) => acc + item.offerPrice * item.quantity,
+      0
+    );
+    const discountPrice = totalOriginalPrice - totalDiscountedPrice;
+    return discountPrice + (appliedCoupon ? couponDiscount : 0);
+  };
+
   const calculateTotalSavings = () => {
     return items.reduce((acc, item) => {
-      const originalTotal = item.offerPrice * item.quantity;
-      const actualTotal = item.price * item.quantity;
-      return acc + (originalTotal - actualTotal);
+      const originalTotal = item.price * item.quantity;
+      const discountedTotal = item.offerPrice * item.quantity;
+      return acc + (originalTotal - discountedTotal);
     }, 0);
   };
 
@@ -66,9 +81,52 @@ export default function CheckoutPage() {
     (acc, item) => acc + item.offerPrice * item.quantity,
     0
   );
-  const shipping = "Free";
-  const total = subtotal;
+  const shipping = 0;
   const totalSavings = calculateTotalSavings();
+
+  const applyCoupon = async () => {
+    try {
+      const response = await axiosInstance.post("/users/coupon/apply", {
+        code: couponCode,
+        userId: user.id,
+        subtotal,
+      });
+      setAppliedCoupon(response.data.coupon);
+      toast.success("Coupon applied successfully!");
+    } catch (error) {
+      console.error("Error applying coupon:", error);
+      toast.error(error.response?.data?.message || "Failed to apply coupon");
+    }
+  };
+
+  const removeCoupon = () => {
+    setAppliedCoupon(null);
+    setCouponCode("");
+    toast.success("Coupon removed successfully!");
+  };
+
+  const calculateDiscountedTotal = () => {
+    if (!appliedCoupon) return subtotal;
+
+    let discountAmount = 0;
+    if (appliedCoupon.discount_type === "percentage") {
+      discountAmount = subtotal * (appliedCoupon.discount_value / 100);
+    } else {
+      discountAmount = appliedCoupon.discount_value;
+    }
+
+    if (appliedCoupon.max_discount_amount) {
+      discountAmount = Math.min(
+        discountAmount,
+        appliedCoupon.max_discount_amount
+      );
+    }
+
+    return Math.max(subtotal - discountAmount, 0);
+  };
+
+  const total = calculateDiscountedTotal() + shipping;
+  const couponDiscount = subtotal - calculateDiscountedTotal();
 
   const handlePlaceOrder = async () => {
     if (!selectedAddress || !selectedPaymentMethod) {
@@ -83,17 +141,23 @@ export default function CheckoutPage() {
     );
 
     if (!addressToSend) {
-      toast("Selected address not found.");
+      toast.error("Selected address not found.");
       return;
     }
 
     try {
+      console.log("in handle place order================");
       const response = await axiosInstance.post(`/users/order/`, {
         userId: user.id,
         order_items: items,
         address: addressToSend,
         payment_method: selectedPaymentMethod,
         subtotal,
+        total_discount: calculateTotalDiscountPercentage() || 0,
+        coupon_discount: couponDiscount || 0,
+        total_price_with_discount: total || 0,
+        shipping_fee: shipping || 0,
+        coupon: appliedCoupon?.code || 0,
       });
 
       setPlacedOrder(response.data.order);
@@ -101,7 +165,7 @@ export default function CheckoutPage() {
       setItems([]);
     } catch (error) {
       console.error("Error placing order:", error);
-      toast.error(error.response.data.message);
+      toast.error(error.response?.data?.message || "Failed to place order");
     }
   };
 
@@ -149,7 +213,6 @@ export default function CheckoutPage() {
                         <p>{address.district}</p>
                         <p>{address.pincode}</p>
                         <p>Contact: {address.phone}</p>
-                        <p>pincode: {address.pincode}</p>
                       </CardContent>
                     </Card>
                   </Label>
@@ -163,12 +226,6 @@ export default function CheckoutPage() {
               Add New Address
             </Button>
           </section>
-
-          <AddAddressModal
-            isOpen={isAddModalOpen}
-            onClose={() => setIsAddModalOpen(false)}
-            onAdd={handleAddAddress}
-          />
 
           <section className="bg-white p-6 rounded-lg shadow-md">
             <h2 className="text-2xl font-semibold mb-4">Payment Methods</h2>
@@ -210,7 +267,7 @@ export default function CheckoutPage() {
               <div key={item._id} className="flex items-center space-x-4">
                 <img
                   src={item.productId.images[0]}
-                  alt={item.name}
+                  alt={item.productId.name}
                   className="w-20 h-30 object-cover rounded-md"
                 />
                 <div className="flex-grow">
@@ -219,7 +276,10 @@ export default function CheckoutPage() {
                     Quantity: {item.quantity}
                   </p>
                   <div className="text-sm text-green-600 font-medium">
-                    {Math.round(item.discount)}% OFF
+                    {Math.round(
+                      ((item.price - item.offerPrice) / item.price) * 100
+                    )}
+                    % OFF
                   </div>
                 </div>
                 <div className="text-right">
@@ -232,31 +292,50 @@ export default function CheckoutPage() {
               </div>
             ))}
           </div>
+
           <Separator className="my-6" />
           <div className="space-y-2 text-sm">
             <div className="flex justify-between">
               <span className="text-gray-600">Subtotal:</span>
-              <span>₹{subtotal}</span>
+              <span>₹{subtotal.toFixed(2)}</span>
             </div>
             <div className="flex justify-between">
               <span className="text-gray-600">Shipping:</span>
-              <span>{shipping}</span>
+              <span>{shipping === 0 ? "Free" : `₹${shipping.toFixed(2)}`}</span>
             </div>
             <div className="flex justify-between text-green-600 font-medium">
-              <span>Total Savings:</span>
-              <span>₹{totalSavings}</span>
+              <span>Product Savings:</span>
+              <span>₹{totalSavings.toFixed(2)}</span>
             </div>
+            {appliedCoupon && (
+              <div className="flex justify-between text-green-600 font-medium">
+                <span>Coupon Discount:</span>
+                <span>₹{couponDiscount.toFixed(2)}</span>
+              </div>
+            )}
           </div>
           <Separator className="my-4" />
           <div className="flex justify-between text-lg font-semibold mb-6">
             <span>Total:</span>
-            <span>₹{total}</span>
+            <span>₹{total.toFixed(2)}</span>
           </div>
+
           <div className="flex space-x-2 mb-6">
-            <Input placeholder="Apply coupon code" className="flex-grow" />
-            <Button variant="outline">Apply</Button>
+            <Input
+              placeholder="Apply coupon code"
+              className="flex-grow"
+              value={couponCode}
+              onChange={(e) => setCouponCode(e.target.value)}
+              disabled={appliedCoupon !== null}
+            />
+            <Button
+              variant="outline"
+              onClick={appliedCoupon ? removeCoupon : applyCoupon}
+            >
+              {appliedCoupon ? "Remove Coupon" : "Apply Coupon"}
+            </Button>
           </div>
-          {getButtonText() == "Place Order" ? (
+          {getButtonText() === "Place Order" ? (
             <Button
               className="w-full mb-4"
               size="lg"
@@ -268,19 +347,12 @@ export default function CheckoutPage() {
           ) : (
             <RazorpayX
               name={user.name}
-              addresses={addresses}
               email={user.email}
               selectedAddress={selectedAddress}
               selectedPaymentMethod={selectedPaymentMethod}
               amount={total}
               buttonName={getButtonText()}
-              userId={user.id}
-              items={items}
-              onSuccess={(order) => {
-                setPlacedOrder(order);
-                setShowConfirmation(true);
-                setItems([]);
-              }}
+              handlePlaceOrder={handlePlaceOrder}
             />
           )}
         </div>
@@ -291,6 +363,11 @@ export default function CheckoutPage() {
           onClose={() => setShowConfirmation(false)}
         />
       )}
+      <AddAddressModal
+        isOpen={isAddModalOpen}
+        onClose={() => setIsAddModalOpen(false)}
+        onAdd={handleAddAddress}
+      />
     </div>
   );
 }

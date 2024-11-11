@@ -1,4 +1,5 @@
 import { useState } from "react";
+import axiosInstance from "@/config/axiosConfig";
 import {
   Dialog,
   DialogContent,
@@ -7,7 +8,6 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
 import {
   Select,
@@ -17,29 +17,83 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
-export default function AdminCouponModal({ isOpen, onClose, categories }) {
+export default function AdminCouponModal({ isOpen, onClose, onCouponAdded }) {
+  const [formData, setFormData] = useState({
+    code: "",
+    description: "",
+    discount_type: "percentage",
+    discount_value: "",
+    min_purchase_amount: "",
+    max_discount_amount: "",
+    expiration_date: "",
+    usage_limit: "",
+  });
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prevData) => ({
+      ...prevData,
+      [name]: value,
+    }));
+  };
+
+  const handleSelectChange = (value) => {
+    setFormData((prevData) => ({
+      ...prevData,
+      discount_type: value,
+    }));
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    try {
+      const response = await axiosInstance.post("/admin/coupon", formData);
+      console.log(response.data);
+      onCouponAdded();
+      onClose();
+    } catch (error) {
+      console.log(error.response?.data?.message || "An error occurred");
+    }
+  };
+
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="max-w-2xl">
         <DialogHeader>
           <DialogTitle>Add New Coupon</DialogTitle>
         </DialogHeader>
-        <form className="grid gap-6">
+        <form className="grid gap-6" onSubmit={handleSubmit}>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label htmlFor="code">Code</Label>
-              <Input id="code" placeholder="Enter coupon code" />
+              <Input
+                id="code"
+                name="code"
+                placeholder="Enter coupon code"
+                value={formData.code}
+                onChange={handleChange}
+              />
             </div>
             <div className="space-y-2">
               <Label htmlFor="description">Description</Label>
-              <Input id="description" placeholder="Enter description" />
+              <Input
+                id="description"
+                name="description"
+                placeholder="Enter description"
+                value={formData.description}
+                onChange={handleChange}
+              />
             </div>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label htmlFor="discountType">Discount Type</Label>
-              <Select defaultValue="percentage">
+              <Select
+                defaultValue="percentage"
+                onValueChange={handleSelectChange}
+              >
                 <SelectTrigger>
                   <SelectValue placeholder="Select discount type" />
                 </SelectTrigger>
@@ -53,8 +107,11 @@ export default function AdminCouponModal({ isOpen, onClose, categories }) {
               <Label htmlFor="discountValue">Discount Value</Label>
               <Input
                 id="discountValue"
+                name="discount_value"
                 type="number"
                 placeholder="Enter value"
+                value={formData.discount_value}
+                onChange={handleChange}
               />
             </div>
           </div>
@@ -64,43 +121,49 @@ export default function AdminCouponModal({ isOpen, onClose, categories }) {
               <Label htmlFor="minPurchase">Minimum Purchase Amount</Label>
               <Input
                 id="minPurchase"
+                name="min_purchase_amount"
                 type="number"
                 placeholder="Enter amount"
+                value={formData.min_purchase_amount}
+                onChange={handleChange}
               />
             </div>
             <div className="space-y-2">
               <Label htmlFor="maxDiscount">Maximum Discount Amount</Label>
               <Input
                 id="maxDiscount"
+                name="max_discount_amount"
                 type="number"
                 placeholder="Enter amount"
+                value={formData.max_discount_amount}
+                onChange={handleChange}
               />
             </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className=" grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label htmlFor="expiryDate">Expiration Date</Label>
-              <Input id="expiryDate" type="date" />
+              <Input
+                id="expiryDate"
+                name="expiration_date"
+                type="date"
+                value={formData.expiration_date}
+                onChange={handleChange}
+              />
             </div>
             <div className="space-y-2">
               <Label htmlFor="usageLimit">Usage Limit</Label>
-              <Input id="usageLimit" type="number" placeholder="Enter limit" />
+              <Input
+                id="usageLimit"
+                name="usage_limit"
+                type="number"
+                placeholder="Enter limit"
+                value={formData.usage_limit}
+                onChange={handleChange}
+              />
             </div>
           </div>
-
-          <div className="space-y-4">
-            <Label>Eligible Categories</Label>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              {categories.map((category) => (
-                <div key={category} className="flex items-center space-x-2">
-                  <Checkbox id={category} />
-                  <Label htmlFor={category}>{category}</Label>
-                </div>
-              ))}
-            </div>
-          </div>
-
           <div className="flex justify-end gap-4">
             <Button variant="outline" onClick={onClose}>
               Cancel

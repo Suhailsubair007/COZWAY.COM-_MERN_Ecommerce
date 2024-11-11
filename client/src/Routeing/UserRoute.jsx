@@ -20,14 +20,13 @@ import ForgotPassword from "@/pages/User/login/ForgotPassword";
 import ResetPassword from "@/pages/User/login/ResetPassword";
 import WishlistPage from "@/pages/User/WishlistPage";
 import UserWallet from "@/pages/User/UserWallet";
-
+import DisplayCoupens from "@/pages/User/DisplayCoupens";
 
 const UserRoute = () => {
   return (
     <>
       <Routes>
         {/* Public route */}
-        
 
         <Route path="/" element={<Landing />} />
 
@@ -131,6 +130,7 @@ const UserRoute = () => {
           <Route path="delivery-address" element={<Address />} />
           <Route path="orders" element={<MyOrders />} />
           <Route path="wallet" element={<UserWallet />} />
+          <Route path="coupons" element={<DisplayCoupens />} />
           {/* <Route path="wallet" element={<Wallet />} />
           <Route path="coupons" element={<Coupons />} />
           <Route path="change-password" element={<ChangePassword />} />  */}

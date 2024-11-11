@@ -1,20 +1,15 @@
 import { Button } from "@/components/ui/button";
 import React from "react";
 import { useRazorpay } from "react-razorpay";
-import axiosInstance from "@/config/axiosConfig";
-import { toast } from "sonner";
 
 const RazorpayX = ({
+  handlePlaceOrder,
   name,
   email,
   amount,
   buttonName,
   selectedAddress,
-  addresses,
   selectedPaymentMethod,
-  userId,
-  items,
-  onSuccess,
 }) => {
   const { Razorpay } = useRazorpay();
 
@@ -28,7 +23,7 @@ const RazorpayX = ({
       order_id: "",
       handler: async (response) => {
         console.log(response);
-        await handlePlaceOrder();
+        handlePlaceOrder();
       },
       prefill: {
         name: name,
@@ -43,24 +38,7 @@ const RazorpayX = ({
     const razorpayInstance = new Razorpay(options);
     razorpayInstance.open();
   };
-  const addressToSend =
-    addresses && addresses.find((address) => address._id === selectedAddress);
 
-  const handlePlaceOrder = async () => {
-    try {
-      const response = await axiosInstance.post(`/users/order/`, {
-        userId: userId,
-        order_items: items,
-        address: addressToSend,
-        payment_method: selectedPaymentMethod,
-        subtotal: amount,
-      });
-      onSuccess(response.data.order);
-    } catch (error) {
-      console.error("Error placing order:", error);
-      toast.error("Failed to place the order. Please try again.");
-    }
-  };
 
   return (
     <div>

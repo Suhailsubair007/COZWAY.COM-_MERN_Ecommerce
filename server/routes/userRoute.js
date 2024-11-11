@@ -10,6 +10,8 @@ const cartController = require('../controller/User/cartController')
 const orderController = require('../controller/User/orderController')
 const wishlistController = require('../controller/User/wishlistController')
 const walletController = require('../controller/User/walletController')
+const couponController = require('../controller/User/couponController')
+
 const verifyUser = require('../middleware/userAuth')
 
 
@@ -80,4 +82,9 @@ router.post('/wallet', walletController.addAmountToWallet)
 router.get('/wallet', walletController.getUserWallet)
 
 
+router.post('/coupon/apply', couponController.applyCoupon);
+router.get('/coupons', couponController.getCoupens);
+
+
 module.exports = router;
+                                                               
