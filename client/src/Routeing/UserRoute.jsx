@@ -21,6 +21,7 @@ import ResetPassword from "@/pages/User/login/ResetPassword";
 import WishlistPage from "@/pages/User/WishlistPage";
 import UserWallet from "@/pages/User/UserWallet";
 import DisplayCoupens from "@/pages/User/DisplayCoupens";
+import ChangePassword from "@/pages/User/ChangePassword";
 
 const UserRoute = () => {
   return (
@@ -131,6 +132,8 @@ const UserRoute = () => {
           <Route path="orders" element={<MyOrders />} />
           <Route path="wallet" element={<UserWallet />} />
           <Route path="coupons" element={<DisplayCoupens />} />
+          <Route path="change-password" element={<ChangePassword />} />
+
           {/* <Route path="wallet" element={<Wallet />} />
           <Route path="coupons" element={<Coupons />} />
           <Route path="change-password" element={<ChangePassword />} />  */}

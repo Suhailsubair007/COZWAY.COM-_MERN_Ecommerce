@@ -25,6 +25,7 @@ router.post('/send-otp', userController.sendOTP);
 //profie based contoller..
 router.patch('/profile/:id', profileController.updateProfile);
 router.get('/user/:id', profileController.getUserData);
+router.post('/update_password', profileController.changePassword)
 
 //forgot password controller..
 router.post('/reset', userController.sendOTPForPasswordReset)
@@ -87,4 +88,3 @@ router.get('/coupons', couponController.getCoupens);
 
 
 module.exports = router;
-                                                               

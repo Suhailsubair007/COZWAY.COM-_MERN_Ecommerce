@@ -30,6 +30,15 @@ const addOffer = async (req, res) => {
     try {
         const { name, value, target, targetId, targetName, endDate } = req.body;
 
+        const existingOffer = await Offer.findOne({
+            target_type: target,
+            target_id: targetId
+        });
+
+        if (existingOffer) {
+            return res.status(400).json({ success: false, message: "An offer already exists for this product/category." });
+        }
+
         const newOffer = await Offer.create({
             name,
             offer_value: value,

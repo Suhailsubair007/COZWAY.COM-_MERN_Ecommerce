@@ -148,16 +148,24 @@ const createOrder = async (req, res) => {
             await wallet.save();
         }
 
-        // Update coupon usage
         if (coupon) {
-            await Coupon.findOneAndUpdate(
-                { code: coupon },
-                { $inc: { 'users_applied.$[elem].used_count': 1 } },
-                {
-                    arrayFilters: [{ 'elem.user': userId }],
-                    new: true
+            const existingCoupen = await Coupon.findOne({ code: coupon });
+        
+            if (existingCoupen) {
+                const userUsage = existingCoupen.users_applied.find(
+                    (entry) => entry.user.toString() === userId.toString()
+                );
+                if (userUsage) {
+                    userUsage.used_count += 1;
+                } else {
+                    existingCoupen.users_applied.push({
+                        user: userId,
+                        used_count: 1
+                    });
                 }
-            );
+        
+                await existingCoupen.save();
+            }
         }
 
         return res.status(201).json({ order, success: true, message: "Order Placed" });

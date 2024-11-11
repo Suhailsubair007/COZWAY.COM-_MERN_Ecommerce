@@ -1,4 +1,15 @@
 const User = require('../../model/User')
+const bcrypt = require("bcrypt");
+
+
+const securePassword = async (password) => {
+    try {
+        return await bcrypt.hash(password, 10);
+    } catch (error) {
+        console.log(error);
+    }
+};
+
 
 // controller for update frofile details in the profile page...
 const updateProfile = async (req, res) => {
@@ -7,9 +18,7 @@ const updateProfile = async (req, res) => {
 
     const name = fullname;
 
-    // console.log("useid==============>", userId);
-    // console.log("name===========>", name);
-    // console.log("phone==========>", phone);
+
 
     const updateFields = {};
 
@@ -70,9 +79,54 @@ const getUserData = async (req, res) => {
 };
 
 
+const changePassword = async (req, res) => {
+    const { email, currentPassword, newPassword } = req.body;
+
+    try {
+
+        const user = await User.findOne({ email });
+
+        if (!user) {
+            return res.status(404).json({
+                success: false,
+                message: 'User  not found'
+            });
+        }
+
+        const isPasswordMatch = await bcrypt.compare(currentPassword, user.password);
+        if (!isPasswordMatch) {
+            return res.status(401).json({
+                success: false,
+                message: 'Current password is incorrect'
+            });
+        }
+
+        const hashedNewPassword = await securePassword(newPassword);
+        user.password = hashedNewPassword;
+
+
+        await user.save();
+
+        return res.status(200).json({
+            success: true,
+            message: 'Password updated successfully'
+        });
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({
+            success: false,
+            message: 'Server error'
+        });
+    }
+};
+
+
+
+
 
 
 module.exports = {
     updateProfile,
     getUserData,
+    changePassword
 };

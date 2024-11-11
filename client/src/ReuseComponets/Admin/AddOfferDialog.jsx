@@ -1,114 +1,132 @@
-import { useState, useEffect, useCallback } from "react"
-import { Search } from "lucide-react"
-import axiosInstance from "@/config/axiosConfig"
-import debounce from "lodash/debounce"
-import { toast } from "sonner"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+import { useState, useEffect, useCallback } from "react";
+import { Search } from "lucide-react";
+import axiosInstance from "@/config/axiosConfig";
+import debounce from "lodash/debounce";
+import { toast } from "sonner";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 
-export default function AddOfferDialog({ isOpen, setIsOpen, activeTab, onOfferAdded }) {
+export default function AddOfferDialog({
+  isOpen,
+  setIsOpen,
+  activeTab,
+  onOfferAdded,
+}) {
   const [formData, setFormData] = useState({
     name: "",
     value: "",
     target: activeTab,
     targetId: "",
     targetName: "",
-    endDate: ""
-  })
-  const [searchValue, setSearchValue] = useState("")
-  const [products, setProducts] = useState([])
-  const [categories, setCategories] = useState([])
-  const [isDropdownVisible, setIsDropdownVisible] = useState(false)
+    endDate: "",
+  });
+  const [searchValue, setSearchValue] = useState("");
+  const [products, setProducts] = useState([]);
+  const [categories, setCategories] = useState([]);
+  const [isDropdownVisible, setIsDropdownVisible] = useState(false);
 
   useEffect(() => {
     // Update formData.target when activeTab changes
-    setFormData(prev => ({ ...prev, target: activeTab }))
-  }, [activeTab])
+    setFormData((prev) => ({ ...prev, target: activeTab }));
+  }, [activeTab]);
 
   const fetchCategories = async () => {
     try {
-      const response = await axiosInstance.get("/admin/getCategories")
-      setCategories(response.data)
+      const response = await axiosInstance.get("/admin/getCategories");
+      setCategories(response.data);
     } catch (error) {
-      console.error("Error fetching categories:", error)
-      toast.error("Failed to load categories")
+      console.error("Error fetching categories:", error);
+      toast.error("Failed to load categories");
     }
-  }
+  };
 
   const debouncedSearch = useCallback(
     debounce(async (searchTerm) => {
       if (searchTerm.length > 2) {
         try {
-          const response = await axiosInstance.get(`/admin/products?searchTerm=${searchTerm}`)
-          setProducts(response.data.products)
-          setIsDropdownVisible(true)
+          const response = await axiosInstance.get(
+            `/admin/products?searchTerm=${searchTerm}`
+          );
+          setProducts(response.data.products);
+          setIsDropdownVisible(true);
         } catch (error) {
-          console.error("Error fetching products:", error)
-          toast.error("Failed to search products")
+          console.error("Error fetching products:", error);
+          toast.error("Failed to search products");
         }
       } else {
-        setProducts([])
-        setIsDropdownVisible(false)
+        setProducts([]);
+        setIsDropdownVisible(false);
       }
     }, 300),
     []
-  )
+  );
 
   useEffect(() => {
     if (activeTab === "product") {
-      debouncedSearch(searchValue)
+      debouncedSearch(searchValue);
     } else if (activeTab === "category") {
-      fetchCategories()
+      fetchCategories();
     }
-  }, [searchValue, activeTab, debouncedSearch])
+  }, [searchValue, activeTab, debouncedSearch]);
 
   const handleInputChange = (e) => {
-    const { name, value } = e.target
-    setFormData((prev) => ({ ...prev, [name]: value }))
-  }
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
 
   const handleProductSelect = (product) => {
-    setSearchValue(product.name)
+    setSearchValue(product.name);
     setFormData((prev) => ({
       ...prev,
       targetId: product._id,
-      targetName: product.name
-    }))
-    setIsDropdownVisible(false)
-  }
+      targetName: product.name,
+    }));
+    setIsDropdownVisible(false);
+  };
 
   const handleCategorySelect = (categoryId) => {
-    const category = categories.find((cat) => cat._id === categoryId)
+    const category = categories.find((cat) => cat._id === categoryId);
     setFormData((prev) => ({
       ...prev,
       targetId: categoryId,
-      targetName: category.name
-    }))
-  }
+      targetName: category.name,
+    }));
+  };
 
   const handleSubmit = async (e) => {
-    e.preventDefault()
+    e.preventDefault();
     try {
-      const response = await axiosInstance.post("/admin/addoffer", formData)
-      toast.success("Offer added successfully")
+      const response = await axiosInstance.post("/admin/addoffer", formData);
+      toast.success("Offer added successfully");
       setFormData({
         name: "",
         value: "",
         target: activeTab,
         targetId: "",
         targetName: "",
-        endDate: ""
-      })
-      setIsOpen(false)
-      onOfferAdded()
+        endDate: "",
+      });
+      setIsOpen(false);
+      onOfferAdded();
     } catch (error) {
-      console.error("Error adding offer:", error)
-      toast.error("Failed to add offer")
+      console.error("Error adding offer:", error);
+      toast.error(error.response.data.message);
     }
-  }
+  };
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
@@ -165,7 +183,10 @@ export default function AddOfferDialog({ isOpen, setIsOpen, activeTab, onOfferAd
                   value={searchValue}
                   onChange={(e) => setSearchValue(e.target.value)}
                 />
-                <Search className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
+                <Search
+                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400"
+                  size={20}
+                />
               </div>
               {isDropdownVisible && (
                 <ul className="absolute z-10 mt-1 w-full bg-white shadow-lg max-h-60 rounded-md py-1 text-base ring-1 ring-black ring-opacity-5 overflow-auto focus:outline-none sm:text-sm">
@@ -206,7 +227,11 @@ export default function AddOfferDialog({ isOpen, setIsOpen, activeTab, onOfferAd
           )}
 
           <div className="flex justify-end space-x-2">
-            <Button type="button" variant="outline" onClick={() => setIsOpen(false)}>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setIsOpen(false)}
+            >
               Cancel
             </Button>
             <Button type="submit">Add Offer</Button>
@@ -214,5 +239,5 @@ export default function AddOfferDialog({ isOpen, setIsOpen, activeTab, onOfferAd
         </form>
       </DialogContent>
     </Dialog>
-  )
+  );
 }
