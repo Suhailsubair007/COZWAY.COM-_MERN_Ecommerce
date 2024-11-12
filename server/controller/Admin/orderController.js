@@ -2,9 +2,17 @@ const Order = require('../../model/order');
 
 const getAllOrders = async (req, res) => {
     try {
-        const orders = await Order.find({}).populate('userId');
+        const page = parseInt(req.query.page);
+        const limit = parseInt(req.query.limit);
+        const skip = (page - 1) * limit;
+        const totalOrders = await Order.countDocuments({});
+        const totalPages = Math.ceil(totalOrders / limit);
+        const orders = await Order.find({})
+            .populate('userId').
+            skip(skip).
+            limit(limit);
         console.log("Orders:", orders);
-        res.status(200).json(orders);
+        res.status(200).json({ orders, totalPages });
     } catch (error) {
         console.error("Error fetching orders:", error);
         res.status(500).json({ error: error.message });
@@ -72,4 +80,4 @@ const getOrderById = async (req, res) => {
 };
 
 
-module.exports = { getAllOrders, updateOrderStatus,getOrderById};
+module.exports = { getAllOrders, updateOrderStatus, getOrderById };

@@ -9,7 +9,7 @@ const addToCart = async (req, res) => {
             return res.status(400).json({ error: 'Invalid quantity' });
         }
 
-        const discount = ((product.price - product.offerPrice) / product.price) * 100;
+
         const totalProductPrice = product.offerPrice * product.quantity;
 
 
@@ -19,7 +19,6 @@ const addToCart = async (req, res) => {
                 userId,
                 products: [{
                     ...product,
-                    discount,
                     totalProductPrice
                 }],
                 totalCartPrice: totalProductPrice
@@ -100,10 +99,16 @@ const getAllCartItems = async (req, res) => {
             .populate({
                 path: 'products.productId',
                 match: { is_active: true },
-                populate: {
-                    path: 'category',
-                    select: 'name'
-                }
+                populate: [
+                    {
+                        path: 'category',
+                        select: 'name'
+                    },
+                    {
+                        path: 'offer',
+                        select: 'offer_value'
+                    }
+                ]
             });
         if (!cartItems) {
             return res.status(404).json({ message: 'Cart not found' });
@@ -115,7 +120,7 @@ const getAllCartItems = async (req, res) => {
 
             const product = item.productId;
             const sizeData = product.sizes.find((s) => s.size === item.size);
-            // console.log("productss:=>", product)
+            // console.log("productss:=>", product) 
             // console.log("sizedata vann :", sizeData);
             if (sizeData) {
                 if (item.quantity > sizeData.stock) {
@@ -123,7 +128,9 @@ const getAllCartItems = async (req, res) => {
                 } else if (item.quantity == 0 && sizeData.stock > 1) {
                     item.quantity = 1;
                 }
-                item.totalProductPrice = item.offerPrice * item.quantity;
+                item.totalProductPrice = (item.offerPrice - (item.offerPrice * (item.productId?.offer?.offer_value ? item.productId?.offer?.offer_value : 0) / 100)) * item.quantity;
+
+                item.discount = (((item.price - item.offerPrice) / item.price) * 100) + (item.productId?.offer?.offer_value ? item.productId?.offer?.offer_value : 0)
             }
         })
         cartItems.totalCartPrice = cartItems.products.reduce((total, item) => {

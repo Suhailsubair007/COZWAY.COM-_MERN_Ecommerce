@@ -2,7 +2,10 @@ import React from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 
-export const ProductCard = ({ product, onNavigate }) => (
+export const ProductCard = ({ product, onNavigate }) => {
+  // console.log(product?.offer?.offer_value) 
+
+  return(
   <Card
     onClick={() => onNavigate(product)}
     className="bg-white overflow-hidden flex flex-col group transition-all duration-300 ease-in-out hover:shadow-xl hover:-translate-y-2 hover:bg-gray-50"
@@ -40,10 +43,11 @@ export const ProductCard = ({ product, onNavigate }) => (
       <p className="text-sm font-bold mt-2 group-hover:text-primary transition-colors duration-300">
         ₹
         {product?.offer?.offer_value
-          ? product?.offerPrice -
-            (product?.offerPrice * product?.offer?.offer_value) / 100
+          ?( product?.offerPrice -
+            (product?.offerPrice * product?.offer?.offer_value) / 100)
           : product?.offerPrice}
       </p>
     </CardContent>
   </Card>
-);
+  )
+};

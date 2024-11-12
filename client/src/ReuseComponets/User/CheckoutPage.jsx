@@ -16,6 +16,7 @@ import RazorpayX from "./Payment/Razorpay";
 
 export default function CheckoutPage() {
   const [addresses, setAddresses] = useState([]);
+  const [x,setX] = useState(0);
   const [showConfirmation, setShowConfirmation] = useState(false);
   const [placedOrder, setPlacedOrder] = useState(null);
   const [items, setItems] = useState([]);
@@ -45,11 +46,14 @@ export default function CheckoutPage() {
     try {
       const response = await axiosInstance.get(`/users/items/${user.id}`);
       setItems(response.data.products);
+      setX(response.data.totalCartPrice)
+      console.log("reponce-->", response.data);
     } catch (error) {
       console.error("Error fetching items:", error);
       toast.error("Failed to fetch cart items");
     }
   };
+  console.log(x)
 
   const handleAddAddress = (newAddress) => {
     setAddresses([...addresses, newAddress]);
@@ -276,17 +280,14 @@ export default function CheckoutPage() {
                     Quantity: {item.quantity}
                   </p>
                   <div className="text-sm text-green-600 font-medium">
-                    {Math.round(
-                      ((item.price - item.offerPrice) / item.price) * 100
-                    )}
-                    % OFF
+                    {item.discount.toFixed(2)}% OFF
                   </div>
                 </div>
                 <div className="text-right">
                   <p className="line-through text-gray-500">₹{item.price}</p>
                   <p className="font-semibold">₹{item.offerPrice}</p>
                   <p className="text-sm text-gray-600">
-                    Total: ₹{item.offerPrice * item.quantity}
+                    Total: ₹{item.totalProductPrice}
                   </p>
                 </div>
               </div>
@@ -297,7 +298,12 @@ export default function CheckoutPage() {
           <div className="space-y-2 text-sm">
             <div className="flex justify-between">
               <span className="text-gray-600">Subtotal:</span>
-              <span>₹{subtotal.toFixed(2)}</span>
+              <span>
+                ₹
+                {items
+                  .reduce((acc, item) => acc + item.totalProductPrice, 0)
+                  .toFixed(2)}
+              </span>
             </div>
             <div className="flex justify-between">
               <span className="text-gray-600">Shipping:</span>
@@ -317,7 +323,7 @@ export default function CheckoutPage() {
           <Separator className="my-4" />
           <div className="flex justify-between text-lg font-semibold mb-6">
             <span>Total:</span>
-            <span>₹{total.toFixed(2)}</span>
+            <span>₹{x.toFixed(2)}</span>
           </div>
 
           <div className="flex space-x-2 mb-6">

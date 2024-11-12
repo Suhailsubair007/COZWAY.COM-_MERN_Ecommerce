@@ -1,17 +1,23 @@
-import React, { useEffect, useState } from "react"
-import { useSelector } from "react-redux"
-import { useNavigate } from "react-router-dom"
-import { Minus, Plus, Trash2, ChevronRight } from "lucide-react"
-import { toast } from "sonner"
-import axiosInstance from "@/config/axiosConfig"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { Separator } from "@/components/ui/separator"
-import EmptyCart from "./EmptyCart"
+import React, { useEffect, useState } from "react";
+import { useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
+import { Minus, Plus, Trash2, ChevronRight } from "lucide-react";
+import { toast } from "sonner";
+import axiosInstance from "@/config/axiosConfig";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Separator } from "@/components/ui/separator";
+import EmptyCart from "./EmptyCart";
 
 const CartItem = ({ item, onUpdateQuantity, onRemove }) => {
-  const discount = Math.floor(item.discount)
-  const isOutOfStock = item.quantity === 0
+  const discount = Math.floor(item.discount);
+  const isOutOfStock = item.quantity === 0;
 
   return (
     <Card className={`mb-4 ${isOutOfStock ? "opacity-50" : ""}`}>
@@ -28,7 +34,9 @@ const CartItem = ({ item, onUpdateQuantity, onRemove }) => {
               Category: {item.productId.category.name}
             </p>
             <p className="text-sm font-medium">Size: {item.size}</p>
-            <p className="text-sm text-green-600 font-medium">Discount: {discount}%</p>
+            <p className="text-sm text-green-600 font-medium">
+              Discount: {discount}%
+            </p>
             {isOutOfStock ? (
               <p className="text-red-500 font-bold">Out of Stock</p>
             ) : item.stock < 5 ? (
@@ -37,7 +45,16 @@ const CartItem = ({ item, onUpdateQuantity, onRemove }) => {
           </div>
           <div className="text-right">
             <p className="font-bold text-lg">
-              ₹{(item.offerPrice * item.quantity).toFixed(2)}
+              ₹
+              {(
+                (item.offerPrice -
+                  (item.offerPrice *
+                    (item?.productId?.offer?.offer_value
+                      ? item?.productId?.offer?.offer_value
+                      : 0)) /
+                    100) *
+                item.quantity
+              ).toFixed(2)}
             </p>
             <div className="flex items-center mt-2 space-x-2">
               <Button
@@ -71,64 +88,68 @@ const CartItem = ({ item, onUpdateQuantity, onRemove }) => {
         </div>
       </CardContent>
     </Card>
-  )
-}
+  );
+};
 
 export default function ShoppingCart() {
-  const navigate = useNavigate()
-  const [cartItems, setCartItems] = useState([])
-  const [subtotal, setSubtotal] = useState(0)
-  const userId = useSelector((state) => state.user.userInfo.id)
+  const navigate = useNavigate();
+  const [cartItems, setCartItems] = useState([]);
+  const [subtotal, setSubtotal] = useState(0);
+  const userId = useSelector((state) => state.user.userInfo.id);
 
   useEffect(() => {
-    fetchCart()
-  }, [userId])
+    fetchCart();
+  }, [userId]);
 
   const fetchCart = async () => {
     try {
-      const response = await axiosInstance.get(`/users/cart/${userId}`)
-      console.log("cart products=====>",response.data.cartItems.products)
-      setCartItems(response.data.cartItems.products)
-      setSubtotal(response.data.cartItems.totalCartPrice)
+      const response = await axiosInstance.get(`/users/cart/${userId}`);
+      console.log("cart products=====>", response.data.cartItems.products);
+      setCartItems(response.data.cartItems.products);
+      setSubtotal(response.data.cartItems.totalCartPrice);
     } catch (error) {
-      console.error("Error fetching cart:", error)
+      console.error("Error fetching cart:", error);
       if (error.response) {
-        toast.error(error.response.data.message)
+        toast.error(error.response.data.message);
       }
     }
-  }
+  };
 
   const updateQuantity = async (item, action) => {
     try {
-      const endpoint = action === "increase" ? "add" : "min"
-      await axiosInstance.patch(`/users/quantity/${endpoint}/${userId}/${item._id}`)
-      fetchCart()
+      const endpoint = action === "increase" ? "add" : "min";
+      await axiosInstance.patch(
+        `/users/quantity/${endpoint}/${userId}/${item._id}`
+      );
+      fetchCart();
     } catch (error) {
-      console.error("Error updating quantity:", error)
+      console.error("Error updating quantity:", error);
       if (error.response) {
-        toast.error(error.response.data.message)
+        toast.error(error.response.data.message);
       }
     }
-  }
+  };
 
   const removeItem = async (item) => {
     try {
-      const response = await axiosInstance.delete(`/users/delete/${userId}/${item._id}`)
-      toast.success("Item removed from cart..")
-      fetchCart()
+      const response = await axiosInstance.delete(
+        `/users/delete/${userId}/${item._id}`
+      );
+      toast.success("Item removed from cart..");
+      fetchCart();
     } catch (error) {
-      console.error("Error removing item from cart:", error)
+      console.error("Error removing item from cart:", error);
       if (error.response) {
-        toast.error(error.response.data.message)
+        toast.error(error.response.data.message);
       }
     }
-  }
+  };
 
   const handleCheckout = () => {
-    navigate("/checkout")
-  }
+    navigate("/checkout");
+  };
 
-  const isCheckoutDisabled = cartItems.every((item) => item.quantity === 0)
+  const isCheckoutDisabled = cartItems.every((item) => item.quantity === 0);
 
   return (
     <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -178,5 +199,5 @@ export default function ShoppingCart() {
         </div>
       )}
     </div>
-  )
+  );
 }

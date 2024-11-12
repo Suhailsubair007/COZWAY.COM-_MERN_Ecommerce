@@ -29,6 +29,14 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination";
 import { toast } from "sonner";
 
 export default function OrderManagement() {
@@ -36,26 +44,34 @@ export default function OrderManagement() {
   const [searchTerm, setSearchTerm] = useState("");
   const [orderToCancel, setOrderToCancel] = useState(null);
   const [isCancelDialogOpen, setIsCancelDialogOpen] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
   const navigate = useNavigate();
 
   useEffect(() => {
-    fetchOrders();
-  }, []);
+    fetchOrders(currentPage);
+  }, [currentPage]);
 
-  const fetchOrders = async () => {
+  const fetchOrders = async (page) => {
     try {
-      const response = await axiosInstance.get("/admin/orders");
-      console.log("data===============>",response.data);
-      setOrders(response.data);
+      const response = await axiosInstance.get(
+        `/admin/orders?page=${page}&limit=6`
+      );
+      console.log("data===============>", response.data);
+      setOrders(response.data.orders);
+      setTotalPages(response.data.totalPages);
     } catch (error) {
       console.error(error);
       toast.error("Failed to fetch orders. Please try again.");
     }
   };
+  const handlePageChange = (newPage) => {
+    setCurrentPage(newPage);
+  };
 
   const handleStatusChange = async (orderId, newStatus, currentStatus) => {
     // Prevent changing status to a previous state
-    const statusOrder = ['pending', 'shipped', 'delivered', 'cancelled'];
+    const statusOrder = ["pending", "shipped", "delivered", "cancelled"];
     const currentIndex = statusOrder.indexOf(currentStatus.toLowerCase());
     const newIndex = statusOrder.indexOf(newStatus);
 
@@ -85,7 +101,11 @@ export default function OrderManagement() {
     if (!orderToCancel) return;
 
     try {
-      await handleStatusChange(orderToCancel._id, "cancelled", orderToCancel.order_status);
+      await handleStatusChange(
+        orderToCancel._id,
+        "cancelled",
+        orderToCancel.order_status
+      );
       toast.success("Order cancelled successfully.");
     } catch (error) {
       console.error("Error cancelling order:", error);
@@ -103,7 +123,7 @@ export default function OrderManagement() {
   );
 
   const getAvailableStatuses = (currentStatus) => {
-    const statusOrder = ['pending', 'shipped', 'delivered', 'cancelled'];
+    const statusOrder = ["pending", "shipped", "delivered", "cancelled"];
     const currentIndex = statusOrder.indexOf(currentStatus.toLowerCase());
     return statusOrder.slice(currentIndex);
   };
@@ -179,18 +199,25 @@ export default function OrderManagement() {
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      {getAvailableStatuses(order.order_status).map((status) => (
-                        <SelectItem key={status} value={status}>
-                          <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
-                            status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
-                            status === 'shipped' ? 'bg-blue-100 text-blue-800' :
-                            status === 'delivered' ? 'bg-green-100 text-green-800' :
-                            'bg-red-100 text-red-800'
-                          }`}>
-                            {status.charAt(0).toUpperCase() + status.slice(1)}
-                          </span>
-                        </SelectItem>
-                      ))}
+                      {getAvailableStatuses(order.order_status).map(
+                        (status) => (
+                          <SelectItem key={status} value={status}>
+                            <span
+                              className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
+                                status === "pending"
+                                  ? "bg-yellow-100 text-yellow-800"
+                                  : status === "shipped"
+                                  ? "bg-blue-100 text-blue-800"
+                                  : status === "delivered"
+                                  ? "bg-green-100 text-green-800"
+                                  : "bg-red-100 text-red-800"
+                              }`}
+                            >
+                              {status.charAt(0).toUpperCase() + status.slice(1)}
+                            </span>
+                          </SelectItem>
+                        )
+                      )}
                     </SelectContent>
                   </Select>
                 </TableCell>
@@ -222,6 +249,32 @@ export default function OrderManagement() {
           </TableBody>
         </Table>
       </div>
+      <Pagination className="mt-8">
+        <PaginationContent>
+          <PaginationItem>
+            <PaginationPrevious
+              onClick={() => handlePageChange(currentPage - 1)}
+              disabled={currentPage === 1}
+            />
+          </PaginationItem>
+          {[...Array(totalPages)].map((_, index) => (
+            <PaginationItem key={index}>
+              <PaginationLink
+                onClick={() => handlePageChange(index + 1)}
+                isActive={currentPage === index + 1}
+              >
+                {index + 1}
+              </PaginationLink>
+            </PaginationItem>
+          ))}
+          <PaginationItem>
+            <PaginationNext
+              onClick={() => handlePageChange(currentPage + 1)}
+              disabled={currentPage === totalPages}
+            />
+          </PaginationItem>
+        </PaginationContent>
+      </Pagination>
 
       <AlertDialog
         open={isCancelDialogOpen}

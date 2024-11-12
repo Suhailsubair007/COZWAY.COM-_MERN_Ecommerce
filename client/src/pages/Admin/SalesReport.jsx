@@ -20,8 +20,7 @@ import {
 export default function SalesReport() {
   const [activeTab, setActiveTab] = useState("daily");
   const [currentPage, setCurrentPage] = useState(1);
-  //   const [coustome, setCoustom] = useState(false);
-  const [startDate, setStartDate] = useState(""); // State for start date
+  const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
   const itemsPerPage = 5;
 

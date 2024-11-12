@@ -12,13 +12,17 @@ const getCheckoutCartItems = async (req, res) => {
         const cartItems = await Cart.findOne({ userId })
             .populate({
                 path: 'products.productId',
-                populate: {
-                    path: 'category',
-                    select: 'name'
-                }
+                populate: [
+                    {
+                        path: 'category',
+                        select: 'name'
+                    },
+                    {
+                        path: 'offer',
+                        select: 'offer_value'
+                    }
+                ]
             });
-
-
 
         if (!cartItems) {
             return res.status(404).json({ message: 'Cart not found' });
@@ -27,7 +31,22 @@ const getCheckoutCartItems = async (req, res) => {
         const filtered = cartItems.products.filter((item) =>
             item.quantity > 0 && item.productId.is_active
         );
-        // console.log("cartItems========================>", filtered);
+
+        filtered.forEach((item) => {
+            const product = item.productId;
+            const sizeData = product.sizes.find((s) => s.size === item.size);
+
+            if (sizeData) {
+                if (item.quantity > sizeData.stock) {
+                    item.quantity = sizeData.stock;
+                } else if (item.quantity === 0 && sizeData.stock > 1) {
+                    item.quantity = 1;
+                }
+
+                item.totalProductPrice = (item.offerPrice - (item.offerPrice * (item.productId?.offer?.offer_value ? item.productId?.offer?.offer_value : 0) / 100)) * item.quantity;
+                item.discount = (((item.price - item.offerPrice) / item.price) * 100) + (item.productId?.offer?.offer_value ? item.productId?.offer?.offer_value : 0);
+            }
+        });
 
         const totalCartPrice = filtered.reduce((total, item) => {
             return total + item.totalProductPrice;
@@ -44,6 +63,7 @@ const getCheckoutCartItems = async (req, res) => {
         res.status(500).json({ message: 'Server error' });
     }
 };
+
 
 //cerate an order...
 const createOrder = async (req, res) => {
@@ -150,7 +170,7 @@ const createOrder = async (req, res) => {
 
         if (coupon) {
             const existingCoupen = await Coupon.findOne({ code: coupon });
-        
+
             if (existingCoupen) {
                 const userUsage = existingCoupen.users_applied.find(
                     (entry) => entry.user.toString() === userId.toString()
@@ -163,7 +183,7 @@ const createOrder = async (req, res) => {
                         used_count: 1
                     });
                 }
-        
+
                 await existingCoupen.save();
             }
         }

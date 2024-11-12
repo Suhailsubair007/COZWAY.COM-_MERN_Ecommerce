@@ -6,12 +6,24 @@ import axiosInstance from "@/config/axiosConfig";
 import AddressList from "./AddressList";
 import EditAddressModal from "./EditAddressModal";
 import AddAddressModal from "./AddNewAddress";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 export default function Address() {
   const [addresses, setAddresses] = useState([]);
+  const [isCancelDialogOpen, setIsCancelDialogOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [editingAddress, setEditingAddress] = useState(null);
+  const [addressToDelete, setAddressToDelete] = useState(null); // State to track address to delete
 
   const user = useSelector((state) => state.user.userInfo.id);
 
@@ -33,12 +45,24 @@ export default function Address() {
     setIsEditModalOpen(true);
   };
 
-  const handleDelete = async (addressToDelete) => {
+  const handleDelete = (address) => {
+    setAddressToDelete(address);
+    setIsCancelDialogOpen(true); // Open the confirmation dialog
+  };
+
+  const confirmDelete = async () => {
+    if (!addressToDelete) return;
+
     try {
       await axiosInstance.delete(`/users/address/${addressToDelete._id}`);
-      setAddresses(addresses.filter((addr) => addr._id !== addressToDelete._id));
+      setAddresses(
+        addresses.filter((addr) => addr._id !== addressToDelete._id)
+      );
     } catch (error) {
       console.error("Error deleting address:", error);
+    } finally {
+      setIsCancelDialogOpen(false); // Close the dialog
+      setAddressToDelete(null); // Clear the address to delete
     }
   };
 
@@ -91,6 +115,30 @@ export default function Address() {
         onClose={() => setIsAddModalOpen(false)}
         onAdd={handleAddAddress}
       />
+
+      <AlertDialog
+        open={isCancelDialogOpen}
+        onOpenChange={setIsCancelDialogOpen}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>
+              Are you sure you want to delete the address?
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              Deleting this address will permanently remove it from your list.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={() => setIsCancelDialogOpen(false)}>
+              No, keep the address
+            </AlertDialogCancel>
+            <AlertDialogAction onClick={confirmDelete}>
+              Yes, delete the address
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
