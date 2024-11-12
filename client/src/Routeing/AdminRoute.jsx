@@ -9,10 +9,11 @@ import Aside from "@/ReuseComponets/Admin/Aside";
 import UserList from "@/pages/Admin/UserList";
 import EditProduct from "@/pages/Admin/EditProduct";
 import OrderManagement from "@/pages/Admin/OrderManagement";
-// import AdminProtect from "./Protected_Routing/admin/adminProtect";
 import AdminOrderDetail from "@/pages/Admin/AdminOrderDetail";
 import Coupon from "@/pages/Admin/Coupon";
 import Offer from "@/pages/Admin/Offer";
+import SalesReport from "@/pages/Admin/SalesReport";
+
 // import Cookies from "js-cookie";
 
 const AdminRoute = () => {
@@ -36,6 +37,8 @@ const AdminRoute = () => {
           <Route path="/new/:id" element={<AdminOrderDetail />} />
           <Route path="/coupons" element={<Coupon />} />
           <Route path="/offer" element={<Offer />} />
+          <Route path="/report" element={<SalesReport />} />
+
         </Routes>
       </main>
       <Toaster richColors position="bottom-center" />

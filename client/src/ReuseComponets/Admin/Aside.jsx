@@ -15,6 +15,7 @@ import {
   Settings,
   LogOut,
   CirclePercent,
+  FileText,
 } from "lucide-react";
 
 const Aside = () => {
@@ -88,6 +89,11 @@ const Aside = () => {
                 path: "/admin/offer",
                 icon: <CirclePercent size={20} />,
                 label: "Offers",
+              },
+              {
+                path: "/admin/report",
+                icon: <FileText size={20} />,
+                label: "Report",
               },
               {
                 path: "/admin/banner",

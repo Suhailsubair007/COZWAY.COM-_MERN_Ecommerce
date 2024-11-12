@@ -1,383 +1,110 @@
-import { useState, useEffect, useCallback } from "react";
-import { toast } from "sonner";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import axiosInstance from "@/config/axiosConfig";
-import Cropper from "react-easy-crop";
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { getCroppedImg } from "../../config/cropImage"; // Import your cropping function
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Label } from "@/components/ui/label";
-import { Slider } from "@/components/ui/slider";
-import { X, Upload, Save } from "lucide-react";
-import axios from "axios";
-import { useNavigate } from "react-router-dom";
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { ChevronLeft, ChevronRight } from "lucide-react";
+import axiosInstance from "@/config/axiosConfig";
 
-export default function AddProduct() {
-  const navigate = useNavigate();
-  const [product, setProduct] = useState({
-    name: "",
-    description: "",
-    price: "",
-    category: "",
-    fit: "",
-    sleeve: "",
-    sizes: { S: "", M: "", L: "", XL: "", XXL: "" },
-    images: Array(5).fill(null),
+export default function SalesReport() {
+  const [salesData, setSalesData] = useState({
+    report: [],
+    totalSalesCount: 0,
+    totalOrderAmount: 0,
+    totalDiscount: 0,
+    totalPage: 1,
+    page: 1,
   });
-
-  const [categories, setCategories] = useState([]);
-  const [selectedImageIndex, setSelectedImageIndex] = useState(null); // Track which image is being cropped
-  const [image, setImage] = useState(null); // Image for cropping
-  const [crop, setCrop] = useState({ x: 0, y: 0 });
-  const [zoom, setZoom] = useState(1);
-  const [croppedAreaPixels, setCroppedAreaPixels] = useState(null);
+  const [currentPage, setCurrentPage] = useState(1);
 
   useEffect(() => {
-    const fetchCategories = async () => {
-      try {
-        const response = await axiosInstance.get("/admin/categories");
-        setCategories(response.data);
-      } catch (error) {
-        console.error("Error fetching categories:", error);
-        toast("Failed to load categories");
-      }
-    };
-    fetchCategories();
-  }, []);
+    fetchReports(currentPage);
+  }, [currentPage]);
 
-
-
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setProduct({
-      ...product,
-      [name]: value,
-    });
-  };
-
-
-  const handleSizeChange = (size, value) => {
-    setProduct({
-      ...product,
-      sizes: {
-        ...product.sizes,
-        [size]: value,
-      },
-    });
-  };
-
-
-  const handleImageChange = (index, event) => {
-    const file = event.target.files[0];
-    if (file) {
-      setImage(URL.createObjectURL(file)); 
-      setSelectedImageIndex(index);
-    }
-  };
-
-  const onCropComplete = useCallback((croppedArea, croppedAreaPixels) => {
-    setCroppedAreaPixels(croppedAreaPixels);
-  }, []);
-
-
-
-  const saveCroppedImage = async () => {
+  const fetchReports = async (page) => {
     try {
-      const croppedImageBlob = await getCroppedImg(image, croppedAreaPixels);
-      const croppedImageURL = URL.createObjectURL(croppedImageBlob);
-
-      const newImages = [...product.images];
-      newImages[selectedImageIndex] = croppedImageBlob; // Store the cropped image blob
-
-      setProduct({ ...product, images: newImages });
-      setImage(null);
-      setSelectedImageIndex(null);
-    } catch (error) {
-      console.error("Error cropping image:", error);
-    }
-  };
-
-
-  //functio to uplaod image to cloudinary..
-
-  const uploadImagesToCloudinary = async () => {
-    const uploadPromises = product.images.map(async (file) => {
-      if (!file) return null;
-
-      const formData = new FormData();
-      formData.append("file", file);
-      formData.append("upload_preset", "cozway");
-
-      try {
-        const response = await axios.post(
-          "https://api.cloudinary.com/v1_1/dupo7yv88/image/upload",
-          formData
-        );
-        return response.data.secure_url;
-      } catch (error) {
-        console.error("Error uploading image:", error);
-        return null;
-      }
-    });
-
-    return await Promise.all(uploadPromises);
-  };
-
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-
-    const { name, description, price, category, fit, sleeve, sizes } = product;
-
-    const sizeArray = Object.entries(sizes).map(([size, stock]) => ({
-      size,
-      stock: Number(stock),
-    }));
-
-    const imageUrls = await uploadImagesToCloudinary();
-    const filteredImages = imageUrls.filter((url) => url !== null);
-
-    if (filteredImages.length === 0) {
-      toast("Error uploading images");
-      return;
-    }
-
-    const newProduct = {
-      name,
-      description,
-      price: Number(price),
-      category,
-      fit,
-      sleeve,
-      sizes: sizeArray,
-      images: filteredImages,
-    };
-
-    try {
-      const response = await axiosInstance.post(
-        "/admin/add_product",
-        newProduct
+      const response = await axiosInstance.get(
+        `/admin/report?page=${page}&limit=5`
       );
-      if (response.status === 201) {
-        navigate('/admin/product')
-        toast("Product added successfully!");
-      } else {
-        toast("Failed to add product.");
-      }
+      console.log(response.data.report);
+      setSalesData(response.data);
     } catch (error) {
-      console.error("Error:", error);
-      toast("Error adding product.");
+      console.error("Error fetching sales report:", error);
     }
   };
 
-  
+  const handlePageChange = (newPage) => {
+    setCurrentPage(newPage);
+  };
+
   return (
-    <div className=" flex bg-gray-100">
-      <main className="flex-1 p-8 overflow-y-auto">
-        <div className="mb-8">
-          <h2 className="text-3xl font-bold">Add Product</h2>
-          <p className="text-gray-500">Dashboard &gt; product &gt; add</p>
-        </div>
+    <div className="container mx-auto py-10 px-4 sm:px-6 lg:px-8">
+      <div className="bg-white p-6 rounded-lg shadow-md">
+        <h1 className="text-3xl font-bold mb-6">Sales Report</h1>
 
-        <form onSubmit={handleSubmit}>
-          <div className="bg-white shadow-md rounded-lg p-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {Array.from({ length: 5 }, (_, index) => (
-                <div key={index} className="space-y-2">
-                  <Label
-                    htmlFor={`image-${index}`}
-                    className="text-sm font-medium text-gray-700"
-                  >
-                    Image {index + 1}
-                  </Label>
-                  <div className="flex items-center space-x-2">
-                    <Button
-                      type="button"
-                      variant="outline"
-                      size="icon"
-                      onClick={() =>
-                        document.getElementById(`image-${index}`).click()
-                      }
-                    >
-                      <Upload className="h-4 w-4" />
-                    </Button>
-                    <input
-                      id={`image-${index}`}
-                      type="file"
-                      accept="image/*"
-                      onChange={(e) => handleImageChange(index, e)}
-                      className="hidden"
-                    />
-                    {product.images[index] && (
-                      <img
-                        src={
-                          typeof product.images[index] === "string"
-                            ? product.images[index]
-                            : URL.createObjectURL(product.images[index])
-                        }
-                        alt={`preview-${index}`}
-                        className="w-16 h-16 object-cover rounded-md"
-                      />
-                    )}
-                  </div>
-                </div>
-              ))}
-            </div>
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Order ID</TableHead>
+              <TableHead>User</TableHead>
+              <TableHead>Date</TableHead>
+              <TableHead>Payment Method</TableHead>
+              <TableHead>Order Status</TableHead>
+              <TableHead className="text-right">Amount</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {salesData.report.map((order) => (
+              <TableRow key={order._id}>
+                <TableCell>{order.order_id}</TableCell>
+                <TableCell>{order.userId.name}</TableCell>
+                <TableCell>
+                  {new Date(order.placed_at).toLocaleDateString()}
+                </TableCell>
+                <TableCell>{order.payment_method}</TableCell>
+                <TableCell>{order.order_status}</TableCell>
+                <TableCell className="text-right">
+                  ₹{order.total_price_with_discount.toFixed(2)}
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
 
-            {/* Product Details Section */}
-            <div className="space-y-4 mt-6">
-              <Input
-                placeholder="Type name here..."
-                label="Product Name"
-                name="name"
-                value={product.name}
-                onChange={handleChange}
-              />
-
-              <Textarea
-                placeholder="Type description here..."
-                label="Description"
-                name="description"
-                value={product.description}
-                onChange={handleChange}
-              />
-
-              <Input
-                placeholder="₹ 1399"
-                label="Price"
-                name="price"
-                value={product.price}
-                onChange={handleChange}
-              />
-            </div>
-
-            <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="space-y-4">
-                <Select
-                  onValueChange={(value) =>
-                    setProduct({ ...product, category: value })
-                  }
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select category" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {categories.map((category) => (
-                      <SelectItem key={category._id} value={category._id}>
-                        {category.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-
-                <Select
-                  onValueChange={(value) =>
-                    setProduct({ ...product, fit: value })
-                  }
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select Fit Type" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="regular">Regular Fit</SelectItem>
-                    <SelectItem value="slim">Slim Fit</SelectItem>
-                    <SelectItem value="loose">Loose Fit</SelectItem>
-                  </SelectContent>
-                </Select>
-
-                <Select
-                  onValueChange={(value) =>
-                    setProduct({ ...product, sleeve: value })
-                  }
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select Sleeve" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="full">Full Sleeve</SelectItem>
-                    <SelectItem value="half">Half Sleeve</SelectItem>
-                    <SelectItem value="sleeveless">Elbow Sleeve</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div className="space-y-4">
-                <div className="grid grid-cols-4 gap-4">
-                  {["S", "M", "L", "XL", "XXL"].map((size) => (
-                    <div key={size} className="flex items-center space-x-2">
-                      <span>{size}</span>
-                      <Input
-                        placeholder="10"
-                        value={product.sizes[size]}
-                        onChange={(e) => handleSizeChange(size, e.target.value)}
-                      />
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-
-            <Button type="submit" className="mt-6">
-              Add Product
+        <div className="mt-4 flex items-center justify-between">
+          <div>
+            Total Sales: {salesData.totalSalesCount} | Total Amount: ₹
+            {salesData.totalOrderAmount.toFixed(2)} | Total Discount: ₹
+            {salesData.totalDiscount.toFixed(2)}
+          </div>
+          <div className="flex gap-2">
+            <Button
+              variant="outline"
+              onClick={() => handlePageChange(currentPage - 1)}
+              disabled={currentPage === 1}
+            >
+              <ChevronLeft className="h-4 w-4" />
+              Previous
+            </Button>
+            <span className="flex items-center">
+              Page {currentPage} of {salesData.totalPage}
+            </span>
+            <Button
+              variant="outline"
+              onClick={() => handlePageChange(currentPage + 1)}
+              disabled={currentPage === salesData.totalPage}
+            >
+              Next
+              <ChevronRight className="h-4 w-4" />
             </Button>
           </div>
-        </form>
-
-        {/* Cropping Modal */}
-        {image && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4">
-            <Card className="w-full max-w-lg">
-              <CardHeader>
-                <CardTitle className="text-2xl font-bold">Crop Image</CardTitle>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="absolute right-2 top-2"
-                  onClick={() => setImage(null)}
-                >
-                  <X className="h-4 w-4" />
-                </Button>
-              </CardHeader>
-              <CardContent>
-                <div className="aspect-square relative">
-                  <Cropper
-                    image={image}
-                    crop={crop}
-                    zoom={zoom}
-                    aspect={2 / 3}
-                    onCropChange={setCrop}
-                    onZoomChange={setZoom}
-                    onCropComplete={onCropComplete}
-                  />
-                </div>
-                <div className="mt-4 space-y-2">
-                  <Label htmlFor="zoom">Zoom</Label>
-                  <Slider
-                    id="zoom"
-                    min={1}
-                    max={3}
-                    step={0.1}
-                    value={[zoom]}
-                    onValueChange={(value) => setZoom(value[0])}
-                  />
-                </div>
-                <Button onClick={saveCroppedImage} className="mt-4 w-full">
-                  <Save className="h-4 w-4 mr-2" />
-                  Save Cropped Image
-                </Button>
-              </CardContent>
-            </Card>
-          </div>
-        )}
-      </main>
+        </div>
+      </div>
     </div>
   );
 }

@@ -8,6 +8,7 @@ const productController = require('../controller/Admin/productController')
 const orderController = require('../controller/Admin/orderController');
 const offerController = require('../controller/Admin/offerController')
 const couponController = require('../controller/Admin/couponController')
+const salesController = require('../controller/Admin/salesController')
 
 
 //Admin login and Signup route..
@@ -50,6 +51,11 @@ router.get('/getCategories', offerController.getCategoriesForOffer);
 router.post('/coupon', couponController.addCoupon);
 router.delete('/deleteCoupon/:id', couponController.deleteCoupon);
 router.get('/getCoupon', couponController.getAllCoupons);
+
+
+router.get('/report', salesController.getSalesReport)
+router.get('/download/report/pdf', salesController.download_sales_report_pdf)
+router.get('/download/report/xl', salesController.download_sales_report_xl)
 
 
 
