@@ -54,7 +54,7 @@ const CartItem = ({ item, onUpdateQuantity, onRemove }) => {
                       : 0)) /
                     100) *
                 item.quantity
-              ).toFixed(2)}
+              ).toFixed()}
             </p>
             <div className="flex items-center mt-2 space-x-2">
               <Button
@@ -176,12 +176,12 @@ export default function ShoppingCart() {
               <CardContent>
                 <div className="flex justify-between mb-2">
                   <span className="text-muted-foreground">Subtotal</span>
-                  <span>₹{subtotal.toFixed(2)}</span>
+                  <span>₹{subtotal.toFixed()}</span>
                 </div>
                 <Separator className="my-4" />
                 <div className="flex justify-between text-lg font-bold">
                   <span>Total</span>
-                  <span>₹{subtotal.toFixed(2)}</span>
+                  <span>₹{subtotal.toFixed()}</span>
                 </div>
               </CardContent>
               <CardFooter>

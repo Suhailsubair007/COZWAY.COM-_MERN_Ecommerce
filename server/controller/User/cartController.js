@@ -33,7 +33,7 @@ const addToCart = async (req, res) => {
                 existingProduct.totalProductPrice += totalProductPrice;
             } else {
 
-                cart.products.push({ ...product, discount, totalProductPrice });
+                cart.products.push({ ...product, totalProductPrice });
             }
 
             cart.totalCartPrice = cart.products.reduce((acc, item) => acc + item.totalProductPrice, 0);

@@ -4,12 +4,16 @@ const applyCoupon = async (req, res) => {
     try {
         const { code, userId, subtotal } = req.body;
 
+        console.log( code);
+        console.log( userId);
+        console.log( subtotal);
+
         console.log("sub total coupon -->", subtotal)
         const coupon = await Coupon.findOne({ code: code.toUpperCase() });
 
         if (!coupon) {
             return res.status(404).json({
-                message: "Coupon not found"
+                message: "Coupon not found"  
             });
         }
 

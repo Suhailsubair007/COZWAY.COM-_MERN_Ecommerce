@@ -9,14 +9,15 @@ import { useSelector } from "react-redux";
 import axiosInstance from "@/config/axiosConfig";
 import AddAddressModal from "./AddNewAddress";
 import paypal from "../../assets/image/pay.png";
-import { Banknote, Wallet } from "lucide-react";
+import { Banknote, Wallet, X } from "lucide-react";
 import { toast } from "sonner";
 import OrderConfirmationModal from "./OrderConfirmModal";
 import RazorpayX from "./Payment/Razorpay";
 
 export default function CheckoutPage() {
   const [addresses, setAddresses] = useState([]);
-  const [x,setX] = useState(0);
+  const [subtotal, setSubtotal] = useState(0);
+  const [total, setTotal] = useState(0);
   const [showConfirmation, setShowConfirmation] = useState(false);
   const [placedOrder, setPlacedOrder] = useState(null);
   const [items, setItems] = useState([]);
@@ -24,13 +25,20 @@ export default function CheckoutPage() {
   const [selectedAddress, setSelectedAddress] = useState("");
   const [couponCode, setCouponCode] = useState("");
   const [appliedCoupon, setAppliedCoupon] = useState(null);
+  const [couponDiscount, setCouponDiscount] = useState(0);
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState("");
   const user = useSelector((state) => state.user.userInfo);
+
+  const shipping = 0;
 
   useEffect(() => {
     fetchAddresses();
     fetchItems();
   }, [user]);
+
+  useEffect(() => {
+    setTotal(subtotal - couponDiscount + shipping);
+  }, [subtotal, couponDiscount, shipping]);
 
   const fetchAddresses = async () => {
     try {
@@ -46,14 +54,12 @@ export default function CheckoutPage() {
     try {
       const response = await axiosInstance.get(`/users/items/${user.id}`);
       setItems(response.data.products);
-      setX(response.data.totalCartPrice)
-      console.log("reponce-->", response.data);
+      setSubtotal(response.data.totalCartPrice);
     } catch (error) {
       console.error("Error fetching items:", error);
       toast.error("Failed to fetch cart items");
     }
   };
-  console.log(x)
 
   const handleAddAddress = (newAddress) => {
     setAddresses([...addresses, newAddress]);
@@ -69,8 +75,7 @@ export default function CheckoutPage() {
       (acc, item) => acc + item.offerPrice * item.quantity,
       0
     );
-    const discountPrice = totalOriginalPrice - totalDiscountedPrice;
-    return discountPrice + (appliedCoupon ? couponDiscount : 0);
+    return totalOriginalPrice - totalDiscountedPrice + couponDiscount;
   };
 
   const calculateTotalSavings = () => {
@@ -81,13 +86,6 @@ export default function CheckoutPage() {
     }, 0);
   };
 
-  const subtotal = items.reduce(
-    (acc, item) => acc + item.offerPrice * item.quantity,
-    0
-  );
-  const shipping = 0;
-  const totalSavings = calculateTotalSavings();
-
   const applyCoupon = async () => {
     try {
       const response = await axiosInstance.post("/users/coupon/apply", {
@@ -96,6 +94,7 @@ export default function CheckoutPage() {
         subtotal,
       });
       setAppliedCoupon(response.data.coupon);
+      setCouponDiscount(response.data.discountAmount);
       toast.success("Coupon applied successfully!");
     } catch (error) {
       console.error("Error applying coupon:", error);
@@ -105,32 +104,10 @@ export default function CheckoutPage() {
 
   const removeCoupon = () => {
     setAppliedCoupon(null);
+    setCouponDiscount(0);
     setCouponCode("");
     toast.success("Coupon removed successfully!");
   };
-
-  const calculateDiscountedTotal = () => {
-    if (!appliedCoupon) return subtotal;
-
-    let discountAmount = 0;
-    if (appliedCoupon.discount_type === "percentage") {
-      discountAmount = subtotal * (appliedCoupon.discount_value / 100);
-    } else {
-      discountAmount = appliedCoupon.discount_value;
-    }
-
-    if (appliedCoupon.max_discount_amount) {
-      discountAmount = Math.min(
-        discountAmount,
-        appliedCoupon.max_discount_amount
-      );
-    }
-
-    return Math.max(subtotal - discountAmount, 0);
-  };
-
-  const total = calculateDiscountedTotal() + shipping;
-  const couponDiscount = subtotal - calculateDiscountedTotal();
 
   const handlePlaceOrder = async () => {
     if (!selectedAddress || !selectedPaymentMethod) {
@@ -150,18 +127,17 @@ export default function CheckoutPage() {
     }
 
     try {
-      console.log("in handle place order================");
       const response = await axiosInstance.post(`/users/order/`, {
         userId: user.id,
         order_items: items,
         address: addressToSend,
         payment_method: selectedPaymentMethod,
         subtotal,
-        total_discount: calculateTotalDiscountPercentage() || 0,
-        coupon_discount: couponDiscount || 0,
-        total_price_with_discount: total || 0,
-        shipping_fee: shipping || 0,
-        coupon: appliedCoupon?.code || 0,
+        total_discount: calculateTotalDiscountPercentage(),
+        coupon_discount: couponDiscount,
+        total_price_with_discount: total,
+        shipping_fee: shipping,
+        coupon: appliedCoupon?.code || null,
       });
 
       setPlacedOrder(response.data.order);
@@ -280,12 +256,23 @@ export default function CheckoutPage() {
                     Quantity: {item.quantity}
                   </p>
                   <div className="text-sm text-green-600 font-medium">
-                    {item.discount.toFixed(2)}% OFF
+                    {item.discount.toFixed()}% OFF
                   </div>
                 </div>
                 <div className="text-right">
                   <p className="line-through text-gray-500">₹{item.price}</p>
-                  <p className="font-semibold">₹{item.offerPrice}</p>
+                  <p className="font-semibold">
+                    ₹
+                    {(
+                      (item.offerPrice -
+                        (item.offerPrice *
+                          (item?.productId?.offer?.offer_value
+                            ? item?.productId?.offer?.offer_value
+                            : 0)) /
+                          100) *
+                      item.quantity
+                    ).toFixed(2)}
+                  </p>
                   <p className="text-sm text-gray-600">
                     Total: ₹{item.totalProductPrice}
                   </p>
@@ -298,12 +285,7 @@ export default function CheckoutPage() {
           <div className="space-y-2 text-sm">
             <div className="flex justify-between">
               <span className="text-gray-600">Subtotal:</span>
-              <span>
-                ₹
-                {items
-                  .reduce((acc, item) => acc + item.totalProductPrice, 0)
-                  .toFixed(2)}
-              </span>
+              <span>₹{subtotal.toFixed(2)}</span>
             </div>
             <div className="flex justify-between">
               <span className="text-gray-600">Shipping:</span>
@@ -311,7 +293,7 @@ export default function CheckoutPage() {
             </div>
             <div className="flex justify-between text-green-600 font-medium">
               <span>Product Savings:</span>
-              <span>₹{totalSavings.toFixed(2)}</span>
+              <span>₹{calculateTotalSavings().toFixed(2)}</span>
             </div>
             {appliedCoupon && (
               <div className="flex justify-between text-green-600 font-medium">
@@ -323,7 +305,7 @@ export default function CheckoutPage() {
           <Separator className="my-4" />
           <div className="flex justify-between text-lg font-semibold mb-6">
             <span>Total:</span>
-            <span>₹{x.toFixed(2)}</span>
+            {total.toFixed(2)}
           </div>
 
           <div className="flex space-x-2 mb-6">
