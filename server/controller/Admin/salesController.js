@@ -119,30 +119,19 @@ const download_sales_report_pdf = async (req, res) => {
             pdfDoc.text(`Report ${index + 1}:`).moveDown(0.5);
 
             pdfDoc.fontSize(10).font("Helvetica");
-            pdfDoc.text(
-                `Order Date: ${new Date(report.placed_at).toLocaleDateString()}`
-            );
+            pdfDoc.text(`Order Date: ${new Date(report.placed_at).toLocaleDateString()}`);
             pdfDoc.text(`Customer Name: ${report.userId.name}`);
             pdfDoc.text(`Payment Method: ${report.payment_method}`);
             pdfDoc.text(`Delivery Status: ${report.order_status}`).moveDown(0.5);
 
             const table = {
                 title: "Product Details",
-                headers: [
-                    "Product Name",
-                    "Quantity",
-                    "Unit Price (RS)",
-                    "Total Price (RS)",
-                    "Discount (RS)",
-                    "Coupon (RS)",
-                ],
+                headers: ["Product Name", "Quantity", "Unit Price (RS)", "Total Price (RS)"],
                 rows: report.order_items.map((p) => [
                     p.product.name,
                     p.quantity.toString(),
                     p.price.toFixed(2),
                     p.totalProductPrice.toFixed(2),
-                    report.coupon_discount.toFixed(2),
-                    report.total_discount.toFixed(2),
                 ]),
             };
 
@@ -150,19 +139,26 @@ const download_sales_report_pdf = async (req, res) => {
                 await pdfDoc.table(table, {
                     prepareHeader: () => pdfDoc.font("Helvetica-Bold").fontSize(8),
                     prepareRow: (row, i) => pdfDoc.font("Helvetica").fontSize(8),
-                    width: 500,
-                    columnsSize: [140, 50, 70, 70, 70, 70],
+                    width: 400,
+                    columnsSize: [200, 70, 70, 70],
+                    padding: 5,
+                    align: 'center',
+                    borderWidth: 0.5,
+                    rowOptions: { borderColor: '#cccccc' },
+                    header: { fillColor: '#f2f2f2', textColor: '#333333' }
                 });
+
             } catch (error) {
                 console.error("Error generating table:", error);
             }
 
             pdfDoc.moveDown(0.5);
-            pdfDoc
-                .font("Helvetica-Bold")
-                .fontSize(10)
-                .text(`Final Amount: RS. ${report.total_price_with_discount.toFixed(2)}`);
-            pdfDoc.moveDown();
+            pdfDoc.font("Helvetica-Bold").fontSize(10)
+                .text(`Final coupon discount: RS. ${(report.coupon_discount).toFixed(2)}`)
+                .text(`Final discount: RS. ${(report.total_discount).toFixed(2)}`)
+                .text(`Final Amount: RS. ${(report.total_price_with_discount).toFixed(2)}`);
+
+            if (index < reports.length - 1) pdfDoc.moveDown();
         }
 
         pdfDoc.end();
@@ -171,6 +167,8 @@ const download_sales_report_pdf = async (req, res) => {
         res.status(500).send("Error generating sales report PDF");
     }
 };
+
+
 
 
 const download_sales_report_xl = async (req, res) => {

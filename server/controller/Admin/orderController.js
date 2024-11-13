@@ -8,9 +8,13 @@ const getAllOrders = async (req, res) => {
         const totalOrders = await Order.countDocuments({});
         const totalPages = Math.ceil(totalOrders / limit);
         const orders = await Order.find({})
-            .populate('userId').
-            skip(skip).
-            limit(limit);
+            .populate('userId')
+            .sort({
+                placed_at
+                    : -1
+            })
+            .skip(skip)
+            .limit(limit);
         console.log("Orders:", orders);
         res.status(200).json({ orders, totalPages });
     } catch (error) {

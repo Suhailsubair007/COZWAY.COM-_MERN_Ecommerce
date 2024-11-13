@@ -40,8 +40,8 @@ import {
 import { toast } from "sonner";
 
 export default function OrderManagement() {
+
   const [orders, setOrders] = useState([]);
-  const [searchTerm, setSearchTerm] = useState("");
   const [orderToCancel, setOrderToCancel] = useState(null);
   const [isCancelDialogOpen, setIsCancelDialogOpen] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
@@ -70,7 +70,6 @@ export default function OrderManagement() {
   };
 
   const handleStatusChange = async (orderId, newStatus, currentStatus) => {
-    // Prevent changing status to a previous state
     const statusOrder = ["pending", "shipped", "delivered", "cancelled"];
     const currentIndex = statusOrder.indexOf(currentStatus.toLowerCase());
     const newIndex = statusOrder.indexOf(newStatus);
@@ -115,12 +114,7 @@ export default function OrderManagement() {
     setIsCancelDialogOpen(false);
   };
 
-  const filteredOrders = orders.filter(
-    (order) =>
-      order.order_id.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      order.userId.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      order.userId.email.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+
 
   const getAvailableStatuses = (currentStatus) => {
     const statusOrder = ["pending", "shipped", "delivered", "cancelled"];
@@ -145,15 +139,6 @@ export default function OrderManagement() {
       </nav>
       <h1 className="text-2xl font-bold mb-6">Orders Management</h1>
 
-      <div className="mb-6">
-        <Input
-          placeholder="Search orders by ID, customer name, or email..."
-          className="max-w-xl w-full"
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-        />
-      </div>
-
       <div className="rounded-md border overflow-x-auto">
         <Table>
           <TableHeader>
@@ -167,7 +152,7 @@ export default function OrderManagement() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {filteredOrders.map((order) => (
+            {orders.map((order) => (
               <TableRow key={order._id}>
                 <TableCell className="font-medium">
                   <div className="flex items-center gap-2">
@@ -186,7 +171,9 @@ export default function OrderManagement() {
                 <TableCell className="hidden sm:table-cell">
                   {new Date(order.placed_at).toLocaleDateString()}
                 </TableCell>
-                <TableCell>{order.total_amount}</TableCell>
+                <TableCell>
+                  {order.total_price_with_discount.toFixed(2)}
+                </TableCell>
                 <TableCell>
                   <Select
                     value={order.order_status.toLowerCase()}

@@ -23,8 +23,7 @@ const orderSchema = new mongoose.Schema({
             },
             quantity: {
                 type: Number,
-                required: true,
-                min: [1, "Quantity minimum is 1"],
+                required: true
             },
             price: {
                 type: Number,

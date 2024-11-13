@@ -42,7 +42,7 @@ export default function SalesReport() {
       const response = await axiosInstance.get(
         `/admin/report?period=${activeTab}&page=${page}&limit=5&startDate=${startDate}&endDate=${endDate}`
       );
-      console.log(response.data);
+      console.log("data------>",response.data);
       setSalesData(response.data);
     } catch (error) {
       console.error("Error fetching sales report:", error);
@@ -163,7 +163,7 @@ export default function SalesReport() {
             </TableHeader>
             <TableBody>
               {salesData &&
-                salesData?.salesReport.map((sale, index) => (
+                salesData?.salesReport.map((sale) => (
                   <TableRow key={sale._id}>
                     <TableCell>{sale.userId.name}</TableCell>
                     <TableCell>{sale.placed_at}</TableCell>

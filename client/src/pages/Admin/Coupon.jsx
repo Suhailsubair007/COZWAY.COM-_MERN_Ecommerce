@@ -1,6 +1,6 @@
-import { useEffect, useState } from "react";
-import { Plus, Trash2, Link2 } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { useEffect, useState } from "react"
+import { Plus, Trash2 } from 'lucide-react'
+import { Button } from "@/components/ui/button"
 import {
   Table,
   TableBody,
@@ -8,38 +8,54 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table";
-import AdminCouponModal from "@/ReuseComponets/Admin/AdminCouponModal";
-import axiosInstance from "@/config/axiosConfig";
+} from "@/components/ui/table"
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog"
+import AdminCouponModal from "@/ReuseComponets/Admin/AdminCouponModal"
+import axiosInstance from "@/config/axiosConfig"
 
 export default function Coupon() {
-  const [isOpen, setIsOpen] = useState(false);
-  const [coupons, setCoupons] = useState([]);
+  const [isOpen, setIsOpen] = useState(false)
+  const [coupons, setCoupons] = useState([])
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
+  const [couponToDelete, setCouponToDelete] = useState(null)
 
   useEffect(() => {
-    fetchCoupons();
-  }, []);
+    fetchCoupons()
+  }, [])
 
   const fetchCoupons = async () => {
     try {
-      const responce = await axiosInstance.get("/admin/getCoupon");
-      console.log("dataaa--->", responce.data);
-      setCoupons(responce.data.coupons);
+      const response = await axiosInstance.get("/admin/getCoupon")
+      console.log("dataaa--->", response.data)
+      setCoupons(response.data.coupons)
     } catch (error) {
-      console.error(error);
+      console.error(error)
     }
-  };
+  }
 
-  const handleDelete = async (id) => {
+  const handleDelete = (couponId) => {
+    setCouponToDelete(couponId)
+    setIsDeleteDialogOpen(true)
+  }
+
+  const confirmDelete = async () => {
     try {
-      console.log("id------->",id);
-      console.log("================")
-      await axiosInstance.delete(`/admin/deleteCoupon/${id}`);
-      fetchCoupons();
+      await axiosInstance.delete(`/admin/deleteCoupon/${couponToDelete}`)
+      fetchCoupons()
+      setIsDeleteDialogOpen(false)
     } catch (error) {
-      console.log(error);
+      console.log(error)
     }
-  };
+  }
 
   return (
     <div className="container mx-auto py-10 px-4 sm:px-6 lg:px-8 h-screen">
@@ -91,7 +107,35 @@ export default function Coupon() {
         </Table>
       </div>
 
-      <AdminCouponModal isOpen={isOpen} onClose={() => setIsOpen(false)} onCouponAdded={fetchCoupons} />
+      <AdminCouponModal
+        isOpen={isOpen}
+        onClose={() => setIsOpen(false)}
+        onCouponAdded={fetchCoupons}
+      />
+
+      <AlertDialog
+        open={isDeleteDialogOpen}
+        onOpenChange={setIsDeleteDialogOpen}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>
+              Are you sure you want to delete this coupon?
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              This action cannot be undone. This coupon will be permanently deleted from the system.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={() => setIsDeleteDialogOpen(false)}>
+              Cancel
+            </AlertDialogCancel>
+            <AlertDialogAction onClick={confirmDelete}>
+              Delete Coupon
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
-  );
+  )
 }

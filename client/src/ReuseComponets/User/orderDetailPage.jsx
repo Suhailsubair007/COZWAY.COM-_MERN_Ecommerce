@@ -8,6 +8,7 @@ import {
   CreditCard,
   FileText,
   Truck,
+  Undo2,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
@@ -189,7 +190,7 @@ export default function OrderDetail() {
             <div className="text-sm space-y-2">
               <div className="flex justify-between text-muted-foreground">
                 <span>Items Total</span>
-                <span>₹{orderData.total_amount.toFixed(2)}</span>
+                <span>₹{orderData.total_price_with_discount.toFixed(2)}</span>
               </div>
               <div className="flex justify-between text-muted-foreground">
                 <span>Shipping Charge</span>
@@ -240,22 +241,29 @@ export default function OrderDetail() {
         </div>
       </ScrollArea>
 
-      {/* Cancel Order Button */}
       <div className="flex justify-end mt-8">
-        <Button
-          variant="destructive"
-          onClick={handleCancel}
-          disabled={
-            orderData.order_status === "cancelled" ||
-            orderData.order_status === "delivered"
-          }
-        >
-          {orderData.order_status === "cancelled"
-            ? "Order Cancelled"
-            : orderData.order_status === "delivered"
-            ? "Order Delivered"
-            : "Cancel Order"}
-        </Button>
+        {orderData.order_status === "cancelled" ? (
+          <Button
+            variant="default"
+            className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg flex items-center space-x-2"
+          >
+            <Undo2 className="w-5 h-5" />
+            <span>Return Order</span>
+          </Button>
+        ) : (
+          <Button
+            variant="destructive"
+            onClick={handleCancel}
+            disabled={
+              orderData.order_status === "cancelled" ||
+              orderData.order_status === "delivered"
+            }
+          >
+            {orderData.order_status === "delivered"
+              ? "Order Delivered"
+              : "Cancel Order"}
+          </Button>
+        )}
       </div>
 
       {/* Cancel Dialog */}

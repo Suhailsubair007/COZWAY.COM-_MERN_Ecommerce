@@ -4,16 +4,24 @@ const applyCoupon = async (req, res) => {
     try {
         const { code, userId, subtotal } = req.body;
 
-        console.log( code);
-        console.log( userId);
-        console.log( subtotal);
+        console.log(code);
+        console.log(userId);
+        console.log(subtotal);
 
         console.log("sub total coupon -->", subtotal)
         const coupon = await Coupon.findOne({ code: code.toUpperCase() });
 
         if (!coupon) {
             return res.status(404).json({
-                message: "Coupon not found"  
+                message: "Coupon not found"
+            });
+        }
+
+        const userUsage = coupon.users_applied.find(u => u.user.toString() === userId);
+
+        if (userUsage && coupon.usage_limit && userUsage.used_count >= coupon.usage_limit) {
+            return res.status(400).json({
+                message: "Coupon usage limit reached for this user"
             });
         }
 
@@ -30,18 +38,16 @@ const applyCoupon = async (req, res) => {
             });
         }
 
-        const userUsage = coupon.users_applied.find(u => u.user.toString() === userId);
 
-        if (userUsage && coupon.usage_limit && userUsage.used_count >= coupon.usage_limit) {
-            return res.status(400).json({
-                message: "Coupon usage limit reached for this user"
-            });
-        }
+
+
 
 
         let discountAmount;
         if (coupon.discount_type === "percentage") {
             discountAmount = Math.ceil((subtotal * coupon.discount_value) / 100);
+            console.log("dicount amount---------------->", discountAmount)
+            console.log("max dicount amount------------->", coupon.max_discount_amount)
             if (coupon.max_discount_amount) {
                 discountAmount = Math.min(discountAmount, coupon.max_discount_amount);
             }
@@ -65,7 +71,7 @@ const applyCoupon = async (req, res) => {
             message: "Server error", error: error.message
         });
     }
-} ;
+};
 
 const getCoupens = async (req, res) => {
     try {

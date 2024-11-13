@@ -60,28 +60,42 @@ export default function CheckoutPage() {
       toast.error("Failed to fetch cart items");
     }
   };
-
+  // console.log("items-------------------->", items);
   const handleAddAddress = (newAddress) => {
     setAddresses([...addresses, newAddress]);
     setIsAddModalOpen(false);
   };
 
-  const calculateTotalDiscountPercentage = () => {
+  const calculateTotalDiscountPrice = () => {
     const totalOriginalPrice = items.reduce(
       (acc, item) => acc + item.price * item.quantity,
       0
     );
     const totalDiscountedPrice = items.reduce(
-      (acc, item) => acc + item.offerPrice * item.quantity,
+      (acc, item) =>
+        acc +
+        (item.offerPrice -
+          (item.offerPrice *
+            (item?.productId?.offer?.offer_value
+              ? item?.productId?.offer?.offer_value
+              : 0)) /
+            100) *
+          item.quantity,
       0
     );
     return totalOriginalPrice - totalDiscountedPrice + couponDiscount;
   };
-
   const calculateTotalSavings = () => {
     return items.reduce((acc, item) => {
       const originalTotal = item.price * item.quantity;
-      const discountedTotal = item.offerPrice * item.quantity;
+      const discountedTotal =
+        (item.offerPrice -
+          (item.offerPrice *
+            (item?.productId?.offer?.offer_value
+              ? item?.productId?.offer?.offer_value
+              : 0)) /
+            100) *
+        item.quantity;
       return acc + (originalTotal - discountedTotal);
     }, 0);
   };
@@ -133,7 +147,7 @@ export default function CheckoutPage() {
         address: addressToSend,
         payment_method: selectedPaymentMethod,
         subtotal,
-        total_discount: calculateTotalDiscountPercentage(),
+        total_discount: calculateTotalDiscountPrice(),
         coupon_discount: couponDiscount,
         total_price_with_discount: total,
         shipping_fee: shipping,
@@ -271,10 +285,10 @@ export default function CheckoutPage() {
                             : 0)) /
                           100) *
                       item.quantity
-                    ).toFixed()}
+                    ).toFixed(2)}
                   </p>
                   <p className="text-sm text-gray-600">
-                    Total: ₹{item.totalProductPrice}
+                    Total: ₹{item.totalProductPrice.toFixed(2)}
                   </p>
                 </div>
               </div>
@@ -305,7 +319,7 @@ export default function CheckoutPage() {
           <Separator className="my-4" />
           <div className="flex justify-between text-lg font-semibold mb-6">
             <span>Total:</span>
-            {total.toFixed()}
+            {total.toFixed(2)}
           </div>
 
           <div className="flex space-x-2 mb-6">

@@ -110,12 +110,7 @@ export default function Component() {
         <main className="flex-1 p-6">
           <h2 className="text-xl font-semibold mb-6">Product Management</h2>
           <div className="flex items-center justify-between mb-6">
-            <input
-              type="text"
-              placeholder="Search product..."
-              className="border border-gray-300 rounded-lg p-2 text-sm w-full lg:w-1/2"
-              onChange={(e) => {/* Implement search functionality */}}
-            />
+           
             <Button
               className="ml-4 bg-black text-white font-semibold py-2 px-4 rounded-lg hover:bg-blue-700"
               onClick={handleAddNewProduct}

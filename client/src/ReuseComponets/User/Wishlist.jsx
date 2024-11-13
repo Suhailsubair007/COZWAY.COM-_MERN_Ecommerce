@@ -1,100 +1,100 @@
-import { ShoppingCart, Trash2 } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { useEffect, useState } from "react"
-import axiosInstance from "@/config/axiosConfig"
-import { useSelector } from "react-redux"
-import EmptyWishlist from "./EmptyWishlist"
+import { ShoppingCart, Trash2 } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { useEffect, useState } from "react";
+import axiosInstance from "@/config/axiosConfig";
+import { useSelector } from "react-redux";
+import EmptyWishlist from "./EmptyWishlist";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select"
-import { toast } from "sonner"
+} from "@/components/ui/select";
+import { toast } from "sonner";
 
 export default function Wishlist() {
-  const [wishlist, setWishlist] = useState([])
-  const [selectedSizes, setSelectedSizes] = useState({})
-  const userId = useSelector((state) => state.user.userInfo.id)
+  const [wishlist, setWishlist] = useState([]);
+  const [selectedSizes, setSelectedSizes] = useState({});
+  const userId = useSelector((state) => state.user.userInfo.id);
 
   useEffect(() => {
-    fetchItems()
-  }, [])
+    fetchItems();
+  }, []);
 
   const handleRemove = async (id) => {
     try {
       const response = await axiosInstance.post("/users/wishlist/remove", {
         userId,
         id,
-      })
+      });
       if (response.status === 200) {
-        fetchItems()
-        toast.success("Item removed from your wishlist!")
+        fetchItems();
+        toast.success("Item removed from your wishlist!");
       }
     } catch (error) {
-      console.error("Error removing from wishlist:", error)
-      toast.error("Failed to remove item from wishlist. Please try again.")
+      console.error("Error removing from wishlist:", error);
+      toast.error("Failed to remove item from wishlist. Please try again.");
     }
-  }
+  };
 
   const fetchItems = async () => {
     try {
-      const response = await axiosInstance.get(`/users/wishlist/${userId}`)
-      console.log("Fetched data================>:", response.data)
+      const response = await axiosInstance.get(`/users/wishlist/${userId}`);
+      console.log("Fetched data================>:", response.data);
 
       if (response.data.success) {
-        setWishlist(response.data.wishlistItems)
+        setWishlist(response.data.wishlistItems);
         // Initialize selected sizes
-        const initialSizes = {}
+        const initialSizes = {};
         response.data.wishlistItems.forEach((item) => {
-          initialSizes[item.product._id] = item.product.sizes[0]?.size || ""
-        })
-        setSelectedSizes(initialSizes)
+          initialSizes[item.product?._id] = item.product.sizes[0]?.size || "";
+        });
+        setSelectedSizes(initialSizes);
       }
     } catch (error) {
-      console.error("Error fetching wishlist items:", error)
-      toast.error("Failed to fetch wishlist items. Please try again.")
+      console.error("Error fetching wishlist items:", error);
+      toast.error("Failed to fetch wishlist items. Please try again.");
     }
-  }
+  };
 
   const handleSizeChange = (productId, size) => {
-    setSelectedSizes((prev) => ({ ...prev, [productId]: size }))
-  }
+    setSelectedSizes((prev) => ({ ...prev, [productId]: size }));
+  };
 
   const handleAddToCart = async (item) => {
-    const selectedSize = selectedSizes[item.product._id]
+    const selectedSize = selectedSizes[item.product?._id];
     if (!selectedSize) {
-      toast.error("Please select a size before adding to cart.")
-      return
+      toast.error("Please select a size before adding to cart.");
+      return;
     }
 
     try {
       const response = await axiosInstance.post("/users/movetocart", {
         userId,
-        productId: item.product._id,
+        productId: item.product?._id,
         size: selectedSize,
-      })
+      });
 
       if (response.data.success) {
         toast.success(
           `Added ${item.product.name} (Size: ${selectedSize}) to cart!`
-        )
-        fetchItems()
+        );
+        fetchItems();
       } else {
-        toast.error("Failed to add item to cart. Please try again.")
+        toast.error("Failed to add item to cart. Please try again.");
       }
     } catch (error) {
-      console.error("Error adding to cart:", error)
-      toast.error("Failed to add item to cart. Please try again.")
+      console.error("Error adding to cart:", error);
+      toast.error("Failed to add item to cart. Please try again.");
     }
-  }
+  };
 
   const isOutOfStock = (item) => {
-    const selectedSize = selectedSizes[item.product._id]
-    const sizeOption = item.product.sizes.find((s) => s.size === selectedSize)
-    return sizeOption?.stock === 0
-  }
+    const selectedSize = selectedSizes[item.product?._id];
+    const sizeOption = item.product.sizes.find((s) => s.size === selectedSize);
+    return sizeOption?.stock === 0;
+  };
 
   return (
     <div className="container mx-auto py-10 px-6 max-w-7xl">
@@ -108,7 +108,7 @@ export default function Wishlist() {
           <div className="space-y-6">
             {wishlist.map((item) => (
               <div
-                key={item._id}
+                key={item?._id}
                 className={`flex flex-col sm:flex-row items-start sm:items-center gap-4 border-b pb-6 ${
                   isOutOfStock(item) ? "opacity-50" : ""
                 }`}
@@ -141,9 +141,9 @@ export default function Wishlist() {
                     )}
                   </div>
                   <Select
-                    value={selectedSizes[item.product._id]}
+                    value={selectedSizes[item.product?._id]}
                     onValueChange={(value) =>
-                      handleSizeChange(item.product._id, value)
+                      handleSizeChange(item.product?._id, value)
                     }
                   >
                     <SelectTrigger className="w-[100px]">
@@ -152,7 +152,7 @@ export default function Wishlist() {
                     <SelectContent>
                       {item.product.sizes.map((sizeOption) => (
                         <SelectItem
-                          key={sizeOption._id}
+                          key={sizeOption?._id}
                           value={sizeOption.size}
                           disabled={sizeOption.stock === 0}
                         >
@@ -170,7 +170,7 @@ export default function Wishlist() {
                 </div>
                 <div className="w-full sm:w-[180px] space-y-2">
                   <Button
-                    onClick={() => handleRemove(item.product._id)}
+                    onClick={() => handleRemove(item.product?._id)}
                     variant="destructive"
                     className="w-full flex items-center justify-center gap-2"
                   >
@@ -192,5 +192,5 @@ export default function Wishlist() {
         </>
       )}
     </div>
-  )
+  );
 }
