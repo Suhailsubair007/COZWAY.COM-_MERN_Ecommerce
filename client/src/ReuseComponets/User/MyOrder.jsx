@@ -1,8 +1,9 @@
 import { useNavigate } from "react-router-dom";
 import React, { useState, useEffect } from "react";
 import axiosInstance from "@/config/axiosConfig";
-import { House, ChevronRight } from "lucide-react";
+import { House, ChevronRight, Undo2 } from "lucide-react";
 import { useSelector } from "react-redux";
+import { Button } from "@/components/ui/button";
 import {
   Pagination,
   PaginationContent,
@@ -41,7 +42,7 @@ export default function Component() {
       const response = await axiosInstance.get(
         `/users/orders/${user}?page=${page}&limit=2`
       );
-      console.log("dataaaa=================>",response.data)
+      console.log("dataaaa=================>", response.data);
       setOrders(response.data.orders);
       setTotalPages(response.data.totalPages);
     } catch (error) {
@@ -99,11 +100,11 @@ export default function Component() {
       <div className="space-y-8">
         {orders.map((order) => (
           <div key={order._id} className="bg-white rounded-lg shadow-sm p-6">
-            <div className="flex justify-between items-center mb-4">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4">
               <h2 className="text-lg font-semibold text-gray-900">
                 Order ID: {order.order_id}
               </h2>
-              <p className="text-sm text-gray-600">
+              <p className="text-sm text-gray-600 mt-1 sm:mt-0">
                 Placed on: {new Date(order.placed_at).toLocaleDateString()}
               </p>
             </div>
@@ -111,9 +112,8 @@ export default function Component() {
               {order.order_items.map((item) => (
                 <div
                   key={item._id}
-                  className="flex items-center gap-6 border-b pb-4 last:border-b-0 last:pb-0"
+                  className="flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-6 border-b pb-4 last:border-b-0 last:pb-0"
                 >
-                  {/* Product Image */}
                   <div className="shrink-0">
                     <img
                       src={item.product.images[0]}
@@ -123,8 +123,6 @@ export default function Component() {
                       className="rounded-lg border object-cover"
                     />
                   </div>
-
-                  {/* Product Details */}
                   <div className="flex-1 min-w-0">
                     <h3 className="text-sm font-medium text-gray-900">
                       {item.product.name}
@@ -134,16 +132,14 @@ export default function Component() {
                         Quantity: {item.quantity}
                       </p>
                       <p className="text-sm text-gray-500">
-                        Price: ₹{item.price.toFixed(2)}
+                        Price: ₹{item.price.toFixed(0)}
                       </p>
                       <p className="text-sm font-medium text-gray-900">
-                        Total: ₹{item.totalProductPrice.toFixed(2)}
+                        Total: ₹{item.totalProductPrice.toFixed(0)}
                       </p>
                     </div>
                   </div>
-
-                  {/* Status */}
-                  <div className="shrink-0 text-right">
+                  <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-4 mt-2 sm:mt-0">
                     <p
                       className={`text-sm font-medium ${getStatusColor(
                         order.order_status
@@ -151,11 +147,22 @@ export default function Component() {
                     >
                       {order.order_status}
                     </p>
+                    {order.order_status === "delivered" && (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handleReturnOrder(order._id)}
+                        className="flex items-center space-x-2"
+                      >
+                        <Undo2 className="w-4 h-4" />
+                        <span>Return Order</span>
+                      </Button>
+                    )}
                   </div>
                 </div>
               ))}
             </div>
-            <div className="mt-6 flex justify-between items-center">
+            <div className="mt-6 flex flex-col sm:flex-row justify-between items-start sm:items-center">
               <div>
                 <p className="text-lg font-medium text-gray-900">
                   Total Amount: ₹{order.total_price_with_discount.toFixed(2)}
@@ -167,24 +174,24 @@ export default function Component() {
                   Payment Status: {order.payment_status}
                 </p>
               </div>
-              <div className="space-x-3">
-                <button
+              <div className="space-x-3 mt-4 sm:mt-0">
+                <Button
+                  variant="default"
                   onClick={() => navigate(`/orders/${order._id}`)}
-                  className="inline-block px-4 py-2 bg-black text-white rounded hover:bg-gray-800 transition-colors"
                 >
                   View Details
-                </button>
+                </Button>
                 {order.order_items.some(
-                  (item) => item.order_status === "Pending"
+                  (item) => item.order_status === "pending"
                 ) && (
-                  <button
+                  <Button
+                    variant="destructive"
                     onClick={() => {
-                      // cali
+                      /* Implement cancel order logic */
                     }}
-                    className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 transition-colors"
                   >
                     Cancel Order
-                  </button>
+                  </Button>
                 )}
               </div>
             </div>

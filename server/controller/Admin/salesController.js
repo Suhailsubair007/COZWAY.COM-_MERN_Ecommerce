@@ -199,7 +199,7 @@ const download_sales_report_xl = async (req, res) => {
             const products = report.order_items.map((item) => ({
                 productName: item.product.name,
                 quantity: item.quantity,
-                unitPrice: item.price,
+                OrginaalUnitPrice: item.price,
                 totalPrice: item.totalProductPrice,
                 discount: report.total_discount,
                 couponDeduction: report.coupon_discount,

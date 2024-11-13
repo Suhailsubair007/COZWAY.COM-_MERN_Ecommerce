@@ -242,7 +242,7 @@ export default function OrderDetail() {
       </ScrollArea>
 
       <div className="flex justify-end mt-8">
-        {orderData.order_status === "cancelled" ? (
+        {orderData.order_status === "delivered" ? (
           <Button
             variant="default"
             className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg flex items-center space-x-2"
@@ -254,13 +254,11 @@ export default function OrderDetail() {
           <Button
             variant="destructive"
             onClick={handleCancel}
-            disabled={
-              orderData.order_status === "cancelled" ||
-              orderData.order_status === "delivered"
-            }
+            disabled={orderData.order_status === "cancelled"}
+            className="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-lg"
           >
-            {orderData.order_status === "delivered"
-              ? "Order Delivered"
+            {orderData.order_status === "cancelled"
+              ? "Order Cancelled"
               : "Cancel Order"}
           </Button>
         )}
