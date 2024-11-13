@@ -54,11 +54,7 @@ const getCartDetails = async (req, res) => {
     try {
         // console.log("vannuuu")
         const { userId, productId, size } = req.query;
-        // console.log(userId)
-        // console.log(productId)
-        // console.log(size);
         const cart = await Cart.findOne({ userId });
-        // console.log(cart)
 
         if (!cart) {
             return res.status(404).json({ message: "Cart not found" });

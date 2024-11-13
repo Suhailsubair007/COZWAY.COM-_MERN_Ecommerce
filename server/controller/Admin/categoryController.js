@@ -2,17 +2,16 @@
 const Category = require('../../model/Category');
 
 
-
 const addCategory = async (req, res) => {
     try {
         const { name, description } = req.body;
 
-
         const existingCategory = await Category.findOne({ name });
         if (existingCategory) {
-            return res.status(400).json({ error: 'Category with this name already exists' });
+            return res.status(400).json({
+                error: 'Category with this name already exists'
+            });
         }
-
 
         const newCategory = new Category({
             name,
@@ -21,13 +20,17 @@ const addCategory = async (req, res) => {
             createdAt: new Date(),
         });
 
-
         await newCategory.save();
 
-        res.status(201).json({ message: 'Category added successfully', category: newCategory });
+        res.status(201).json({
+            message: 'Category added successfully',
+            category: newCategory
+        });
     } catch (error) {
         console.error(error);
-        res.status(500).json({ error: 'Server error' });
+        res.status(500).json({
+            error: 'Server error'
+        });
     }
 };
 
@@ -35,10 +38,8 @@ const addCategory = async (req, res) => {
 const updateCategory = async (req, res) => {
     try {
         const { name, description } = req.body;
-        const {id} = req.params;
+        const { id } = req.params;
         // console.log(id);
-
-    
         const updatedCategory = await Category.findByIdAndUpdate(
             id,
             { name, description },
@@ -46,12 +47,19 @@ const updateCategory = async (req, res) => {
         );
 
         if (!updatedCategory) {
-            return res.status(404).json({ message: 'Category not found' });
+            return res.status(404).json({
+                message: 'Category not found'
+            });
         }
 
-        res.status(200).json({ message: 'Category updated successfully', category: updatedCategory });
+        res.status(200).json({
+            message: 'Category updated successfully',
+            category: updatedCategory
+        });
     } catch (error) {
-        res.status(500).json({ error: 'Server error' });
+        res.status(500).json({
+            error: 'Server error'
+        });
     }
 };
 
@@ -72,20 +80,23 @@ const getCategories = async (req, res) => {
 
 
 const fetchCategoryById = async (req, res) => {
-    const { categoryId } = req.params; 
+    const { categoryId } = req.params;
     // console.log(categoryId)
-
     try {
         const category = await Category.findById(categoryId);
 
         if (!category) {
-            return res.status(404).json({ message: 'Category not found' });
+            return res.status(404).json({
+                message: 'Category not found'
+            });
         }
 
         res.status(200).json(category);
     } catch (error) {
         console.error('Error fetching category:', error);
-        res.status(500).json({ message: 'Server error. Please try again later.' });
+        res.status(500).json({
+            message: 'Server error. Please try again later.'
+        });
     }
 };
 
@@ -102,13 +113,17 @@ const updateCategoryStatus = async (req, res) => {
         );
 
         if (!updatedCategory) {
-            return res.status(404).json({ message: 'Category not found' });
+            return res.status(404).json({
+                message: 'Category not found'
+            });
         }
 
         res.status(200).json(updatedCategory);
     } catch (error) {
         console.error(error);
-        res.status(500).json({ message: 'Error updating category status' });
+        res.status(500).json({
+            message: 'Error updating category status'
+        });
     }
 };
 

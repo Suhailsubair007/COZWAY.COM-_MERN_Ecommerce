@@ -271,7 +271,7 @@ export default function CheckoutPage() {
                             : 0)) /
                           100) *
                       item.quantity
-                    ).toFixed(2)}
+                    ).toFixed()}
                   </p>
                   <p className="text-sm text-gray-600">
                     Total: ₹{item.totalProductPrice}
@@ -285,11 +285,11 @@ export default function CheckoutPage() {
           <div className="space-y-2 text-sm">
             <div className="flex justify-between">
               <span className="text-gray-600">Subtotal:</span>
-              <span>₹{subtotal.toFixed(2)}</span>
+              <span>₹{subtotal.toFixed()}</span>
             </div>
             <div className="flex justify-between">
               <span className="text-gray-600">Shipping:</span>
-              <span>{shipping === 0 ? "Free" : `₹${shipping.toFixed(2)}`}</span>
+              <span>{shipping === 0 ? "Free" : `₹${shipping.toFixed()}`}</span>
             </div>
             <div className="flex justify-between text-green-600 font-medium">
               <span>Product Savings:</span>
@@ -298,14 +298,14 @@ export default function CheckoutPage() {
             {appliedCoupon && (
               <div className="flex justify-between text-green-600 font-medium">
                 <span>Coupon Discount:</span>
-                <span>₹{couponDiscount.toFixed(2)}</span>
+                <span>₹{couponDiscount.toFixed()}</span>
               </div>
             )}
           </div>
           <Separator className="my-4" />
           <div className="flex justify-between text-lg font-semibold mb-6">
             <span>Total:</span>
-            {total.toFixed(2)}
+            {total.toFixed()}
           </div>
 
           <div className="flex space-x-2 mb-6">

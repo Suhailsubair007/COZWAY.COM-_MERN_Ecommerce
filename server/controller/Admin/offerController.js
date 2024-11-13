@@ -1,9 +1,11 @@
 const Offer = require('../../model/Offer');
-const Product = require('../../model/Product');
 const Category = require('../../model/Category')
-const { applyCategoryOffer, applyProductOffer, removeCategoryOffer, removeProductOffer } = require('../../Helper/offerHelperFunctiions')
+const { applyCategoryOffer,
+    applyProductOffer,
+    removeCategoryOffer,
+    removeProductOffer } = require('../../Helper/offerHelperFunctiions')
 
-
+// Controller for get all the offers for 
 const getOffers = async (req, res) => {
     try {
         const offers = await Offer.find({});
@@ -26,6 +28,7 @@ const getOffers = async (req, res) => {
     }
 }
 
+//Add offer Contoller...
 const addOffer = async (req, res) => {
     try {
         const { name, value, target, targetId, targetName, endDate } = req.body;
@@ -35,8 +38,22 @@ const addOffer = async (req, res) => {
             target_id: targetId
         });
 
+        const existingName = await Offer.findOne({
+            name: name
+        })
+        if (existingName) {
+            return res.status(400).json({
+                success: false,
+                message: "An offer with this name already exists ."
+            });
+        }
+
+
         if (existingOffer) {
-            return res.status(400).json({ success: false, message: "An offer already exists for this product/category." });
+            return res.status(400).json({
+                success: false,
+                message: "An offer with this name already exists for this product/category."
+            });
         }
 
         const newOffer = await Offer.create({
@@ -54,13 +71,22 @@ const addOffer = async (req, res) => {
             await applyCategoryOffer(targetId, newOffer);
         }
 
-        res.status(201).json({ success: true, newOffer });
+        res.status(201).json({
+            success:
+                true,
+            newOffer
+        });
     } catch (err) {
         console.error(err);
-        return res.status(500).json({ success: false, message: "Server error" });
+        return res.status(500).json({
+            success: false,
+            message: "Server error"
+        });
     }
 };
 
+
+// Delete offer controller...
 const deleteOffer = async (req, res) => {
     try {
         const { offerId } = req.body;
@@ -94,7 +120,7 @@ const deleteOffer = async (req, res) => {
 
 
 
-//API for fetch the categories in the add category dropdown dynamically...
+//controllerfor fetch the categories in the add category dropdown dynamically...
 const getCategoriesForOffer = async (req, res) => {
     try {
         const categories = await Category.find({ is_active: true }, 'name');
@@ -106,4 +132,9 @@ const getCategoriesForOffer = async (req, res) => {
 };
 
 
-module.exports = { addOffer, deleteOffer, getOffers, getCategoriesForOffer };
+module.exports = {
+    addOffer,
+    deleteOffer,
+    getOffers,
+    getCategoriesForOffer
+};

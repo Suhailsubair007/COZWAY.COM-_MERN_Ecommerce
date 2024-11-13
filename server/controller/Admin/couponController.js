@@ -1,9 +1,18 @@
 const Coupon = require('../../model/coupun');
 
 
+//Add a new coupen discount....
 const addCoupon = async (req, res) => {
     try {
-        const { code, description, discount_type, discount_value, min_purchase_amount, max_discount_amount, expiration_date, usage_limit } = req.body;
+        const {
+            code,
+            description,
+            discount_type,
+            discount_value,
+            min_purchase_amount,
+            max_discount_amount,
+            expiration_date,
+            usage_limit } = req.body;
 
 
         const existingCoupon = await Coupon.findOne({ code: code.toUpperCase() });
@@ -40,7 +49,7 @@ const addCoupon = async (req, res) => {
 
 
 
-
+//To delete the ccoupen...
 const deleteCoupon = async (req, res) => {
 
     console.log("arrived.......")
@@ -68,7 +77,7 @@ const deleteCoupon = async (req, res) => {
     }
 };
 
-
+//To Display the coupens in table in the admin side...
 const getAllCoupons = async (req, res) => {
     try {
         const coupons = await Coupon.find();

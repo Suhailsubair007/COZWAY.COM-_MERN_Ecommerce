@@ -75,6 +75,7 @@ export default function SalesReport() {
         `/admin/download/report/pdf?period=${activeTab}&startDate=${startDate}&endDate=${endDate}`,
         { responseType: "blob" }
       );
+      console.log("data====>",response)
 
       const blob = new Blob([response.data], { type: "application/pdf" });
       saveAs(blob, "SalesReport.pdf");

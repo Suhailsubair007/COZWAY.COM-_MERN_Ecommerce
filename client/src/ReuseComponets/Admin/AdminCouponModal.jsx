@@ -16,6 +16,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { validateCouponForm } from "../../utils/Validations";
 
 export default function AdminCouponModal({ isOpen, onClose, onCouponAdded }) {
   const [formData, setFormData] = useState({
@@ -28,6 +29,7 @@ export default function AdminCouponModal({ isOpen, onClose, onCouponAdded }) {
     expiration_date: "",
     usage_limit: "",
   });
+  const [errors, setErrors] = useState({});
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -47,13 +49,18 @@ export default function AdminCouponModal({ isOpen, onClose, onCouponAdded }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    try {
-      const response = await axiosInstance.post("/admin/coupon", formData);
-      console.log(response.data);
-      onCouponAdded();
-      onClose();
-    } catch (error) {
-      console.log(error.response?.data?.message || "An error occurred");
+    const validationErrors = validateCouponForm(formData);
+    setErrors(validationErrors);
+
+    if (Object.keys(validationErrors).length === 0) {
+      try {
+        const response = await axiosInstance.post("/admin/coupon", formData);
+        console.log(response.data);
+        onCouponAdded();
+        onClose();
+      } catch (error) {
+        console.log(error.response?.data?.message || "An error occurred");
+      }
     }
   };
 
@@ -74,6 +81,9 @@ export default function AdminCouponModal({ isOpen, onClose, onCouponAdded }) {
                 value={formData.code}
                 onChange={handleChange}
               />
+              {errors.code && (
+                <p className="text-sm text-red-500">{errors.code}</p>
+              )}
             </div>
             <div className="space-y-2">
               <Label htmlFor="description">Description</Label>
@@ -84,6 +94,9 @@ export default function AdminCouponModal({ isOpen, onClose, onCouponAdded }) {
                 value={formData.description}
                 onChange={handleChange}
               />
+              {errors.description && (
+                <p className="text-sm text-red-500">{errors.description}</p>
+              )}
             </div>
           </div>
 
@@ -113,6 +126,9 @@ export default function AdminCouponModal({ isOpen, onClose, onCouponAdded }) {
                 value={formData.discount_value}
                 onChange={handleChange}
               />
+              {errors.discount_value && (
+                <p className="text-sm text-red-500">{errors.discount_value}</p>
+              )}
             </div>
           </div>
 
@@ -127,6 +143,11 @@ export default function AdminCouponModal({ isOpen, onClose, onCouponAdded }) {
                 value={formData.min_purchase_amount}
                 onChange={handleChange}
               />
+              {errors.min_purchase_amount && (
+                <p className="text-sm text-red-500">
+                  {errors.min_purchase_amount}
+                </p>
+              )}
             </div>
             <div className="space-y-2">
               <Label htmlFor="maxDiscount">Maximum Discount Amount</Label>
@@ -138,10 +159,15 @@ export default function AdminCouponModal({ isOpen, onClose, onCouponAdded }) {
                 value={formData.max_discount_amount}
                 onChange={handleChange}
               />
+              {errors.max_discount_amount && (
+                <p className="text-sm text-red-500">
+                  {errors.max_discount_amount}
+                </p>
+              )}
             </div>
           </div>
 
-          <div className=" grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label htmlFor="expiryDate">Expiration Date</Label>
               <Input
@@ -151,6 +177,9 @@ export default function AdminCouponModal({ isOpen, onClose, onCouponAdded }) {
                 value={formData.expiration_date}
                 onChange={handleChange}
               />
+              {errors.expiration_date && (
+                <p className="text-sm text-red-500">{errors.expiration_date}</p>
+              )}
             </div>
             <div className="space-y-2">
               <Label htmlFor="usageLimit">Usage Limit</Label>
@@ -162,6 +191,9 @@ export default function AdminCouponModal({ isOpen, onClose, onCouponAdded }) {
                 value={formData.usage_limit}
                 onChange={handleChange}
               />
+              {errors.usage_limit && (
+                <p className="text-sm text-red-500">{errors.usage_limit}</p>
+              )}
             </div>
           </div>
           <div className="flex justify-end gap-4">

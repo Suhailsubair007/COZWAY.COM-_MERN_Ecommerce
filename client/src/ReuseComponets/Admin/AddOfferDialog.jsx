@@ -1,5 +1,5 @@
-import { useState, useEffect, useCallback } from "react";
-import { Search } from "lucide-react";
+import { useEffect, useCallback, useState } from "react";
+import { Search } from 'lucide-react';
 import axiosInstance from "@/config/axiosConfig";
 import debounce from "lodash/debounce";
 import { toast } from "sonner";
@@ -19,6 +19,8 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { useFormik } from "formik";
+import { addOfferValidationSchema } from "../../utils/Validations";
 
 export default function AddOfferDialog({
   isOpen,
@@ -26,23 +28,37 @@ export default function AddOfferDialog({
   activeTab,
   onOfferAdded,
 }) {
-  const [formData, setFormData] = useState({
-    name: "",
-    value: "",
-    target: activeTab,
-    targetId: "",
-    targetName: "",
-    endDate: "",
-  });
-  const [searchValue, setSearchValue] = useState("");
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
   const [isDropdownVisible, setIsDropdownVisible] = useState(false);
 
+  const formik = useFormik({
+    initialValues: {
+      name: "",
+      value: "",
+      target: activeTab,
+      targetId: "",
+      targetName: "",
+      endDate: "",
+    },
+    validationSchema: addOfferValidationSchema,
+    onSubmit: async (values) => {
+      try {
+        const response = await axiosInstance.post("/admin/addoffer", values);
+        toast.success("Offer added successfully");
+        formik.resetForm();
+        setIsOpen(false);
+        onOfferAdded();
+      } catch (error) {
+        console.error("Error adding offer:", error);
+        toast.error(error.response?.data?.message || "Failed to add offer");
+      }
+    },
+  });
+
   useEffect(() => {
-    // Update formData.target when activeTab changes
-    setFormData((prev) => ({ ...prev, target: activeTab }));
-  }, [activeTab]);
+    formik.setFieldValue("target", activeTab);
+  }, [activeTab]); 
 
   const fetchCategories = async () => {
     try {
@@ -77,55 +93,22 @@ export default function AddOfferDialog({
 
   useEffect(() => {
     if (activeTab === "product") {
-      debouncedSearch(searchValue);
+      debouncedSearch(formik.values.targetName);
     } else if (activeTab === "category") {
       fetchCategories();
     }
-  }, [searchValue, activeTab, debouncedSearch]);
-
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
-  };
+  }, [formik.values.targetName, activeTab, debouncedSearch]);
 
   const handleProductSelect = (product) => {
-    setSearchValue(product.name);
-    setFormData((prev) => ({
-      ...prev,
-      targetId: product._id,
-      targetName: product.name,
-    }));
+    formik.setFieldValue("targetId", product._id);
+    formik.setFieldValue("targetName", product.name);
     setIsDropdownVisible(false);
   };
 
   const handleCategorySelect = (categoryId) => {
     const category = categories.find((cat) => cat._id === categoryId);
-    setFormData((prev) => ({
-      ...prev,
-      targetId: categoryId,
-      targetName: category.name,
-    }));
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    try {
-      const response = await axiosInstance.post("/admin/addoffer", formData);
-      toast.success("Offer added successfully");
-      setFormData({
-        name: "",
-        value: "",
-        target: activeTab,
-        targetId: "",
-        targetName: "",
-        endDate: "",
-      });
-      setIsOpen(false);
-      onOfferAdded();
-    } catch (error) {
-      console.error("Error adding offer:", error);
-      toast.error(error.response.data.message);
-    }
+    formik.setFieldValue("targetId", categoryId);
+    formik.setFieldValue("targetName", category.name);
   };
 
   return (
@@ -134,17 +117,20 @@ export default function AddOfferDialog({
         <DialogHeader>
           <DialogTitle>Add New Offer</DialogTitle>
         </DialogHeader>
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={formik.handleSubmit} className="space-y-4">
           <div>
             <Label htmlFor="name">Offer Name</Label>
             <Input
               id="name"
               name="name"
-              value={formData.name}
-              onChange={handleInputChange}
+              value={formik.values.name}
+              onChange={formik.handleChange}
+              onBlur={formik.handleBlur}
               placeholder="Enter offer name"
-              required
             />
+            {formik.touched.name && formik.errors.name && (
+              <div className="text-red-500">{formik.errors.name}</div>
+            )}
           </div>
 
           <div>
@@ -153,11 +139,14 @@ export default function AddOfferDialog({
               id="value"
               name="value"
               type="number"
-              value={formData.value}
-              onChange={handleInputChange}
+              value={formik.values.value}
+              onChange={formik.handleChange}
+              onBlur={formik.handleBlur}
               placeholder="Enter value"
-              required
             />
+            {formik.touched.value && formik.errors.value && (
+              <div className="text-red-500">{formik.errors.value}</div>
+            )}
           </div>
 
           <div>
@@ -166,10 +155,13 @@ export default function AddOfferDialog({
               id="endDate"
               name="endDate"
               type="date"
-              value={formData.endDate}
-              onChange={handleInputChange}
-              required
+              value={formik.values.endDate}
+              onChange={formik.handleChange}
+              onBlur={formik.handleBlur}
             />
+            {formik.touched.endDate && formik.errors.endDate && (
+              <div className="text-red-500">{formik.errors.endDate}</div>
+            )}
           </div>
 
           {activeTab === "product" ? (
@@ -178,10 +170,15 @@ export default function AddOfferDialog({
               <div className="relative">
                 <Input
                   id="productSearch"
+                  name="targetName"
                   type="text"
                   placeholder="Search for a product"
-                  value={searchValue}
-                  onChange={(e) => setSearchValue(e.target.value)}
+                  value={formik.values.targetName}
+                  onChange={(e) => {
+                    formik.handleChange(e);
+                    debouncedSearch(e.target.value);
+                  }}
+                  onBlur={formik.handleBlur}
                 />
                 <Search
                   className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400"
@@ -211,7 +208,10 @@ export default function AddOfferDialog({
           ) : (
             <div>
               <Label htmlFor="category">Select Category</Label>
-              <Select onValueChange={handleCategorySelect}>
+              <Select
+                onValueChange={handleCategorySelect}
+                value={formik.values.targetId}
+              >
                 <SelectTrigger>
                   <SelectValue placeholder="Select a category" />
                 </SelectTrigger>
@@ -224,6 +224,9 @@ export default function AddOfferDialog({
                 </SelectContent>
               </Select>
             </div>
+          )}
+          {formik.touched.targetId && formik.errors.targetId && (
+            <div className="text-red-500">{formik.errors.targetId}</div>
           )}
 
           <div className="flex justify-end space-x-2">

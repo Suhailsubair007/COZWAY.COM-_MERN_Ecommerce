@@ -17,7 +17,11 @@ import EmptyCart from "./EmptyCart";
 
 const CartItem = ({ item, onUpdateQuantity, onRemove }) => {
   const discount = Math.floor(item.discount);
-  const isOutOfStock = item.quantity === 0;
+  
+  // Check if the item is out of stock
+  const sizeInfo = item.productId.sizes.find((size) => size.size === item.size);
+  const availableStock = sizeInfo ? sizeInfo.stock : 0; // Default to 0 if sizeInfo is not found
+  const isOutOfStock = availableStock === 0; // Determine if the item is out of stock
 
   return (
     <Card className={`mb-4 ${isOutOfStock ? "opacity-50" : ""}`}>
@@ -39,8 +43,10 @@ const CartItem = ({ item, onUpdateQuantity, onRemove }) => {
             </p>
             {isOutOfStock ? (
               <p className="text-red-500 font-bold">Out of Stock</p>
-            ) : item.stock < 5 ? (
-              <p className="text-orange-500">Only {item.stock} left in stock</p>
+            ) : availableStock < 5 ? (
+              <p className="text-orange-500">
+                Only {availableStock} left in stock
+              </p>
             ) : null}
           </div>
           <div className="text-right">

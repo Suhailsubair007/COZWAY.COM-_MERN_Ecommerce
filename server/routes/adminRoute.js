@@ -40,7 +40,7 @@ router.patch('/orders/:orderId/status', verifyAdmin, orderController.updateOrder
 // router.delete('/orders/:orderId', verifyAdmin, orderController.deleteOrder);
 router.get('/order/:orderId', verifyAdmin, orderController.getOrderById);
 
-
+//offer related API end points...
 router.get('/offers', offerController.getOffers);
 router.post('/addoffer', offerController.addOffer);
 router.delete('/offer', offerController.deleteOffer);
