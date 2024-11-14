@@ -1,7 +1,7 @@
 const Coupon = require('../../model/coupun');
 
 
-//Add a new coupen discount....
+//POST--Add a new coupen discount....
 const addCoupon = async (req, res) => {
     try {
         const {
@@ -49,10 +49,10 @@ const addCoupon = async (req, res) => {
 
 
 
-//To delete the ccoupen...
+//DELETE---To delete the ccoupen...
 const deleteCoupon = async (req, res) => {
 
-    console.log("arrived.......")
+    // console.log("arrived.......")
     try {
         const { id } = req.params;
 
@@ -77,7 +77,7 @@ const deleteCoupon = async (req, res) => {
     }
 };
 
-//To Display the coupens in table in the admin side...
+//GET---To Display the coupens in table in the admin side...
 const getAllCoupons = async (req, res) => {
     try {
         const coupons = await Coupon.find();

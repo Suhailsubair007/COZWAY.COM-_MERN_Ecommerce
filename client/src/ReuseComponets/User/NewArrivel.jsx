@@ -1,53 +1,55 @@
-import { useState, useEffect } from "react";
-import axiosInstance from "@/config/axiosConfig";
-import { useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react"
+import axiosInstance from "@/config/axiosConfig"
+import { useNavigate } from "react-router-dom"
 
 const TrendingNow = () => {
-  const [trendingItems, setTrendingItems] = useState([]);
-  const navigate = useNavigate();
+  const [trendingItems, setTrendingItems] = useState([])
+  const navigate = useNavigate()
 
   useEffect(() => {
     const fetchTrendingItems = async () => {
       try {
-        const response = await axiosInstance.get(
-          "/users/latest"
-        );
-        console.log(response.data)
-
+        const response = await axiosInstance.get("/users/latest")
         const fetchedItems = response.data.slice(0, 4).map((item) => ({
           name: item.name,
           image: item.images[0],
           id: item._id,
-        }));
-
-        setTrendingItems(fetchedItems);
-        console.log(fetchedItems);
+        }))
+        setTrendingItems(fetchedItems)
       } catch (error) {
-        console.error("Error fetching trending items:", error);
+        console.error("Error fetching trending items:", error)
       }
-    };
+    }
+    fetchTrendingItems()
+  }, [])
 
-    fetchTrendingItems();
-  }, []);
-
-  const handleclick =()=>{
+  const handleClick = () => {
     navigate('/shop')
   }
 
   return (
-    <section className="py-12">
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8 ">
-        <h2 className="text-2xl font-bold mb-6">Trending now</h2>
+    <section className="py-16 bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+        <h2 className="text-3xl md:text-4xl font-bold mb-8 text-center text-gray-800 dark:text-gray-100">
+          Trending Now
+        </h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
           {trendingItems.map((item) => (
-            <div onClick={handleclick} key={item.id} className="rounded-lg shadow-lg overflow-hidden">
-              <img
-                src={item.image}
-                alt={item.name}
-                className="w-full h-[400px] object-cover"
-              />
-              <div className="p-4">
-                <h3 className="font text-gray-800 text-xs text-center font-medium">
+            <div
+              key={item.id}
+              onClick={handleClick}
+              className="relative bg-white dark:bg-gray-800 shadow-xl rounded-lg overflow-hidden cursor-pointer group"
+            >
+              <div className="aspect-w-3 aspect-h-4">
+                <img
+                  src={item.image}
+                  alt={item.name}
+                  className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
+                />
+              </div>
+              <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+              <div className="absolute bottom-0 left-0 right-0 p-4 transform translate-y-full group-hover:translate-y-0 transition-transform duration-300">
+                <h3 className="text-white text-lg font-semibold text-center">
                   {item.name}
                 </h3>
               </div>
@@ -56,7 +58,7 @@ const TrendingNow = () => {
         </div>
       </div>
     </section>
-  );
-};
+  )
+}
 
-export default TrendingNow;
+export default TrendingNow

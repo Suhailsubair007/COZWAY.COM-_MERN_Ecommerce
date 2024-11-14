@@ -1,7 +1,7 @@
 
 const Category = require('../../model/Category');
 
-
+//POST controller for add hte categories for admin....
 const addCategory = async (req, res) => {
     try {
         const { name, description } = req.body;
@@ -34,7 +34,7 @@ const addCategory = async (req, res) => {
     }
 };
 
-
+//PUT --Update the categories in the admin...
 const updateCategory = async (req, res) => {
     try {
         const { name, description } = req.body;
@@ -67,7 +67,7 @@ const updateCategory = async (req, res) => {
 
 
 
-
+//GET-- get the categories for displa in the admin...
 const getCategories = async (req, res) => {
     try {
         const categories = await Category.find({}, '_id name description is_active');
@@ -79,6 +79,7 @@ const getCategories = async (req, res) => {
 };
 
 
+//GET-- fetch the purticular cateegories to edit...
 const fetchCategoryById = async (req, res) => {
     const { categoryId } = req.params;
     // console.log(categoryId)
@@ -100,7 +101,7 @@ const fetchCategoryById = async (req, res) => {
     }
 };
 
-
+//PATCH -- Update the category ststus...
 const updateCategoryStatus = async (req, res) => {
     try {
         const { id } = req.params;

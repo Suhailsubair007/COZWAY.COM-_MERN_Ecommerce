@@ -3,6 +3,7 @@ const PdfPrinter = require('pdfmake')
 const ExcelJS = require('exceljs')
 const PDFDocument = require('pdfkit-table')
 
+//Function for get the sales report based on the selacted date....
 const getSalesReportDate = async (skip = 0, limit = 0, startDate, endDate, period) => {
     let dateSelection = {};
     const currentDate = new Date();
@@ -11,7 +12,7 @@ const getSalesReportDate = async (skip = 0, limit = 0, startDate, endDate, perio
         const start = new Date(startDate).setHours(0, 0, 0, 0);
         const end = new Date(endDate).setHours(23, 59, 59, 999);
         dateSelection = { placed_at: { $gte: new Date(start), $lte: new Date(end) } };
-        console.log("Custom date range ---->:", dateSelection);
+        // console.log("Custom date range ---->:", dateSelection);
         return await Order.find(dateSelection).populate('userId').populate('order_items.product').skip(skip).limit(limit);
     }
 
@@ -53,9 +54,9 @@ const getSalesReportDate = async (skip = 0, limit = 0, startDate, endDate, perio
     }
     return await Order.find(dateSelection).populate('userId').populate('order_items.product').skip(skip).limit(limit);
 }
-
+//GET--To get the sales report  for the admin...
 const getSalesReport = async (req, res) => {
-    console.log("in the get reports---->")
+    // console.log("in the get reports---->")
     const {
         startDate = null,
         endDate = null,
@@ -63,10 +64,62 @@ const getSalesReport = async (req, res) => {
         page = 1,
         limit = 5,
     } = req.query;
+    console.log("Received Query Params:", req.query);
+
 
     const skip = (page - 1) * limit;
 
+    console.log("startdate ---->", startDate);
+    console.log("end date---->", endDate);
+    console.log("period--->", period);
+
     let dateSelection = {};
+
+    const currentDate = new Date();
+
+    if (period === "custom" && startDate && endDate) {
+        const start = new Date(startDate).setHours(0, 0, 0, 0);
+        const end = new Date(endDate).setHours(23, 59, 59, 999);
+        dateSelection = { placed_at: { $gte: new Date(start), $lte: new Date(end) } };
+        // console.log("Custom date range ---->:", dateSelection);
+        return await Order.find(dateSelection).populate('userId').populate('order_items.product').skip(skip).limit(limit);
+    }
+    switch (period) {
+        case "daily":
+            currentDate.setHours(0, 0, 0);
+            dateSelection = {
+                placed_at: {
+                    $gte: currentDate,
+                    $lt: new Date(),
+                }
+            }
+            break;
+        case "weekly":
+            dateSelection = {
+                placed_at: {
+                    $gte: new Date(currentDate.setDate(currentDate.getDate() - 7)),
+                    $lt: new Date(),
+                }
+            }
+            break;
+        case "monthly":
+            dateSelection = {
+                placed_at: {
+                    $gte: new Date(currentDate.setMonth(currentDate.getMonth() - 1)),
+                    $lt: new Date(),
+                },
+            }
+        case "yearly":
+            dateSelection = {
+                placed_at: {
+                    $gte: new Date(currentDate.setFullYear(currentDate.getFullYear() - 1)),
+                    $lt: new Date(),
+                }
+            }
+            break;
+        default:
+            break
+    }
 
 
     const salesReport = await getSalesReportDate(skip, limit, startDate, endDate, period);
@@ -95,7 +148,7 @@ const getSalesReport = async (req, res) => {
     });
 }
 
-
+// GET--To download  the sals report in pdf format.....
 const download_sales_report_pdf = async (req, res) => {
     const { startDate, endDate, period } = req.query;
 
@@ -170,12 +223,12 @@ const download_sales_report_pdf = async (req, res) => {
 
 
 
-
+//GET---Download the sales report in the XL formt....
 const download_sales_report_xl = async (req, res) => {
     try {
         const { startDate, endDate, period } = req.query;
         const reports = await getSalesReportDate(0, 0, startDate, endDate, period);
-        console.log("exel reporst--->", reports)
+        // console.log("exel reporst--->", reports)
 
         const workbook = new ExcelJS.Workbook();
         const worksheet = workbook.addWorksheet("Sales Report");
@@ -226,4 +279,8 @@ const download_sales_report_xl = async (req, res) => {
     }
 };
 
-module.exports = { getSalesReport, download_sales_report_pdf, download_sales_report_xl }
+module.exports = {
+    getSalesReport,
+    download_sales_report_pdf,
+    download_sales_report_xl
+}

@@ -5,6 +5,8 @@ const { applyCategoryOffer,
     removeCategoryOffer,
     removeProductOffer } = require('../../Helper/offerHelperFunctiions')
 
+
+
 // Controller for get all the offers for 
 const getOffers = async (req, res) => {
     try {
@@ -28,7 +30,7 @@ const getOffers = async (req, res) => {
     }
 }
 
-//Add offer Contoller...
+//POST--Add offer Contoller...
 const addOffer = async (req, res) => {
     try {
         const { name, value, target, targetId, targetName, endDate } = req.body;
@@ -86,11 +88,11 @@ const addOffer = async (req, res) => {
 };
 
 
-// Delete offer controller...
+// DELETE--Delete offer controller...
 const deleteOffer = async (req, res) => {
     try {
         const { offerId } = req.body;
-        console.log("offer id----->", offerId)
+        // console.log("offer id----->", offerId)
         const existingOffer = await Offer.findById(offerId);
 
         if (!existingOffer) {
@@ -120,7 +122,7 @@ const deleteOffer = async (req, res) => {
 
 
 
-//controllerfor fetch the categories in the add category dropdown dynamically...
+//GET---controllerfor fetch the categories in the add category dropdown dynamically...
 const getCategoriesForOffer = async (req, res) => {
     try {
         const categories = await Category.find({ is_active: true }, 'name');

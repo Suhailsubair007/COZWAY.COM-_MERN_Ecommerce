@@ -35,27 +35,26 @@ router.get('/coustmers', userController.getCoutomers);
 router.patch('/coustmers/:id', verifyAdmin, userController.updateCoustomerStatus);
 
 //order related routes..
-router.get('/orders', orderController.getAllOrders);
+router.get('/orders', verifyAdmin, orderController.getAllOrders);
 router.patch('/orders/:orderId/status', verifyAdmin, orderController.updateOrderStatus);
-// router.delete('/orders/:orderId', verifyAdmin, orderController.deleteOrder);
 router.get('/order/:orderId', verifyAdmin, orderController.getOrderById);
 
 //offer related API end points...
-router.get('/offers', offerController.getOffers);
-router.post('/addoffer', offerController.addOffer);
-router.delete('/offer', offerController.deleteOffer);
-router.get('/products', productController.get_product_offer);
-router.get('/getCategories', offerController.getCategoriesForOffer);
+router.get('/offers', verifyAdmin, offerController.getOffers);
+router.post('/addoffer', verifyAdmin, offerController.addOffer);
+router.delete('/offer', verifyAdmin, offerController.deleteOffer);
+router.get('/products', verifyAdmin, productController.get_product_offer);
+router.get('/getCategories', verifyAdmin, offerController.getCategoriesForOffer);
 
 
-router.post('/coupon', couponController.addCoupon);
-router.delete('/deleteCoupon/:id', couponController.deleteCoupon);
-router.get('/getCoupon', couponController.getAllCoupons);
+router.post('/coupon', verifyAdmin, couponController.addCoupon);
+router.delete('/deleteCoupon/:id', verifyAdmin, couponController.deleteCoupon);
+router.get('/getCoupon', verifyAdmin, couponController.getAllCoupons);
 
 
-router.get('/report', salesController.getSalesReport)
-router.get('/download/report/pdf', salesController.download_sales_report_pdf)
-router.get('/download/report/xl', salesController.download_sales_report_xl)
+router.get('/report', verifyAdmin, salesController.getSalesReport)
+router.get('/download/report/pdf', verifyAdmin, salesController.download_sales_report_pdf)
+router.get('/download/report/xl', verifyAdmin, salesController.download_sales_report_xl)
 
 
 

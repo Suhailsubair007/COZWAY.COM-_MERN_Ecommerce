@@ -1,6 +1,7 @@
 const User = require("../../model/User");
 
 
+//GET ---Get the data of the users in the admin side....
 const getCoutomers = async (req, res) => {
     try {
         const users = await User.find({});
@@ -17,13 +18,11 @@ const getCoutomers = async (req, res) => {
     }
 };
 
-
+//PATCH---to change the active ststus of the user by the admin....
 const updateCoustomerStatus = async (req, res) => {
     try {
         const { id } = req.params;
         const { is_blocked } = req.body;
-        // console.log(is_blocked)
-        // console.log(id)
 
         const updateStats = await User.findByIdAndUpdate(id, { is_blocked }, { new: true })
         // console.log(updateStats);

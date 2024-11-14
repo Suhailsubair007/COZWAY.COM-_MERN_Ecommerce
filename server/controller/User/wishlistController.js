@@ -50,7 +50,7 @@ const getAllWishlistItems = async (req, res) => {
         const wishlist = await Wishlist.findOne({ user: userId })
             .populate('items.product');
 
-       
+
 
         if (!wishlist) {
             return res.status(404).json({
@@ -243,6 +243,35 @@ const moveToCart = async (req, res) => {
 };
 
 
+const getWishlishProductCount = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const wishlist = await Wishlist.findOne({ user: id })
+
+        if (!wishlist) {
+            return res.status(404).json({
+                sucess: false,
+                messgae: "Wishlist not found"
+            })
+
+        }
+        const wishlist_length = wishlist.items.length;
+        res.status(200).json({
+            sucess: true,
+            message: "fetched sucess",
+            wishlist_length
+        })
+
+    } catch (error) {
+        console.error(error)
+        res.status(500).json({
+            success: false,
+            message: "server error"
+        })
+    }
+}
+
+
 
 module.exports = {
     AddItemToWishlist,
@@ -250,4 +279,5 @@ module.exports = {
     isInWishlist,
     removeItemFromWishlist,
     moveToCart,
+    getWishlishProductCount
 }

@@ -1,5 +1,7 @@
 const Order = require('../../model/order');
 
+
+// GET --Get all orders for display in the table in admin side....
 const getAllOrders = async (req, res) => {
     try {
         const page = parseInt(req.query.page);
@@ -15,7 +17,7 @@ const getAllOrders = async (req, res) => {
             })
             .skip(skip)
             .limit(limit);
-        console.log("Orders:", orders);
+        // console.log("Orders:", orders);
         res.status(200).json({ orders, totalPages });
     } catch (error) {
         console.error("Error fetching orders:", error);
@@ -23,6 +25,7 @@ const getAllOrders = async (req, res) => {
     }
 }
 
+//PATCH -- update the order status
 const updateOrderStatus = async (req, res) => {
     try {
         const { orderId } = req.params;
@@ -53,6 +56,7 @@ const updateOrderStatus = async (req, res) => {
     }
 }
 
+//GET--- get he purticular order by ID
 const getOrderById = async (req, res) => {
     try {
         const { orderId } = req.params;

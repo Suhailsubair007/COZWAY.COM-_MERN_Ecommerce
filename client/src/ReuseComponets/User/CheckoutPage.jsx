@@ -270,7 +270,7 @@ export default function CheckoutPage() {
                     Quantity: {item.quantity}
                   </p>
                   <div className="text-sm text-green-600 font-medium">
-                    {item.discount.toFixed()}% OFF
+                    {item.discount.toFixed(0)}% OFF
                   </div>
                 </div>
                 <div className="text-right">
@@ -285,10 +285,10 @@ export default function CheckoutPage() {
                             : 0)) /
                           100) *
                       item.quantity
-                    ).toFixed(2)}
+                    ).toFixed(0)}
                   </p>
                   <p className="text-sm text-gray-600">
-                    Total: ₹{item.totalProductPrice.toFixed(2)}
+                    Total: ₹{item.totalProductPrice.toFixed(0)}
                   </p>
                 </div>
               </div>
@@ -299,27 +299,27 @@ export default function CheckoutPage() {
           <div className="space-y-2 text-sm">
             <div className="flex justify-between">
               <span className="text-gray-600">Subtotal:</span>
-              <span>₹{subtotal.toFixed()}</span>
+              <span>₹{subtotal.toFixed(0)}</span>
             </div>
             <div className="flex justify-between">
               <span className="text-gray-600">Shipping:</span>
-              <span>{shipping === 0 ? "Free" : `₹${shipping.toFixed()}`}</span>
+              <span>{shipping === 0 ? "Free" : `₹${shipping.toFixed(0)}`}</span>
             </div>
             <div className="flex justify-between text-green-600 font-medium">
               <span>Product Savings:</span>
-              <span>₹{calculateTotalSavings().toFixed(2)}</span>
+              <span>₹{calculateTotalSavings().toFixed(0)}</span>
             </div>
             {appliedCoupon && (
               <div className="flex justify-between text-green-600 font-medium">
                 <span>Coupon Discount:</span>
-                <span>₹{couponDiscount.toFixed()}</span>
+                <span>₹{couponDiscount.toFixed(0)}</span>
               </div>
             )}
           </div>
           <Separator className="my-4" />
           <div className="flex justify-between text-lg font-semibold mb-6">
             <span>Total:</span>
-            {total.toFixed(2)}
+            {total.toFixed(0)}
           </div>
 
           <div className="flex space-x-2 mb-6">
@@ -352,7 +352,7 @@ export default function CheckoutPage() {
               email={user.email}
               selectedAddress={selectedAddress}
               selectedPaymentMethod={selectedPaymentMethod}
-              amount={total}
+              amount={total.toFixed(0)}
               buttonName={getButtonText()}
               handlePlaceOrder={handlePlaceOrder}
             />

@@ -32,7 +32,7 @@ router.post('/reset', userController.sendOTPForPasswordReset)
 router.post('/reset-password', userController.resetPassword);
 router.post('/verify', verifyOTP, userController.verifyResetOTP);
 
-//Google auth login
+//Google auth login and signup
 router.post('/auth/google-signup', userController.googleSignIn);
 router.post('/auth/google-login', userController.googleLoginUser);
 
@@ -59,8 +59,6 @@ router.get('/get-cart-details', verifyUser, cartController.getCartDetails);
 router.get('/cart/:userId', verifyUser, cartController.getAllCartItems);
 router.get('/cartLength/:id', verifyUser, cartController.getUserCartProductCount);
 router.delete('/delete/:id/:pr_id', verifyUser, cartController.deleteItem);
-
-// router.patch('/quantity/:userId/:itemId', cartController.updateCartItemQuantity);
 router.patch('/quantity/add/:userId/:itemId', verifyUser, cartController.incrementCartItemQuantity);
 router.patch('/quantity/min/:userId/:itemId', verifyUser, cartController.decrementCartItemQuantity);
 
@@ -71,20 +69,21 @@ router.get('/orders/:userId', verifyUser, orderController.getUserOrders);
 router.get('/order/:orderId', verifyUser, orderController.getOrderById);
 router.patch('/order/:orderId', verifyUser, orderController.cancelOrder);
 
-//API endpoints for wishlist endpoints...
-router.post('/wishlist/add', wishlistController.AddItemToWishlist);
-router.post('/wishlist/remove', wishlistController.removeItemFromWishlist);
-router.get('/wishlist/:userId', wishlistController.getAllWishlistItems);
-router.get('/inwishlist', wishlistController.isInWishlist);
-router.post('/movetocart', wishlistController.moveToCart);
+//API endpoints for wishlist...
+router.post('/wishlist/add', verifyUser, wishlistController.AddItemToWishlist);
+router.post('/wishlist/remove', verifyUser, wishlistController.removeItemFromWishlist);
+router.get('/wishlist/:userId', verifyUser, wishlistController.getAllWishlistItems);
+router.get('/inwishlist', verifyUser, wishlistController.isInWishlist);
+router.post('/movetocart', verifyUser, wishlistController.moveToCart);
+router.get('/wishlist/length/:id',verifyUser, wishlistController.getWishlishProductCount)
 
 //API end points for wallet..
-router.post('/wallet', walletController.addAmountToWallet)
-router.get('/wallet', walletController.getUserWallet)
+router.post('/wallet', verifyUser, walletController.addAmountToWallet)
+router.get('/wallet', verifyUser, walletController.getUserWallet)
 
-
-router.post('/coupon/apply', couponController.applyCoupon);
-router.get('/coupons', couponController.getCoupens);
+//API endpoints for coupens
+router.post('/coupon/apply', verifyUser, couponController.applyCoupon);
+router.get('/coupons', verifyUser, couponController.getCoupens);
 
 
 module.exports = router;

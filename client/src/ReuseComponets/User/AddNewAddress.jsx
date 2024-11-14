@@ -4,6 +4,7 @@ import { Formik, Form, Field } from "formik";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import {toast} from 'sonner';
 import axiosInstance from "@/config/axiosConfig";
 import {
   Dialog,
@@ -41,6 +42,7 @@ function AddAddressModal({ isOpen, onClose, onAdd }) {
         address: response.data.address.address,
         pincode: response.data.address.pincode,
       });
+      toast.success("Address added sucessfully.");
       onClose();
     } catch (error) {
       console.error("Error adding address:", error);

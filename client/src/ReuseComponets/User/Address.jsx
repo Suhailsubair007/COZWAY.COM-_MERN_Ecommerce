@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import axiosInstance from "@/config/axiosConfig";
 import AddressList from "./AddressList";
 import EditAddressModal from "./EditAddressModal";
+import {toast} from 'sonner';
 import AddAddressModal from "./AddNewAddress";
 import {
   AlertDialog,
@@ -58,6 +59,7 @@ export default function Address() {
       setAddresses(
         addresses.filter((addr) => addr._id !== addressToDelete._id)
       );
+      toast.success('Address deleted sucessfully...')
     } catch (error) {
       console.error("Error deleting address:", error);
     } finally {

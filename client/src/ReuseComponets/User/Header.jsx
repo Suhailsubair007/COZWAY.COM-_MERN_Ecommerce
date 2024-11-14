@@ -31,6 +31,7 @@ import {
 export default function Header() {
   const [isSearchVisible, setSearchVisible] = useState(false);
   const [count, setCount] = useState(0);
+  const [wishlistCount, setWishlistCount] = useState(0);
   const userId = useSelector((state) => state.user.userInfo);
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -38,6 +39,7 @@ export default function Header() {
   useEffect(() => {
     if (userId) {
       fetchCart();
+      fetchWishlist();
     }
   }, [userId]);
 
@@ -47,6 +49,21 @@ export default function Header() {
         `/users/cartLength/${userId.id}`
       );
       setCount(response.data.productCount);
+    } catch (error) {
+      console.error("Error fetching cart:", error);
+      if (error.response) {
+        console.log(error.response.data.message);
+      }
+    }
+  };
+
+  const fetchWishlist = async () => {
+    try {
+      const response = await axiosInstance.get(
+        `/users/wishlist/length/${userId.id}`
+      );
+      console.log("wishlist------->", response.data);
+      setWishlistCount(response.data.wishlist_length);
     } catch (error) {
       console.error("Error fetching cart:", error);
       if (error.response) {
@@ -176,15 +193,34 @@ export default function Header() {
               )}
             </div>
 
+            <div className="relative">
+              <Button
+                onClick={handleWishlistClick}
+                variant="ghost"
+                size="icon"
+                className="text-muted-foreground hover:text-primary"
+              >
+                <Heart className="h-5 w-5" />
+              </Button>
+              {userId && wishlistCount > 0 && (
+                <Badge
+                  variant="destructive"
+                  className="absolute -top-2 -right-2 px-2 py-1 text-xs font-bold rounded-full"
+                >
+                  {wishlistCount}
+                </Badge>
+              )}
+            </div>
+
             {/* Wishlist Icon */}
-            <Button
+            {/* <Button
               onClick={handleWishlistClick}
               variant="ghost"
               size="icon"
               className="text-muted-foreground hover:text-primary"
             >
               <Heart className="h-5 w-5" />
-            </Button>
+            </Button> */}
 
             {/* User Profile or Login Button */}
             {userId ? (

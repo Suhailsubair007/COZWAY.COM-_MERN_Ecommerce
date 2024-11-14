@@ -39,10 +39,13 @@ export default function SalesReport() {
 
   const fetchReports = async (page) => {
     try {
+      console.log("Start Date:", startDate);
+      console.log("End Date:", endDate);
+
       const response = await axiosInstance.get(
         `/admin/report?period=${activeTab}&page=${page}&limit=5&startDate=${startDate}&endDate=${endDate}`
       );
-      console.log("data------>",response.data);
+      console.log("data------>", response.data);
       setSalesData(response.data);
     } catch (error) {
       console.error("Error fetching sales report:", error);
@@ -75,7 +78,7 @@ export default function SalesReport() {
         `/admin/download/report/pdf?period=${activeTab}&startDate=${startDate}&endDate=${endDate}`,
         { responseType: "blob" }
       );
-      console.log("data====>",response)
+      console.log("data====>", response);
 
       const blob = new Blob([response.data], { type: "application/pdf" });
       saveAs(blob, "SalesReport.pdf");

@@ -2,7 +2,7 @@ const Category = require('../../model/Category');
 const Product = require('../../model/Product')
 const Offer = require('../../model/Offer')
 
-
+//POST---To add a product and save to the database.....
 const addProduct = async (req, res) => {
     try {
         const { name, description, price, offerPrice, category, fit, sleeve, sizes, images } = req.body;
@@ -42,7 +42,7 @@ const addProduct = async (req, res) => {
             images,
             offer: highestOffer ? highestOffer._id : null, 
         });
-        console.log(newProduct);
+        // console.log(newProduct);
 
         const savedProduct = await newProduct.save();
         res.status(201).json({
@@ -56,6 +56,7 @@ const addProduct = async (req, res) => {
     }
 };
 
+//GET--Get the products to display in the admin side....
 const getProduct = async (req, res) => {
     try {
         const page = parseInt(req.query.page) || 1;
@@ -88,14 +89,14 @@ const getProduct = async (req, res) => {
     }
 };
 
-
+//PATCH--Update the product status for admion toogle......
 const updateProductStatus = async (req, res) => {
     try {
         const { id } = req.params;
-        console.log("Product ID:", id);
+        // console.log("Product ID:", id);
 
         const { is_active } = req.body;
-        console.log("is_active:", is_active);
+        // console.log("is_active:", is_active);
         const updateStatus = await Product.findByIdAndUpdate(
             id,
             { is_active },
@@ -116,7 +117,7 @@ const updateProductStatus = async (req, res) => {
 
 
 
-
+//PUT -- Update the product....
 const updateProduct = async (req, res) => {
     try {
         const { id } = req.params;
@@ -167,7 +168,7 @@ const updateProduct = async (req, res) => {
 };
 
 
-
+//GET---To get the purticular products details....
 const fetchProductById = async (req, res) => {
     const { id } = req.params;
     // console.log(id)
@@ -185,7 +186,7 @@ const fetchProductById = async (req, res) => {
     }
 };
 
-
+//GET -- To get the product in the offer search box --(debounce search...)
 const get_product_offer = async (req, res) => {
     try {
         const { searchTerm } = req.query;
@@ -197,7 +198,7 @@ const get_product_offer = async (req, res) => {
             { name: true }
         );
 
-        console.log(products);
+        // console.log(products);
         res.status(200).json({ success: true, products });
 
     } catch (error) {
