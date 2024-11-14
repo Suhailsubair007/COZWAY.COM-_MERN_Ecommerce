@@ -30,12 +30,20 @@ export default function ChangePassword() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    // Password validation checks
+    if (formData.new.length <= 6) {
+      setMessage({ error: "New password must be more than 6 characters" });
+      return;
+    }
+
     if (formData.new !== formData.confirm) {
       setMessage({ error: "New passwords don't match" });
       return;
     }
 
     setLoading(true);
+    setMessage({ error: "", success: "" });
 
     try {
       const response = await axiosInstance.post("/users/update_password", {
@@ -64,38 +72,99 @@ export default function ChangePassword() {
           Change Password
         </h2>
         <form onSubmit={handleSubmit} className="mt-8 space-y-6">
-          {["current", "new", "confirm"].map((field) => (
-            <div key={field} className="space-y-2">
-              <label
-                htmlFor={field}
-                className="block text-sm font-medium text-gray-700"
+          <div className="space-y-2">
+            <label
+              htmlFor="current"
+              className="block text-sm font-medium text-gray-700"
+            >
+              Current Password
+            </label>
+            <div className="relative rounded-md shadow-sm">
+              <input
+                id="current"
+                name="current"
+                type={showPassword.current ? "text" : "password"}
+                value={formData.current}
+                onChange={handleChange}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                required
+              />
+              <button
+                type="button"
+                className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-500 focus:outline-none"
+                onClick={() => togglePasswordVisibility("current")}
               >
-                {field.charAt(0).toUpperCase() + field.slice(1)} Password
-              </label>
-              <div className="relative rounded-md shadow-sm">
-                <input
-                  id={field}
-                  name={field}
-                  type={showPassword[field] ? "text" : "password"}
-                  value={formData[field]}
-                  onChange={handleChange}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                  required
-                />
-                <button
-                  type="button"
-                  className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-500 focus:outline-none"
-                  onClick={() => togglePasswordVisibility(field)}
-                >
-                  {showPassword[field] ? (
-                    <EyeOff className="h-5 w-5" aria-hidden="true" />
-                  ) : (
-                    <Eye className="h-5 w-5" aria-hidden="true" />
-                  )}
-                </button>
-              </div>
+                {showPassword.current ? (
+                  <EyeOff className="h-5 w-5" aria-hidden="true" />
+                ) : (
+                  <Eye className="h-5 w-5" aria-hidden="true" />
+                )}
+              </button>
             </div>
-          ))}
+          </div>
+
+          <div className="space-y-2">
+            <label
+              htmlFor="new"
+              className="block text-sm font-medium text-gray-700"
+            >
+              New Password
+            </label>
+            <div className="relative rounded-md shadow-sm">
+              <input
+                id="new"
+                name="new"
+                type={showPassword.new ? "text" : "password"}
+                value={formData.new}
+                onChange={handleChange}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                required
+              />
+              <button
+                type="button"
+                className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-500 focus:outline-none"
+                onClick={() => togglePasswordVisibility("new")}
+              >
+                {showPassword.new ? (
+                  <EyeOff className="h-5 w-5" aria-hidden="true" />
+                ) : (
+                  <Eye className="h-5 w-5" aria-hidden="true" />
+                )}
+              </button>
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <label
+              htmlFor="confirm"
+              className="block text-sm font-medium text-gray-700"
+            >
+              Confirm Password
+            </label>
+            <div className="relative rounded-md shadow-sm">
+              <input
+                id="confirm"
+                name="confirm"
+                type={showPassword.confirm ? "text" : "password"}
+                value={formData.confirm}
+                onChange={handleChange}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                required
+              />
+              <button
+                type="button"
+                className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-500 focus:outline-none"
+                onClick={() => togglePasswordVisibility("confirm")}
+              >
+                {showPassword.confirm ? (
+                  <EyeOff className="h-5 w-5" aria-hidden="true" />
+                ) : (
+                  <Eye className="h-5 w-5" aria-hidden="true" />
+                )}
+              </button>
+            </div>
+          </div>
+
           {message.error && (
             <p className="text-sm text-red-600" role="alert">
               {message.error}

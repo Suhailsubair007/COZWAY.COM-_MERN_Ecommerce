@@ -164,12 +164,14 @@ const download_sales_report_pdf = async (req, res) => {
         for (let index = 0; index < reports.length; index++) {
             const report = reports[index];
 
+
             if (pdfDoc.y > 700) {
                 pdfDoc.addPage();
+                pdfDoc.moveDown(1);
             }
 
-            pdfDoc.fontSize(14).font("Helvetica-Bold");
-            pdfDoc.text(`Report ${index + 1}:`).moveDown(0.5);
+            pdfDoc.fontSize(12).font("Helvetica-Bold");
+            pdfDoc.text(`Report ${index + 1}`, { continued: false }).moveDown(0.6);
 
             pdfDoc.fontSize(10).font("Helvetica");
             pdfDoc.text(`Order Date: ${new Date(report.placed_at).toLocaleDateString()}`);
@@ -200,18 +202,20 @@ const download_sales_report_pdf = async (req, res) => {
                     rowOptions: { borderColor: '#cccccc' },
                     header: { fillColor: '#f2f2f2', textColor: '#333333' }
                 });
-
             } catch (error) {
                 console.error("Error generating table:", error);
             }
 
-            pdfDoc.moveDown(0.5);
+            pdfDoc.moveDown(0.2);
             pdfDoc.font("Helvetica-Bold").fontSize(10)
-                .text(`Final coupon discount: RS. ${(report.coupon_discount).toFixed(2)}`)
-                .text(`Final discount: RS. ${(report.total_discount).toFixed(2)}`)
+                .text(`Final Coupon Discount: RS. ${(report.coupon_discount).toFixed(2)}`)
+                .text(`Final Product Discount: RS. ${(report.total_discount).toFixed(2)}`)
                 .text(`Final Amount: RS. ${(report.total_price_with_discount).toFixed(2)}`);
 
-            if (index < reports.length - 1) pdfDoc.moveDown();
+            pdfDoc.moveDown(1);
+            if (index < reports.length - 1 && pdfDoc.y > 650) {
+                pdfDoc.addPage();
+            }
         }
 
         pdfDoc.end();
@@ -220,6 +224,7 @@ const download_sales_report_pdf = async (req, res) => {
         res.status(500).send("Error generating sales report PDF");
     }
 };
+
 
 
 

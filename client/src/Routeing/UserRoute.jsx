@@ -133,10 +133,6 @@ const UserRoute = () => {
           <Route path="wallet" element={<UserWallet />} />
           <Route path="coupons" element={<DisplayCoupens />} />
           <Route path="change-password" element={<ChangePassword />} />
-
-          {/* <Route path="wallet" element={<Wallet />} />
-          <Route path="coupons" element={<Coupons />} />
-          <Route path="change-password" element={<ChangePassword />} />  */}
         </Route>
       </Routes>
       <Toaster richColors position="bottom-center" />

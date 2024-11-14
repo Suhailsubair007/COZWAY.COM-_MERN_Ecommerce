@@ -8,8 +8,8 @@ const AddItemToWishlist = async (req, res) => {
     try {
         const { userId, id } = req.body;
 
-        console.log(userId)
-        console.log(id)
+        // console.log(userId)
+        // console.log(id)
 
         let wishlist = await Wishlist.findOne({ user: userId })
         if (!wishlist) {
@@ -44,9 +44,9 @@ const AddItemToWishlist = async (req, res) => {
 
 const getAllWishlistItems = async (req, res) => {
     try {
-        console.log("=====================================")
+        // console.log("=====================================")
         const { userId } = req.params;
-        console.log(userId);
+        // console.log(userId);
         const wishlist = await Wishlist.findOne({ user: userId })
             .populate('items.product');
 
@@ -107,11 +107,11 @@ const isInWishlist = async (req, res) => {
 }
 
 const removeItemFromWishlist = async (req, res) => {
-    console.log("vannuu==========================")
+    // console.log("vannuu==========================")
     try {
         const { userId, id } = req.body;
 
-        console.log('Removing from wishlist:', userId, id);
+        // console.log('Removing from wishlist:', userId, id);
 
         let wishlist = await Wishlist.findOne({ user: userId });
 
@@ -155,7 +155,7 @@ const removeItemFromWishlist = async (req, res) => {
 const moveToCart = async (req, res) => {
     try {
         const { userId, productId, size } = req.body;
-        console.log(userId, productId, size);
+        // console.log(userId, productId, size);
 
         let wishlist = await Wishlist.findOne({ user: userId });
         if (!wishlist) {

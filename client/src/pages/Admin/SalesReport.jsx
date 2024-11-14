@@ -81,7 +81,7 @@ export default function SalesReport() {
       console.log("data====>", response);
 
       const blob = new Blob([response.data], { type: "application/pdf" });
-      saveAs(blob, "SalesReport.pdf");
+      saveAs(blob, "SALES REPORT.pdf");
 
       console.log(response.data);
     } catch (error) {
@@ -169,7 +169,9 @@ export default function SalesReport() {
                 salesData?.salesReport.map((sale) => (
                   <TableRow key={sale._id}>
                     <TableCell>{sale.userId.name}</TableCell>
-                    <TableCell>{sale.placed_at}</TableCell>
+                    <TableCell>
+                      {new Date(sale.placed_at).toLocaleDateString()}
+                    </TableCell>
                     <TableCell>{sale.payment_method}</TableCell>
                     <TableCell>{sale.order_items.length}</TableCell>
                     <TableCell className="text-right">
