@@ -33,6 +33,32 @@ const orderSchema = new mongoose.Schema({
                 type: Number,
                 required: true,
             },
+            order_status: {
+                type: String,
+                required: true,
+                enum: ["pending", "shipped", "delivered", "cancelled"],
+                default: "pending",
+            },
+            return_request: {
+                is_requested: {
+                    type: Boolean,
+                    default: false,
+                },
+                reason: {
+                    type: String,
+                },
+                comment: {
+                    type: String,
+                },
+                is_approved: {
+                    type: Boolean,
+                    default: false,
+                },
+                is_response_send: {
+                    type: Boolean,
+                    default: false,
+                },
+            },
 
         },
     ],
@@ -57,12 +83,7 @@ const orderSchema = new mongoose.Schema({
             "RazorPay",
         ],
     },
-    order_status: {
-        type: String,
-        required: true,
-        enum: ["pending", "shipped", "delivered", "cancelled"],
-        default: "pending",
-    },
+
     payment_status: {
         type: String,
         required: true,

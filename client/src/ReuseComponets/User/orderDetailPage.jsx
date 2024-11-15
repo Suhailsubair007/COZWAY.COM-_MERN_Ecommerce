@@ -9,6 +9,7 @@ import {
   FileText,
   Truck,
   Undo2,
+  X,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
@@ -32,7 +33,7 @@ export default function OrderDetail() {
   const userId = useSelector((state) => state.user.userInfo.id);
   const [orderData, setOrderData] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [isCancelDialogOpen, setIsCancelDialogOpen] = useState(false);
+  const [cancelProductId, setCancelProductId] = useState(null);
   const [error, setError] = useState(null);
 
   useEffect(() => {
@@ -43,6 +44,7 @@ export default function OrderDetail() {
     try {
       setIsLoading(true);
       const response = await axiosInstance.get(`/users/order/${id}`);
+      console.log("respoce data---->>>>", response.data);
       setOrderData(response.data.order);
       setError(null);
     } catch (error) {
@@ -53,26 +55,34 @@ export default function OrderDetail() {
     }
   };
 
-  const handleCancel = () => {
-    setIsCancelDialogOpen(true);
+  const handleCancel = (productId) => {
+    setCancelProductId(productId);
   };
 
   const confirmCancel = async () => {
     try {
-      const response = await axiosInstance.patch(`/users/order/${id}`, {
-        status: "Cancelled",
-        userId,
-      });
+      const response = await axiosInstance.patch(
+        `/users/order/${id}/cancel/${cancelProductId}`,
+        {
+          userId,
+        }
+      );
       if (response.status === 200) {
         fetchOrderDetail();
-        toast.success("Order cacelled..");
-        setIsCancelDialogOpen(false);
+        toast.success("Product cancelled successfully");
+        setCancelProductId(null);
       } else {
-        console.log("Order cancellation failed");
+        toast.error("Failed to cancel product");
       }
     } catch (error) {
-      console.error("Error cancelling order:", error);
+      console.error("Error cancelling product:", error);
+      toast.error("Error cancelling product");
     }
+  };
+
+  const handleReturn = async (productId) => {
+    // Implement return logic here
+    toast.info("Return functionality not implemented yet");
   };
 
   if (isLoading)
@@ -131,9 +141,6 @@ export default function OrderDetail() {
       {/* Header */}
       <div className="flex justify-between items-center mb-8">
         <h1 className="text-3xl font-bold text-foreground">Order Details</h1>
-        <Badge variant="outline" className="text-lg px-3 py-1">
-          {orderData.order_status}
-        </Badge>
       </div>
 
       {/* Order Info */}
@@ -190,16 +197,20 @@ export default function OrderDetail() {
             <div className="text-sm space-y-2">
               <div className="flex justify-between text-muted-foreground">
                 <span>Items Total</span>
-                <span>₹{orderData.total_price_with_discount.toFixed(2)}</span>
+                <span>₹{orderData.total_price_with_discount.toFixed(0)}</span>
+              </div>
+              <div className="flex justify-between text-muted-foreground">
+                <span>Total Discout</span>
+                <span>₹{orderData.total_discount.toFixed(0)}</span>
               </div>
               <div className="flex justify-between text-muted-foreground">
                 <span>Shipping Charge</span>
-                <span>₹{orderData.shipping_fee.toFixed(2)}</span>
+                <span>₹{orderData.shipping_fee.toFixed(0)}</span>
               </div>
               <Separator className="my-2" />
               <div className="flex justify-between font-semibold">
                 <span>Grand Total</span>
-                <span>₹{orderData.total_price_with_discount.toFixed(2)}</span>
+                <span>₹{orderData.total_price_with_discount.toFixed(0)}</span>
               </div>
             </div>
           </div>
@@ -225,66 +236,78 @@ export default function OrderDetail() {
               <div className="flex-1">
                 <h3 className="font-medium">{item.product.name}</h3>
                 <p className="text-sm text-muted-foreground mt-1">
-                  Quantity: {item.quantity} x ₹{item.price.toFixed(2)}
+                  Quantity: {item.quantity} x ₹{" "}
+                  {(
+                    item.price -
+                    (item.price * (item?.product?.offer?.offer_value || 0)) /
+                      100
+                  ).toFixed(0)}
                 </p>
                 <Badge variant="secondary" className="mt-2">
                   {item.product.category.name}
                 </Badge>
-              </div>
-              <div className="text-right">
-                <p className="font-semibold">
-                  ₹{(item.quantity * item.price).toFixed(2)}
+                <p className="text-sm text-muted-foreground mt-2">
+                  Status: {item.order_status}
                 </p>
+              </div>
+              <div className="text-right space-y-2">
+                <p className="font-semibold">
+                  ₹
+                  {(
+                    item.price -
+                    (item.price * (item?.product?.offer?.offer_value || 0)) /
+                      100
+                  ).toFixed(0)}
+                </p>
+                {item.order_status === "delivered" ? (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => handleReturn(item._id)}
+                    className="w-full"
+                  >
+                    <Undo2 className="w-4 h-4 mr-2" />
+                    Return
+                  </Button>
+                ) : item.order_status !== "cancelled" &&
+                  item.order_status !== "shipped" ? (
+                  <Button
+                    variant="destructive"
+                    size="sm"
+                    onClick={() => handleCancel(item._id)}
+                    className="w-full"
+                  >
+                    <X className="w-4 h-4 mr-2" />
+                    Cancel
+                  </Button>
+                ) : null}
               </div>
             </div>
           ))}
         </div>
       </ScrollArea>
 
-      <div className="flex justify-end mt-8">
-        {orderData.order_status === "delivered" ? (
-          <Button
-            variant="default"
-            className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg flex items-center space-x-2"
-          >
-            <Undo2 className="w-5 h-5" />
-            <span>Return Order</span>
-          </Button>
-        ) : (
-          <Button
-            variant="destructive"
-            onClick={handleCancel}
-            disabled={orderData.order_status === "cancelled"}
-            className="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-lg"
-          >
-            {orderData.order_status === "cancelled"
-              ? "Order Cancelled"
-              : "Cancel Order"}
-          </Button>
-        )}
-      </div>
-
       {/* Cancel Dialog */}
       <AlertDialog
-        open={isCancelDialogOpen}
-        onOpenChange={setIsCancelDialogOpen}
+        open={!!cancelProductId}
+        onOpenChange={() => setCancelProductId(null)}
       >
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>
-              Are you sure you want to cancel this order?
+              Are you sure you want to cancel this product?
             </AlertDialogTitle>
             <AlertDialogDescription>
-              Cancelling this order will change its status to "Cancelled". This
-              action cannot be undone.
+              Cancelling this product will change its status to "Cancelled".
+              This action cannot be undone.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel onClick={() => setIsCancelDialogOpen(false)}>
-              No, keep the order
+            <AlertDialogCancel onClick={() => setCancelProductId(null)}>
+              No, keep the product
             </AlertDialogCancel>
             <AlertDialogAction onClick={confirmCancel}>
-              Yes, cancel the order
+              Yes, cancel the product
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

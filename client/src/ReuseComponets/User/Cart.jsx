@@ -17,11 +17,11 @@ import EmptyCart from "./EmptyCart";
 
 const CartItem = ({ item, onUpdateQuantity, onRemove }) => {
   const discount = Math.floor(item.discount);
+
   
-  // Check if the item is out of stock
   const sizeInfo = item.productId.sizes.find((size) => size.size === item.size);
-  const availableStock = sizeInfo ? sizeInfo.stock : 0; // Default to 0 if sizeInfo is not found
-  const isOutOfStock = availableStock === 0; // Determine if the item is out of stock
+  const availableStock = sizeInfo ? sizeInfo.stock : 0; 
+  const isOutOfStock = availableStock === 0; 
 
   return (
     <Card className={`mb-4 ${isOutOfStock ? "opacity-50" : ""}`}>

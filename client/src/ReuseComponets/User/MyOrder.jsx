@@ -14,7 +14,7 @@ import {
 } from "@/components/ui/pagination";
 
 const getStatusColor = (status) => {
-  switch (status.toUpperCase()) {
+  switch (status?.toUpperCase()) {
     case "DELIVERED":
       return "text-green-600";
     case "PROCESSING":
@@ -142,16 +142,16 @@ export default function Component() {
                   <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-4 mt-2 sm:mt-0">
                     <p
                       className={`text-sm font-medium ${getStatusColor(
-                        order.order_status
+                        order?.order_status
                       )}`}
                     >
-                      {order.order_status}
+                      {order?.order_status}
                     </p>
-                    {order.order_status === "delivered" && (
+                    {order?.order_status === "delivered" && (
                       <Button
                         variant="outline"
                         size="sm"
-                        onClick={() => handleReturnOrder(order._id)}
+                        onClick={() => handleReturnOrder(order?._id)}
                         className="flex items-center space-x-2"
                       >
                         <Undo2 className="w-4 h-4" />
@@ -168,10 +168,10 @@ export default function Component() {
                   Total Amount: ₹{order.total_price_with_discount.toFixed(2)}
                 </p>
                 <p className="text-sm text-gray-600">
-                  Payment Method: {order.payment_method}
+                  Payment Method: {order?.payment_method}
                 </p>
                 <p className="text-sm text-gray-600">
-                  Payment Status: {order.payment_status}
+                  Payment Status: {order?.payment_status}
                 </p>
               </div>
               <div className="space-x-3 mt-4 sm:mt-0">
@@ -181,8 +181,8 @@ export default function Component() {
                 >
                   View Details
                 </Button>
-                {order.order_items.some(
-                  (item) => item.order_status === "pending"
+                {order?.order_items.some(
+                  (item) => item?.order_status === "pending"
                 ) && (
                   <Button
                     variant="destructive"

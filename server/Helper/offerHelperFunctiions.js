@@ -51,7 +51,6 @@ async function removeCategoryOffer(categoryId) {
         if (product) {
             product.offer = is_any_product_offerExist ? is_any_product_offerExist._id : null;
         }
-
         await product.save();
     }
 }

@@ -64,10 +64,10 @@ router.patch('/quantity/min/:userId/:itemId', verifyUser, cartController.decreme
 
 //Route that mange order related API....
 router.get('/items/:userId', orderController.getCheckoutCartItems);
-router.post('/order', verifyUser, orderController.createOrder);
+router.post('/order', orderController.createOrder);
 router.get('/orders/:userId', verifyUser, orderController.getUserOrders);
 router.get('/order/:orderId', verifyUser, orderController.getOrderById);
-router.patch('/order/:orderId', verifyUser, orderController.cancelOrder);
+router.patch('/order/:orderId/cancel/:productId', verifyUser, orderController.cancelOrder);
 
 //API endpoints for wishlist...
 router.post('/wishlist/add', verifyUser, wishlistController.AddItemToWishlist);
@@ -75,7 +75,7 @@ router.post('/wishlist/remove', verifyUser, wishlistController.removeItemFromWis
 router.get('/wishlist/:userId', verifyUser, wishlistController.getAllWishlistItems);
 router.get('/inwishlist', verifyUser, wishlistController.isInWishlist);
 router.post('/movetocart', verifyUser, wishlistController.moveToCart);
-router.get('/wishlist/length/:id',verifyUser, wishlistController.getWishlishProductCount)
+router.get('/wishlist/length/:id', verifyUser, wishlistController.getWishlishProductCount)
 
 //API end points for wallet..
 router.post('/wallet', verifyUser, walletController.addAmountToWallet)

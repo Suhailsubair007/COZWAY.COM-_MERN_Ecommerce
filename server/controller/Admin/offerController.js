@@ -6,7 +6,6 @@ const { applyCategoryOffer,
     removeProductOffer } = require('../../Helper/offerHelperFunctiions')
 
 
-
 // Controller for get all the offers for 
 const getOffers = async (req, res) => {
     try {
@@ -29,6 +28,7 @@ const getOffers = async (req, res) => {
         });
     }
 }
+
 
 //POST--Add offer Contoller...
 const addOffer = async (req, res) => {
@@ -86,6 +86,7 @@ const addOffer = async (req, res) => {
         });
     }
 };
+
 
 
 // DELETE--Delete offer controller...

@@ -9,11 +9,16 @@ const getUserWallet = async (req, res) => {
         let wallet = await Wallet.findOne({ user: userId });
 
         if (!wallet) {
-            res.status(404).json({
-                sucess: false,
-                message: "wallet not found..."
+            wallet = new Wallet({
+                user: userId,
+                balance: 0,
+                transactions: []
             })
         }
+
+        wallet?.transactions.sort((a, b) =>
+            new Date(b.transaction_date) - new Date(a.transaction_date)
+        );
 
         res.status(200).json({
             sucess: true,
