@@ -1,58 +1,122 @@
-import { useEffect, useState } from "react"
-import { useParams } from "react-router-dom"
-import { ChevronRight, Home, Package, CreditCard, FileText, Truck, RefreshCcw } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Separator } from "@/components/ui/separator"
-import { ScrollArea } from "@/components/ui/scroll-area"
-import { Badge } from "@/components/ui/badge"
-import axiosInstance from "@/config/axiosConfig"
+import { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
+import {
+  ChevronRight,
+  Home,
+  Package,
+  CreditCard,
+  FileText,
+  Truck,
+  RefreshCcw,
+} from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Separator } from "@/components/ui/separator";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Badge } from "@/components/ui/badge";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { toast } from "sonner";
+import axiosInstance from "@/config/axiosConfig";
 
 export default function AdminOrderDetail() {
-  const { id } = useParams()
-  const [orderData, setOrderData] = useState(null)
-  const [isLoading, setIsLoading] = useState(true)
-  const [error, setError] = useState(null)
+  const { id } = useParams();
+  const [orderData, setOrderData] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [updatingStatus, setUpdatingStatus] = useState({});
 
   useEffect(() => {
-    fetchOrderDetail()
-  }, [id])
+    fetchOrderDetail();
+  }, [id]);
 
+  
   const fetchOrderDetail = async () => {
     try {
-      setIsLoading(true)
-      const response = await axiosInstance.get(`/admin/order/${id}`)
-      setOrderData(response.data.order)
-      setError(null)
+      setIsLoading(true);
+      const response = await axiosInstance.get(`/admin/order/${id}`);
+      setOrderData(response.data.order);
+      setError(null);
     } catch (error) {
-      console.error("Error fetching order:", error)
-      setError("Failed to fetch order details")
+      console.error("Error fetching order:", error);
+      setError("Failed to fetch order details");
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }
+  };
 
-  if (isLoading) return <div className="flex items-center justify-center h-screen">Loading...</div>
-  if (error) return <div className="flex items-center justify-center h-screen text-red-500">{error}</div>
-  if (!orderData) return <div className="flex items-center justify-center h-screen">No order found</div>
+  const updateOrderStatus = async (orderId, itemId, newStatus) => {
+    setUpdatingStatus((prev) => ({ ...prev, [itemId]: true }));
+    try {
+      await axiosInstance.patch(`/admin/orders/${orderId}/status`, {
+        newStatus,
+        itemId,
+      });
+      await fetchOrderDetail();
+      toast("The order status has been successfully updated.");
+    } catch (error) {
+      console.error("Error updating order status:", error);
+      toast({
+        title: "Update Failed",
+        description: "Failed to update the order status. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setUpdatingStatus((prev) => ({ ...prev, [itemId]: false }));
+    }
+  };
+
+  if (isLoading)
+    return (
+      <div className="flex items-center justify-center h-screen">
+        Loading...
+      </div>
+    );
+  if (error)
+    return (
+      <div className="flex items-center justify-center h-screen text-red-500">
+        {error}
+      </div>
+    );
+  if (!orderData)
+    return (
+      <div className="flex items-center justify-center h-screen">
+        No order found
+      </div>
+    );
 
   const formatDate = (dateString) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric'
-    })
-  }
+    return new Date(dateString).toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    });
+  };
+
+  const orderStatuses = ["pending", "shipped", "delivered", "cancelled"];
 
   return (
     <div className="container mx-auto py-10 px-4 sm:px-6 lg:px-8 min-h-screen">
       {/* Breadcrumb */}
       <nav className="flex items-center gap-2 text-sm text-muted-foreground mb-6">
-        <a href="/admin/dashboard" className="flex items-center hover:text-foreground transition-colors">
+        <a
+          href="/admin/dashboard"
+          className="flex items-center hover:text-foreground transition-colors"
+        >
           <Home className="h-4 w-4 mr-1" />
           <span>Dashboard</span>
         </a>
         <ChevronRight className="h-4 w-4" />
-        <a href="/admin/orders" className="hover:text-foreground transition-colors">Orders</a>
+        <a
+          href="/admin/orders"
+          className="hover:text-foreground transition-colors"
+        >
+          Orders
+        </a>
         <ChevronRight className="h-4 w-4" />
         <span className="text-foreground font-medium">Order Details</span>
       </nav>
@@ -69,9 +133,15 @@ export default function AdminOrderDetail() {
       <div className="bg-muted/50 rounded-lg p-6 mb-8">
         <div className="flex justify-between items-center mb-4">
           <div className="space-y-1">
-            <p className="text-sm text-muted-foreground">Ordered on {formatDate(orderData.placed_at)}</p>
-            <p className="text-lg font-semibold">Order #{orderData.order_id}</p>
+            <p className="text-sm text-muted-foreground">
+              Ordered on {formatDate(orderData.placed_at)}
+            </p>
+            <p className="text-lg font-semibold flex items-center">
+              <Package className="h-5 w-5 text-primary mr-1" />
+              Order {orderData.order_id}
+            </p>
           </div>
+
           <Button variant="outline" className="gap-2">
             <FileText className="h-4 w-4" />
             Invoice
@@ -87,7 +157,10 @@ export default function AdminOrderDetail() {
             </div>
             <div className="text-sm text-muted-foreground space-y-1">
               <p>{orderData.shipping_address.address}</p>
-              <p>{orderData.shipping_address.district}, {orderData.shipping_address.state}</p>
+              <p>
+                {orderData.shipping_address.district},{" "}
+                {orderData.shipping_address.state}
+              </p>
               <p>Pin Code - {orderData.shipping_address.pincode}</p>
               <p>Contact Number - {orderData.shipping_address.phone}</p>
             </div>
@@ -117,7 +190,7 @@ export default function AdminOrderDetail() {
                 <span>₹{orderData.total_amount.toFixed(2)}</span>
               </div>
               <div className="flex justify-between text-muted-foreground">
-                <span>Total Discout</span>
+                <span>Total Discount</span>
                 <span>₹{orderData.total_discount.toFixed(0)}</span>
               </div>
               <div className="flex justify-between text-muted-foreground">
@@ -133,12 +206,15 @@ export default function AdminOrderDetail() {
           </div>
         </div>
       </div>
-  
+
       <h2 className="text-2xl font-semibold mb-4">Order Items</h2>
       <ScrollArea className="h-[400px] rounded-md border p-4">
         <div className="space-y-6">
           {orderData.order_items.map((item, index) => (
-            <div key={index} className="flex items-start gap-4 pb-4 border-b last:border-b-0">
+            <div
+              key={index}
+              className="flex items-start gap-4 pb-4 border-b last:border-b-0"
+            >
               <img
                 src={item.product.images[0]}
                 alt={item.product.name}
@@ -154,17 +230,40 @@ export default function AdminOrderDetail() {
                 <Badge variant="secondary" className="mt-2">
                   {item.product.category.name}
                 </Badge>
-                <p className="text-lg text-muted-foreground mt-2">
-                  Status: {item.order_status}
-                </p>
+                <div className="flex items-center gap-2 mt-2">
+                  <p className="text-sm text-muted-foreground">Status:</p>
+                  <Select
+                    value={item.order_status}
+                    onValueChange={(newStatus) =>
+                      updateOrderStatus(orderData._id, item._id, newStatus)
+                    }
+                    disabled={updatingStatus[item._id]}
+                  >
+                    <SelectTrigger className="w-[180px]">
+                      <SelectValue placeholder="Select status" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {orderStatuses.map((status) => (
+                        <SelectItem key={status} value={status}>
+                          {status.charAt(0).toUpperCase() + status.slice(1)}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  {updatingStatus[item._id] && (
+                    <RefreshCcw className="h-4 w-4 animate-spin" />
+                  )}
+                </div>
               </div>
               <div className="text-right">
-                <p className="font-semibold">₹{(item.quantity * item.price).toFixed(2)}</p>
+                <p className="font-semibold">
+                  ₹{(item.quantity * item.price).toFixed(2)}
+                </p>
               </div>
             </div>
           ))}
         </div>
       </ScrollArea>
     </div>
-  )
+  );
 }

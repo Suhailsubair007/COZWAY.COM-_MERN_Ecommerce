@@ -29,23 +29,27 @@ const getAllOrders = async (req, res) => {
 const updateOrderStatus = async (req, res) => {
     try {
         const { orderId } = req.params;
-        const { newStatus } = req.body;
-        // console.log(orderId, newStatus);
-        // console.log("testingggggg......");
+        const { newStatus, itemId } = req.body;
+        console.log(orderId, newStatus, itemId);
+        console.log("testingggggg......");
 
-        const order = await Order.findById(orderId);
+        const order = await Order.findById({ _id: orderId });
         if (!orderId) {
             res.status(404).json({ error: "order id not fount..." })
         }
 
-        if (order.order_status === 'Cancelled') {
+        const product = order.order_items.find(
+            (item) => item._id.toString() === itemId
+        )
+
+        if (product.order_status === 'Cancelled') {
             return res.status(400).json({ error: 'Cannot modify a cancelled order' });
         }
         const validStatuses = ['pending', 'shipped', 'delivered', 'cancelled'];
         if (!validStatuses.includes(newStatus)) {
             return res.status(400).json({ error: 'Invalid order status' });
         }
-        order.order_status = newStatus;
+        product.order_status = newStatus;
         await order.save();
 
         res.status(200).json({ message: 'Order status updated successfully', order });

@@ -68,6 +68,7 @@ router.post('/order', orderController.createOrder);
 router.get('/orders/:userId', verifyUser, orderController.getUserOrders);
 router.get('/order/:orderId', verifyUser, orderController.getOrderById);
 router.patch('/order/:orderId/cancel/:productId', verifyUser, orderController.cancelOrder);
+router.post('/order/:orderId/return/:productId', orderController.returnRequest)
 
 //API endpoints for wishlist...
 router.post('/wishlist/add', verifyUser, wishlistController.AddItemToWishlist);

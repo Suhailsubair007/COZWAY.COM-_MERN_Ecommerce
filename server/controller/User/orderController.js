@@ -397,6 +397,65 @@ const cancelOrder = async (req, res) => {
 };
 
 
+const returnRequest = async (req, res) => {
+
+    try {
+        const { productId, orderId } = req.params;
+        const { returnReason, returnComments } = req.body;
+
+        const order = await Order.findOne({ _id: orderId })
+
+        if (!order) {
+            return res.status(404).json({
+                sucess: false,
+                message: "Order not found.."
+            })
+        }
+
+        const product = order.order_items.find(
+            (item) => item._id.toString() === productId
+        );
+
+        if (!product) {
+            return res.status(404).json({
+                sucess: false,
+                message: "product not found.."
+            });
+        }
+
+        if (product.return_request.is_requested) {
+            return res.status(400).json({
+                sucess: false,
+                message: "Return request alredy exist.."
+            })
+        }
+
+        product.return_request = {
+            is_requested: true,
+            reason: returnReason,
+            comment: returnComments,
+            is_approved: false,
+            is_response_send: false,
+        }
+        await order.save();
+
+        res.status(200).json({
+            success: true,
+            message: "Return request submitted successfully.",
+            order,
+        });
+
+
+    } catch (error) {
+        console.error("Error canceling order:", error);
+        res.status(500).json({
+            success: false,
+            message: "Failed to cancel order",
+            error: error.message
+        });
+    }
+
+}
 
 
 module.exports = {
@@ -404,7 +463,8 @@ module.exports = {
     getCheckoutCartItems,
     getUserOrders,
     getOrderById,
-    cancelOrder
+    cancelOrder,
+    returnRequest
 };
 
 

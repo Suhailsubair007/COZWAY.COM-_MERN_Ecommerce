@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { useSelector } from "react-redux";
+import ReturnPopup from "./ReturnPopup";
 import {
   ChevronRight,
   Home,
@@ -10,6 +11,7 @@ import {
   Truck,
   Undo2,
   X,
+  Send,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
@@ -34,6 +36,10 @@ export default function OrderDetail() {
   const [orderData, setOrderData] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [cancelProductId, setCancelProductId] = useState(null);
+  const [returningProductId, setReturningProductId] = useState(null);
+  const [isReturnModalOpen, setIsReturnModalOpen] = useState(false);
+  const [returnReason, setReturnReason] = useState("");
+  const [returnComments, setReturnComments] = useState("");
   const [error, setError] = useState(null);
 
   useEffect(() => {
@@ -44,7 +50,7 @@ export default function OrderDetail() {
     try {
       setIsLoading(true);
       const response = await axiosInstance.get(`/users/order/${id}`);
-      console.log("respoce data---->>>>", response.data);
+      console.log("response data---->>>>", response.data);
       setOrderData(response.data.order);
       setError(null);
     } catch (error) {
@@ -80,11 +86,34 @@ export default function OrderDetail() {
     }
   };
 
-  const handleReturn = async (productId) => {
-    // Implement return logic here
-    toast.info("Return functionality not implemented yet");
+  const handleReturn = (productId) => {
+    setReturningProductId(productId);
+    setIsReturnModalOpen(true);
+    console.log("item id ---->>>>", productId);
   };
 
+  const confirmReturn = async (reason , comments) => {
+    try {
+      const response = await axiosInstance.post(
+        `/users/order/${id}/return/${returningProductId}`,
+        {
+          returnReason: reason,
+          returnComments: comments,
+        }
+      );
+      if (response.status === 200) {
+        fetchOrderDetail();
+        toast.success("Return request submitted successfully");
+        setIsReturnModalOpen(false);
+        setReturningProductId(null);
+      } else {
+        toast.error("Failed to submit return request");
+      }
+    } catch (error) {
+      console.error("Error submitting return request:", error);
+      toast.error("Error submitting return request");
+    }
+  };
   if (isLoading)
     return (
       <div className="flex items-center justify-center h-screen">
@@ -200,7 +229,7 @@ export default function OrderDetail() {
                 <span>₹{orderData.total_price_with_discount.toFixed(0)}</span>
               </div>
               <div className="flex justify-between text-muted-foreground">
-                <span>Total Discout</span>
+                <span>Total Discount</span>
                 <span>₹{orderData.total_discount.toFixed(0)}</span>
               </div>
               <div className="flex justify-between text-muted-foreground">
@@ -246,7 +275,9 @@ export default function OrderDetail() {
                 </p>
               </div>
               <div className=" text-right space-y-2">
-                <p className="font-semibold">₹{(item.price * item.quantity).toFixed(0)}</p>
+                <p className="font-semibold">
+                  ₹{(item.price * item.quantity).toFixed(0)}
+                </p>
                 {item.order_status === "delivered" ? (
                   <Button
                     variant="outline"
@@ -300,6 +331,14 @@ export default function OrderDetail() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {/* Return Modal */}
+
+      <ReturnPopup
+        open={isReturnModalOpen}
+        onOpenChange={setIsReturnModalOpen}
+        onSubmit={confirmReturn}
+      />
     </div>
   );
 }
