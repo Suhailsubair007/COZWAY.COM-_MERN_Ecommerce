@@ -181,18 +181,6 @@ export default function Component() {
                 >
                   View Details
                 </Button>
-                {order?.order_items.some(
-                  (item) => item?.order_status === "pending"
-                ) && (
-                  <Button
-                    variant="destructive"
-                    onClick={() => {
-                      /* Implement cancel order logic */
-                    }}
-                  >
-                    Cancel Order
-                  </Button>
-                )}
               </div>
             </div>
           </div>

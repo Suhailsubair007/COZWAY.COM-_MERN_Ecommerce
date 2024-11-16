@@ -9,13 +9,6 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { Package, Eye, ChevronRight, Home } from "lucide-react";
 import axiosInstance from "@/config/axiosConfig";
@@ -71,7 +64,7 @@ export default function OrderManagement() {
 
   const handleStatusChange = async (orderId, newStatus, currentStatus) => {
     const statusOrder = ["pending", "shipped", "delivered", "cancelled"];
-    const currentIndex = statusOrder.indexOf(currentStatus.toLowerCase());
+    const currentIndex = statusOrder.indexOf(currentStatus?.toLowerCase());
     const newIndex = statusOrder.indexOf(newStatus);
 
     if (newIndex < currentIndex) {
@@ -118,7 +111,7 @@ export default function OrderManagement() {
 
   const getAvailableStatuses = (currentStatus) => {
     const statusOrder = ["pending", "shipped", "delivered", "cancelled"];
-    const currentIndex = statusOrder.indexOf(currentStatus.toLowerCase());
+    const currentIndex = statusOrder.indexOf(currentStatus?.toLowerCase());
     return statusOrder.slice(currentIndex);
   };
 
@@ -147,7 +140,6 @@ export default function OrderManagement() {
               <TableHead className="min-w-[200px]">CUSTOMER</TableHead>
               <TableHead className="hidden sm:table-cell">DATE</TableHead>
               <TableHead>TOTAL</TableHead>
-              <TableHead>STATUS</TableHead>
               <TableHead className="text-right">ACTIONS</TableHead>
             </TableRow>
           </TableHeader>
@@ -169,45 +161,12 @@ export default function OrderManagement() {
                   </div>
                 </TableCell>
                 <TableCell className="hidden sm:table-cell">
-                  {new Date(order.placed_at).toLocaleDateString()}
+                  {new Date(order.placed_at)?.toLocaleDateString()}
                 </TableCell>
                 <TableCell>
                   {order.total_price_with_discount.toFixed(2)}
                 </TableCell>
-                <TableCell>
-                  <Select
-                    value={order.order_status.toLowerCase()}
-                    onValueChange={(value) =>
-                      handleStatusChange(order._id, value, order.order_status)
-                    }
-                    disabled={order.order_status.toLowerCase() === "cancelled"}
-                  >
-                    <SelectTrigger className="w-[120px]">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {getAvailableStatuses(order.order_status).map(
-                        (status) => (
-                          <SelectItem key={status} value={status}>
-                            <span
-                              className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
-                                status === "pending"
-                                  ? "bg-yellow-100 text-yellow-800"
-                                  : status === "shipped"
-                                  ? "bg-blue-100 text-blue-800"
-                                  : status === "delivered"
-                                  ? "bg-green-100 text-green-800"
-                                  : "bg-red-100 text-red-800"
-                              }`}
-                            >
-                              {status.charAt(0).toUpperCase() + status.slice(1)}
-                            </span>
-                          </SelectItem>
-                        )
-                      )}
-                    </SelectContent>
-                  </Select>
-                </TableCell>
+               
                 <TableCell className="text-right">
                   <div className="flex justify-end gap-2">
                     <Button
@@ -223,8 +182,8 @@ export default function OrderManagement() {
                       size="sm"
                       onClick={() => handleCancel(order)}
                       disabled={
-                        order.order_status.toLowerCase() === "cancelled" ||
-                        order.order_status.toLowerCase() === "delivered"
+                        order.order_status?.toLowerCase() === "cancelled" ||
+                        order.order_status?.toLowerCase() === "delivered"
                       }
                     >
                       Cancel

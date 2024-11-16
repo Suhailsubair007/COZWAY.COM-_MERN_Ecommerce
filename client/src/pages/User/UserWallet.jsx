@@ -76,7 +76,7 @@ export default function UserWallet() {
             <div className="flex justify-between items-center">
               <div>
                 <p className="text-sm text-gray-600 mb-1">Wallet Balance</p>
-                <h3 className="text-3xl md:text-4xl font-bold">{balance}</h3>
+                <h3 className="text-3xl md:text-4xl font-bold">{balance?.toFixed(0)}</h3>
               </div>
               <Button
                 onClick={() => setIsPopupOpen(true)}

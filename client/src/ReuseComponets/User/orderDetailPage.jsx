@@ -236,12 +236,7 @@ export default function OrderDetail() {
               <div className="flex-1">
                 <h3 className="font-medium">{item.product.name}</h3>
                 <p className="text-sm text-muted-foreground mt-1">
-                  Quantity: {item.quantity} x ₹{" "}
-                  {(
-                    item.price -
-                    (item.price * (item?.product?.offer?.offer_value || 0)) /
-                      100
-                  ).toFixed(0)}
+                  Quantity: {item.quantity} x ₹ {item.price.toFixed(0)}
                 </p>
                 <Badge variant="secondary" className="mt-2">
                   {item.product.category.name}
@@ -250,15 +245,8 @@ export default function OrderDetail() {
                   Status: {item.order_status}
                 </p>
               </div>
-              <div className="text-right space-y-2">
-                <p className="font-semibold">
-                  ₹
-                  {(
-                    item.price -
-                    (item.price * (item?.product?.offer?.offer_value || 0)) /
-                      100
-                  ).toFixed(0)}
-                </p>
+              <div className=" text-right space-y-2">
+                <p className="font-semibold">₹{(item.price * item.quantity).toFixed(0)}</p>
                 {item.order_status === "delivered" ? (
                   <Button
                     variant="outline"

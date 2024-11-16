@@ -59,7 +59,7 @@ export default function AdminOrderDetail() {
 
       {/* Header */}
       <div className="flex justify-between items-center mb-8">
-        <h1 className="text-3xl font-bold text-foreground">Order Details (Admin View)</h1>
+        <h1 className="text-3xl font-bold text-foreground">Order Details</h1>
         <Badge variant="outline" className="text-lg px-3 py-1">
           {orderData.order_status}
         </Badge>
@@ -117,6 +117,10 @@ export default function AdminOrderDetail() {
                 <span>₹{orderData.total_amount.toFixed(2)}</span>
               </div>
               <div className="flex justify-between text-muted-foreground">
+                <span>Total Discout</span>
+                <span>₹{orderData.total_discount.toFixed(0)}</span>
+              </div>
+              <div className="flex justify-between text-muted-foreground">
                 <span>Shipping Charge</span>
                 <span>₹{orderData.shipping_fee.toFixed(2)}</span>
               </div>
@@ -129,8 +133,7 @@ export default function AdminOrderDetail() {
           </div>
         </div>
       </div>
-
-      {/* Products List */}
+  
       <h2 className="text-2xl font-semibold mb-4">Order Items</h2>
       <ScrollArea className="h-[400px] rounded-md border p-4">
         <div className="space-y-6">
@@ -151,6 +154,9 @@ export default function AdminOrderDetail() {
                 <Badge variant="secondary" className="mt-2">
                   {item.product.category.name}
                 </Badge>
+                <p className="text-lg text-muted-foreground mt-2">
+                  Status: {item.order_status}
+                </p>
               </div>
               <div className="text-right">
                 <p className="font-semibold">₹{(item.quantity * item.price).toFixed(2)}</p>

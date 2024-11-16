@@ -84,6 +84,8 @@ const createOrder = async (req, res) => {
         const discountAmount = (subtotal * total_discount) / 100;
         const calculatedTotal = subtotal - discountAmount + shipping_fee;
 
+        console.log("---------------->>>>>>>>", order_items)
+
         for (const item of order_items) {
             const product = await Product.findById(item.productId._id);
             if (product) {
@@ -107,16 +109,23 @@ const createOrder = async (req, res) => {
             }
         }
 
-        const products = order_items.map(item => ({
-            product: item.productId,
-            quantity: item.quantity,
-            price: item.offerPrice,
-            selectedSize: item.size,
-            discount: item.discount,
-            totalProductPrice: item.totalProductPrice,
-            order_status: "pending",
-            size: item.size
-        }));
+        const products = order_items.map(item => {
+            const discountedPrice =
+                item.offerPrice -
+                (item.offerPrice *
+                    (item.productId?.offer?.offer_value ?
+                        item.productId.offer.offer_value : 0)) / 100;
+            return {
+                product: item.productId,
+                quantity: item.quantity,
+                price: discountedPrice,
+                selectedSize: item.size,
+                discount: item.discount,
+                totalProductPrice: (discountedPrice * item.quantity).toFixed(0),
+                order_status: "pending",
+                size: item.size
+            };
+        });
 
         const order = await Order.create({
             userId,
@@ -322,12 +331,24 @@ const cancelOrder = async (req, res) => {
             });
         }
 
-        const refundAmount = orderItem.totalProductPrice;
+        let refundAmount = orderItem.totalProductPrice;
+        if (order.coupon_discount > 0) {
+            const totalOrderValue = order.order_items.reduce((sum, item) => sum + item.totalProductPrice, 0);
+            const itemProportion = orderItem.totalProductPrice / totalOrderValue;
+            const itemCouponDiscount = order.coupon_discount * itemProportion;
+            refundAmount -= itemCouponDiscount;
+        }
+
+        console.log("Refund amount including coupon adjustment:", refundAmount);
+        // const refundAmount = orderItem.price;
+        // console.log("order itemssssssssssssssss",refundAmount);
 
         console.log("refund amount----->>>", refundAmount)
 
         orderItem.order_status = 'cancelled';
         await order.save();
+
+
 
         const product = await Product.findById(orderItem.product);
         if (product) {

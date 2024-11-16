@@ -99,6 +99,8 @@ export default function CheckoutPage() {
     fetchItems();
   }, [user]);
 
+  console.log("items------->>>>", items);
+
   useEffect(() => {
     setTotal(subtotal - couponDiscount + shipping);
   }, [subtotal, couponDiscount, shipping]);
@@ -206,25 +208,21 @@ export default function CheckoutPage() {
     try {
       const response = await axiosInstance.post(`/users/order/`, {
         userId: user.id,
-        order_items: items.map((item) => ({
-          ...item,
-          totalProductPrice: (
-            (item.offerPrice -
-              (item.offerPrice *
-                (item?.productId?.offer?.offer_value
-                  ? item?.productId?.offer?.offer_value
-                  : 0)) /
-                100) *
-            item.quantity
-          ).toFixed(0),
-          price:
+        order_items: items.map((item) => {
+          const discountedPrice =
             item.offerPrice -
             (item.offerPrice *
               (item?.productId?.offer?.offer_value
                 ? item?.productId?.offer?.offer_value
                 : 0)) /
-              100,
-        })),
+              100;
+
+          return {
+            ...item,
+            price: discountedPrice,
+            totalProductPrice: (discountedPrice * item.quantity).toFixed(0),
+          };
+        }),
         address: addressToSend,
         payment_method: selectedPaymentMethod,
         subtotal,
