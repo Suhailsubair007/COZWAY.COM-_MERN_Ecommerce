@@ -68,7 +68,7 @@ export default function OrderDetail() {
   const confirmCancel = async () => {
     try {
       const response = await axiosInstance.patch(
-        `/users/order/${id}/cancel/${cancelProductId}`,
+        `/admin/order/${id}/cancel/${cancelProductId}`,
         {
           userId,
         }

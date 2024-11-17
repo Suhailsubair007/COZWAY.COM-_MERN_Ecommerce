@@ -38,6 +38,7 @@ router.patch('/coustmers/:id', verifyAdmin, userController.updateCoustomerStatus
 router.get('/orders', verifyAdmin, orderController.getAllOrders);
 router.patch('/orders/:orderId/status', verifyAdmin, orderController.updateOrderStatus);
 router.get('/order/:orderId', verifyAdmin, orderController.getOrderById);
+router.post('/orders/:orderId/return-response', orderController.responseToReturnRequest);
 
 //offer related API end points...
 router.get('/offers', verifyAdmin, offerController.getOffers);

@@ -1,4 +1,6 @@
 const Order = require('../../model/order');
+const Product = require('../../model/Product')
+const Wallet = require('../../model/Wallet')
 
 
 // GET --Get all orders for display in the table in admin side....
@@ -92,4 +94,119 @@ const getOrderById = async (req, res) => {
 };
 
 
-module.exports = { getAllOrders, updateOrderStatus, getOrderById };
+const responseToReturnRequest = async (req, res) => {
+    try {
+        const { orderId } = req.params;
+        const { itemId, isApproved } = req.body;
+        console.log("item thinte id itaann", itemId)
+
+        const order = await Order.findById(orderId);
+
+        if (!order) {
+            return res.status(404).json({
+                success: false,
+                message: 'Order not found'
+            });
+        }
+
+        const orderItem = order.order_items.find(
+            item => item._id.toString() === itemId
+        );
+
+        console.log("order itemmm====>>>>>", itemId)
+
+        if (!orderItem) {
+            return res.status(404).json({
+                success: false,
+                message: 'Order item not found'
+            });
+        }
+
+        if (!orderItem.return_request.is_requested) {
+            return res.status(400).json({
+                success: false,
+                message: 'No return request for this item'
+            });
+        }
+
+        orderItem.return_request.is_approved = isApproved;
+        orderItem.return_request.is_response_send = true;
+        orderItem.return_request.is_requested = false;
+
+        if (isApproved) {
+            orderItem.order_status = 'returned';
+        } else {
+            orderItem.order_status = 'delivered';
+        }
+
+        await order.save();
+
+        let refundAmount = orderItem.totalProductPrice;
+        if (order.coupon_discount > 0) {
+            const totalOrderValue = order.order_items.reduce((sum, item) => sum + item.totalProductPrice, 0);
+            const itemProportion = orderItem.totalProductPrice / totalOrderValue;
+            const itemCouponDiscount = order.coupon_discount * itemProportion;
+            refundAmount -= itemCouponDiscount;
+        }
+
+        console.log("Refund amount including coupon adjustment:", refundAmount);
+
+        await order.save();
+
+
+        const product = await Product.findById(orderItem.product);
+        if (product) {
+            const sizeIndex = product.sizes.findIndex(s => s.size === orderItem.selectedSize);
+            if (sizeIndex !== -1) {
+                product.sizes[sizeIndex].stock += orderItem.quantity;
+                product.totalStock += orderItem.quantity;
+                await product.save();
+            }
+        }
+
+        if (order.payment_method === "Wallet" || order.payment_method === "RazorPay") {
+            let wallet = await Wallet.findOne({ user: order.userId });
+
+            if (!wallet) {
+                wallet = new Wallet({
+                    user: order.userId,
+                    balance: 0,
+                    transactions: []
+                });
+            }
+            wallet.balance += refundAmount;
+            wallet?.transactions.push({
+                order_id: order._id,
+                transaction_date: new Date(),
+                transaction_type: "credit",
+                transaction_status: "completed",
+                amount: refundAmount,
+            });
+
+            await wallet.save();
+        }
+
+        res.status(200).json({
+            success: true,
+            message: `Return request ${isApproved ? 'approved' : 'rejected'}`,
+            order: order
+        });
+
+    } catch (error) {
+        console.error("Error processing return request:", error);
+        res.status(500).json({
+            success: false,
+            message: 'Server error',
+            error: error.message
+        });
+    }
+};
+
+
+
+module.exports = {
+    getAllOrders,
+    updateOrderStatus,
+    getOrderById,
+    responseToReturnRequest
+};
