@@ -8,8 +8,7 @@ const AddItemToWishlist = async (req, res) => {
     try {
         const { userId, id } = req.body;
 
-        // console.log(userId)
-        // console.log(id)
+
 
         let wishlist = await Wishlist.findOne({ user: userId })
         if (!wishlist) {
@@ -37,16 +36,14 @@ const AddItemToWishlist = async (req, res) => {
         });
 
     } catch (error) {
-        console.log(error);
+        console.error(error);
         res.status(500).json({ sucess: false })
     }
 }
 
 const getAllWishlistItems = async (req, res) => {
     try {
-        // console.log("=====================================")
         const { userId } = req.params;
-        // console.log(userId);
         const wishlist = await Wishlist.findOne({ user: userId })
             .populate('items.product');
 
@@ -63,7 +60,7 @@ const getAllWishlistItems = async (req, res) => {
             wishlistItems: wishlist.items,
         });
     } catch (error) {
-        console.log(error);
+        console.error(error);
         res.status(500).json({
             success: false,
             message: 'Error fetching wishlist items',
@@ -98,7 +95,7 @@ const isInWishlist = async (req, res) => {
         }
 
     } catch (error) {
-        console.log(error)
+        console.error(error)
         res.status(500).json({
             success: false,
             message: 'Error checking product in wishlist',
@@ -107,11 +104,9 @@ const isInWishlist = async (req, res) => {
 }
 
 const removeItemFromWishlist = async (req, res) => {
-    // console.log("vannuu==========================")
     try {
         const { userId, id } = req.body;
 
-        // console.log('Removing from wishlist:', userId, id);
 
         let wishlist = await Wishlist.findOne({ user: userId });
 
@@ -143,7 +138,7 @@ const removeItemFromWishlist = async (req, res) => {
         });
 
     } catch (error) {
-        console.log(error);
+        console.error(error);
         res.status(500).json({
             success: false,
             message: 'Error removing product from wishlist',
@@ -155,7 +150,6 @@ const removeItemFromWishlist = async (req, res) => {
 const moveToCart = async (req, res) => {
     try {
         const { userId, productId, size } = req.body;
-        // console.log(userId, productId, size);
 
         let wishlist = await Wishlist.findOne({ user: userId });
         if (!wishlist) {

@@ -12,7 +12,7 @@ const securePassword = async (password) => {
     try {
         return await bcrypt.hash(password, 10);
     } catch (error) {
-        console.log(error);
+        console.error(error);
     }
 };
 
@@ -20,7 +20,6 @@ const securePassword = async (password) => {
 //User registration controller....
 const registerUser = async (req, res) => {
     const { name, email, phone, password } = req.body;
-    // console.log(req.body);
     try {
 
         const existingUser = await User.findOne({ email });
@@ -51,7 +50,6 @@ const registerUser = async (req, res) => {
 const login = async (req, res) => {
     try {
         const { email, password } = req.body;
-        // console.log(req.body)
         if (!email || !password) {
             return res.status(400).json({ success: false, message: "All fields required" });
         }
@@ -64,7 +62,6 @@ const login = async (req, res) => {
             return res.status(403).json({ success: false, message: "User is blocked. Please contact support." });
         }
         const PasswordMatching = await bcrypt.compare(password, finduser.password);
-        // console.log(PasswordMatching)
         if (PasswordMatching) {
             genarateAccesTockenUser(res, finduser._id);
             genarateRefreshTockenUser(res, finduser._id);
@@ -82,7 +79,7 @@ const login = async (req, res) => {
             return res.status(401).json({ success: false, message: "Invalid credentials" });
         }
     } catch (error) {
-        console.log("error", error);
+        console.error("error", error);
         res.status(500).json({ success: false, message: "Server error" });
     }
 }
@@ -100,9 +97,7 @@ const UserLogout = (req, res) => {
 const sendOTP = async (req, res) => {
     try {
         const { email } = req.body;
-        // console.log(email);
         const userPresent = await User.findOne({ email });
-        // console.log(userPresent)
 
         if (userPresent) {
             return res.status(409).json({
@@ -129,9 +124,8 @@ const sendOTP = async (req, res) => {
             message: 'OTP sent successfully',
             otp,
         });
-        // console.log(res.data)
     } catch (error) {
-        console.log(error.message);
+        console.error(error.message);
         return res.status(500).json({ success: false, error: error.message });
     }
 }
@@ -165,7 +159,6 @@ const sendOTPForPasswordReset = async (req, res) => {
 
 //Cntroller for google signup
 const googleSignIn = async (req, res) => {
-    // console.log(req.body);
 
     const { email, name, sub: googleId } = req.body;
 

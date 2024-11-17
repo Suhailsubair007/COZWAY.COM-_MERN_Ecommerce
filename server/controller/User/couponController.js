@@ -3,12 +3,6 @@ const Coupon = require('../../model/coupun');
 const applyCoupon = async (req, res) => {
     try {
         const { code, userId, subtotal } = req.body;
-
-        console.log(code);
-        console.log(userId);
-        console.log(subtotal);
-
-        console.log("sub total coupon -->", subtotal)
         const coupon = await Coupon.findOne({ code: code.toUpperCase() });
 
         if (!coupon) {
@@ -37,17 +31,9 @@ const applyCoupon = async (req, res) => {
                 message: "Coupon has expired"
             });
         }
-
-
-
-
-
-
         let discountAmount;
         if (coupon.discount_type === "percentage") {
             discountAmount = Math.ceil((subtotal * coupon.discount_value) / 100);
-            console.log("dicount amount---------------->", discountAmount)
-            console.log("max dicount amount------------->", coupon.max_discount_amount)
             if (coupon.max_discount_amount) {
                 discountAmount = Math.min(discountAmount, coupon.max_discount_amount);
             }
@@ -57,9 +43,6 @@ const applyCoupon = async (req, res) => {
                 discountAmount = Math.min(discountAmount, coupon.max_discount_amount);
             }
         }
-
-        console.log("discount amount ----->", discountAmount)
-
         return res.status(200).json({
             coupon,
             discountAmount,
@@ -84,7 +67,7 @@ const getCoupens = async (req, res) => {
         })
 
     } catch (error) {
-        console.log(error)
+        console.error(error)
     }
 
 }

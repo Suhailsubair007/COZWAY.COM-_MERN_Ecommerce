@@ -12,7 +12,6 @@ const getSalesReportDate = async (skip = 0, limit = 0, startDate, endDate, perio
         const start = new Date(startDate).setHours(0, 0, 0, 0);
         const end = new Date(endDate).setHours(23, 59, 59, 999);
         dateSelection = { placed_at: { $gte: new Date(start), $lte: new Date(end) } };
-        // console.log("Custom date range ---->:", dateSelection);
         return await Order.find(dateSelection).populate('userId').populate('order_items.product').skip(skip).limit(limit);
     }
 
@@ -56,7 +55,6 @@ const getSalesReportDate = async (skip = 0, limit = 0, startDate, endDate, perio
 }
 //GET--To get the sales report  for the admin...
 const getSalesReport = async (req, res) => {
-    // console.log("in the get reports---->")
     const {
         startDate = null,
         endDate = null,
@@ -64,14 +62,11 @@ const getSalesReport = async (req, res) => {
         page = 1,
         limit = 5,
     } = req.query;
-    console.log("Received Query Params:", req.query);
 
 
     const skip = (page - 1) * limit;
 
-    console.log("startdate ---->", startDate);
-    console.log("end date---->", endDate);
-    console.log("period--->", period);
+
 
     let dateSelection = {};
 
@@ -81,7 +76,6 @@ const getSalesReport = async (req, res) => {
         const start = new Date(startDate).setHours(0, 0, 0, 0);
         const end = new Date(endDate).setHours(23, 59, 59, 999);
         dateSelection = { placed_at: { $gte: new Date(start), $lte: new Date(end) } };
-        // console.log("Custom date range ---->:", dateSelection);
         return await Order.find(dateSelection).populate('userId').populate('order_items.product').skip(skip).limit(limit);
     }
     switch (period) {
@@ -233,7 +227,6 @@ const download_sales_report_xl = async (req, res) => {
     try {
         const { startDate, endDate, period } = req.query;
         const reports = await getSalesReportDate(0, 0, startDate, endDate, period);
-        // console.log("exel reporst--->", reports)
 
         const workbook = new ExcelJS.Workbook();
         const worksheet = workbook.addWorksheet("Sales Report");

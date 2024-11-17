@@ -21,7 +21,7 @@ const getOffers = async (req, res) => {
             productOffers
         });
     } catch (err) {
-        console.log(err);
+        console.error(err);
         return res.status(500).json({
             success: false,
             message: "Server error"
@@ -93,7 +93,6 @@ const addOffer = async (req, res) => {
 const deleteOffer = async (req, res) => {
     try {
         const { offerId } = req.body;
-        // console.log("offer id----->", offerId)
         const existingOffer = await Offer.findById(offerId);
 
         if (!existingOffer) {

@@ -29,14 +29,12 @@ const registerAdmin = async (req, res) => {
 const AdminLogin = async (req, res) => {
     try {
         const { email, password } = req.body;
-        // console.log(email)
-        // console.log(password)
+
         if (!email || !password) {
             return res.status(400).json({ success: false, message: "All fields are required" });
         }
 
         const admin = await Admin.findOne({ email });
-        // console.log(admin)
         if (!admin || !(await bcrypt.compare(password, admin.password))) {
             return res.status(401).json({ success: false, message: "Invalid credentials" });
         }

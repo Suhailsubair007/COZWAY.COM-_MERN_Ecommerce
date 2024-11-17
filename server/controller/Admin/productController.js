@@ -42,7 +42,6 @@ const addProduct = async (req, res) => {
             images,
             offer: highestOffer ? highestOffer._id : null, 
         });
-        // console.log(newProduct);
 
         const savedProduct = await newProduct.save();
         res.status(201).json({
@@ -93,10 +92,8 @@ const getProduct = async (req, res) => {
 const updateProductStatus = async (req, res) => {
     try {
         const { id } = req.params;
-        // console.log("Product ID:", id);
 
         const { is_active } = req.body;
-        // console.log("is_active:", is_active);
         const updateStatus = await Product.findByIdAndUpdate(
             id,
             { is_active },
@@ -171,7 +168,6 @@ const updateProduct = async (req, res) => {
 //GET---To get the purticular products details....
 const fetchProductById = async (req, res) => {
     const { id } = req.params;
-    // console.log(id)
     try {
         const product = await Product.findById(id).populate('category');
 
@@ -198,11 +194,10 @@ const get_product_offer = async (req, res) => {
             { name: true }
         );
 
-        // console.log(products);
         res.status(200).json({ success: true, products });
 
     } catch (error) {
-        console.log(error);
+        console.error(error);
         res.status(500).json({ success: false });
     }
 }

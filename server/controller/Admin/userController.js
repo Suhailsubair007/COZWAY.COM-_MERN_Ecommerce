@@ -10,10 +10,9 @@ const getCoutomers = async (req, res) => {
                 users
 
             });
-            // console.log(users)
         }
     } catch (error) {
-        console.log("error", error);
+        console.error("error", error);
         res.status(500).json({ success: false, message: "Server error" });
     }
 };
@@ -25,7 +24,6 @@ const updateCoustomerStatus = async (req, res) => {
         const { is_blocked } = req.body;
 
         const updateStats = await User.findByIdAndUpdate(id, { is_blocked }, { new: true })
-        // console.log(updateStats);
         if (!updateStats) {
             return res.status(404).json({ message: 'Product not found..' });
         }

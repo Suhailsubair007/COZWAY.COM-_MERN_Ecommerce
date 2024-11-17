@@ -84,7 +84,6 @@ const createOrder = async (req, res) => {
         const discountAmount = (subtotal * total_discount) / 100;
         const calculatedTotal = subtotal - discountAmount + shipping_fee;
 
-        console.log("---------------->>>>>>>>", order_items)
 
         for (const item of order_items) {
             const product = await Product.findById(item.productId._id);
@@ -339,11 +338,7 @@ const cancelOrder = async (req, res) => {
             refundAmount -= itemCouponDiscount;
         }
 
-        console.log("Refund amount including coupon adjustment:", refundAmount);
-        // const refundAmount = orderItem.price;
-        // console.log("order itemssssssssssssssss",refundAmount);
 
-        console.log("refund amount----->>>", refundAmount)
 
         orderItem.order_status = 'cancelled';
         await order.save();

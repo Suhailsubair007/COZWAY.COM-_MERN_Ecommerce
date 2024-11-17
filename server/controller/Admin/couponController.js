@@ -52,7 +52,6 @@ const addCoupon = async (req, res) => {
 //DELETE---To delete the ccoupen...
 const deleteCoupon = async (req, res) => {
 
-    // console.log("arrived.......")
     try {
         const { id } = req.params;
 

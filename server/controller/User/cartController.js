@@ -3,7 +3,6 @@ const Cart = require('../../model/cart');
 // Controller to add a product to the cart.....
 const addToCart = async (req, res) => {
     try {
-        // console.log("Arrivedd....")
         const { userId, product } = req.body;
         if (product.quantity <= 0 || product.quantity > product.stock) {
             return res.status(400).json({ error: 'Invalid quantity' });
@@ -52,7 +51,6 @@ const addToCart = async (req, res) => {
 //Getting cart detais to chek is the purticlar size of theprpduct is alredy in the cart.. Go to cart checking
 const getCartDetails = async (req, res) => {
     try {
-        // console.log("vannuuu")
         const { userId, productId, size } = req.query;
         const cart = await Cart.findOne({ userId });
 
@@ -116,8 +114,6 @@ const getAllCartItems = async (req, res) => {
 
             const product = item.productId;
             const sizeData = product.sizes.find((s) => s.size === item.size);
-            // console.log("productss:=>", product) 
-            // console.log("sizedata vann :", sizeData);
             if (sizeData) {
                 if (item.quantity > sizeData.stock) {
                     item.quantity = sizeData.stock;
@@ -153,11 +149,10 @@ const getAllCartItems = async (req, res) => {
 //To delete the purticukar item from the cart......
 const deleteItem = async (req, res) => {
     try {
-        // console.log("Delete request received...");
+
         const { id, pr_id } = req.params;
 
-        // console.log("User ID:", id);
-        // console.log("Product ID to delete:", pr_id);
+
 
         const cart = await Cart.findOne({ userId: id });
 
@@ -166,7 +161,7 @@ const deleteItem = async (req, res) => {
         }
 
 
-        // console.log("Cart before delete:", cart.products);
+
 
         const updatedCart = await Cart.findOneAndUpdate(
             { userId: id },
@@ -174,7 +169,7 @@ const deleteItem = async (req, res) => {
             { new: true }
         );
 
-        // console.log("Ucart after delete:", updatedCart);
+
 
         updatedCart.totalCartPrice = updatedCart.products.reduce((acc, item) => acc + item.totalProductPrice, 0);
         await updatedCart.save();
@@ -194,8 +189,6 @@ const deleteItem = async (req, res) => {
 const incrementCartItemQuantity = async (req, res) => {
     try {
         const { userId, itemId } = req.params;
-        // console.log(userId)
-        // console.log(itemId)
 
         const cart = await Cart.findOne({ userId }).populate("products.productId");
         if (!cart) {
@@ -249,9 +242,6 @@ const incrementCartItemQuantity = async (req, res) => {
 const decrementCartItemQuantity = async (req, res) => {
     try {
         const { userId, itemId } = req.params;
-        // console.log(userId)
-        // console.log(itemId)
-
 
         const cart = await Cart.findOne({ userId });
         if (!cart) {
@@ -294,10 +284,7 @@ const decrementCartItemQuantity = async (req, res) => {
 const getUserCartProductCount = async (req, res) => {
     try {
         const { id } = req.params;
-        // console.log(id);
-        console.log("ivide vanuu")
         const cart = await Cart.findOne({ userId: id });
-        // console.log(cart)
         if (!cart) {
             return res.status(404).json({ message: 'Cart not found for this user' });
         }

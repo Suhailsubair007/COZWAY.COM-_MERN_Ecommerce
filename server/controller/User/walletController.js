@@ -27,14 +27,13 @@ const getUserWallet = async (req, res) => {
         })
 
     } catch (error) {
-        console.log(error)
+        console.error(error)
     }
 }
 
 
 const addAmountToWallet = async (req, res) => {
     try {
-        console.log("oooooooooooooooo")
         const { userId, amount } = req.body;
 
         let wallet = await Wallet.findOne({ user: userId })
@@ -63,7 +62,7 @@ const addAmountToWallet = async (req, res) => {
         })
 
     } catch (error) {
-        console.log(error)
+        console.error(error)
         res.status(500).json({
             sucess: false,
             message: "Server error"

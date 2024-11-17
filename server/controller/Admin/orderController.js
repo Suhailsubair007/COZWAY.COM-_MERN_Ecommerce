@@ -19,7 +19,6 @@ const getAllOrders = async (req, res) => {
             })
             .skip(skip)
             .limit(limit);
-        // console.log("Orders:", orders);
         res.status(200).json({ orders, totalPages });
     } catch (error) {
         console.error("Error fetching orders:", error);
@@ -32,8 +31,6 @@ const updateOrderStatus = async (req, res) => {
     try {
         const { orderId } = req.params;
         const { newStatus, itemId } = req.body;
-        console.log(orderId, newStatus, itemId);
-        console.log("testingggggg......");
 
         const order = await Order.findById({ _id: orderId });
         if (!orderId) {
@@ -98,7 +95,6 @@ const responseToReturnRequest = async (req, res) => {
     try {
         const { orderId } = req.params;
         const { itemId, isApproved } = req.body;
-        console.log("item thinte id itaann", itemId)
 
         const order = await Order.findById(orderId);
 
@@ -113,7 +109,6 @@ const responseToReturnRequest = async (req, res) => {
             item => item._id.toString() === itemId
         );
 
-        console.log("order itemmm====>>>>>", itemId)
 
         if (!orderItem) {
             return res.status(404).json({
@@ -149,7 +144,6 @@ const responseToReturnRequest = async (req, res) => {
             refundAmount -= itemCouponDiscount;
         }
 
-        console.log("Refund amount including coupon adjustment:", refundAmount);
 
         await order.save();
 
