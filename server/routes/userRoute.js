@@ -26,6 +26,7 @@ router.post('/send-otp', userController.sendOTP);
 router.patch('/profile/:id', profileController.updateProfile);
 router.get('/user/:id', profileController.getUserData);
 router.post('/update_password', profileController.changePassword)
+router.post('/invoice', profileController.OrderInvoice);
 
 //forgot password controller..
 router.post('/reset', userController.sendOTPForPasswordReset)

@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { useSelector } from "react-redux";
+import { saveAs } from "file-saver";
 import ReturnPopup from "./ReturnPopup";
 import {
   ChevronRight,
@@ -114,6 +115,34 @@ export default function OrderDetail() {
       toast.error("Error submitting return request");
     }
   };
+
+  const handleInvoiceDownload = async () => {
+    try {
+      const response = await axiosInstance.post(
+        '/users/invoice',
+        {
+          orderId: id,
+          userId: userId
+        },
+        {
+          responseType: 'blob',
+          headers: {
+            'Accept': 'application/pdf'
+          }
+        }
+      );
+      const blob = new Blob([response.data], { type: 'application/pdf' });
+      const fileName = `invoice-${orderData.order_id}.pdf`;
+      saveAs(blob, fileName);
+  
+      toast.success('Invoice downloaded successfully');
+    } catch (error) {
+      console.error("Error downloading invoice:", error);
+      toast.error("Failed to download invoice");
+    }
+  };
+
+
   if (isLoading)
     return (
       <div className="flex items-center justify-center h-screen">
@@ -181,7 +210,7 @@ export default function OrderDetail() {
             </p>
             <p className="text-lg font-semibold">Order #{orderData.order_id}</p>
           </div>
-          <Button variant="outline" className="gap-2">
+          <Button onClick={handleInvoiceDownload} variant="outline" className="gap-2">
             <FileText className="h-4 w-4" />
             Invoice
           </Button>
