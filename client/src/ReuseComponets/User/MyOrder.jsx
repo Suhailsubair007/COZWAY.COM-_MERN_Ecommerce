@@ -1,7 +1,12 @@
 import { useNavigate } from "react-router-dom";
 import React, { useState, useEffect } from "react";
 import axiosInstance from "@/config/axiosConfig";
-import { House, ChevronRight, Undo2 } from "lucide-react";
+import {
+  HomeIcon as House,
+  ChevronRight,
+  Undo2,
+  CreditCard,
+} from "lucide-react";
 import { useSelector } from "react-redux";
 import { Button } from "@/components/ui/button";
 import {
@@ -12,6 +17,7 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/components/ui/pagination";
+import RetryPayment from "./Payment/RetryPayment";
 
 const getStatusColor = (status) => {
   switch (status?.toUpperCase()) {
@@ -21,6 +27,8 @@ const getStatusColor = (status) => {
       return "text-green-500";
     case "PENDING":
       return "text-yellow-600";
+    case "FAILED":
+      return "text-red-600";
     default:
       return "text-gray-600";
   }
@@ -32,6 +40,7 @@ export default function Component() {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const user = useSelector((state) => state.user.userInfo.id);
+  const userInfo = useSelector((state) => state.user.userInfo);
 
   useEffect(() => {
     fetchOrders(currentPage);
@@ -52,6 +61,13 @@ export default function Component() {
 
   const handlePageChange = (newPage) => {
     setCurrentPage(newPage);
+  };
+
+  const handlePayNow = (orderId) => {
+    // Implement the payment logic here
+    console.log(`Initiating payment for order: ${orderId}`);
+    // You might want to navigate to a payment page or open a payment modal
+    // navigate(`/payment/${orderId}`);
   };
 
   return (
@@ -181,6 +197,14 @@ export default function Component() {
                 >
                   View Details
                 </Button>
+                {order?.payment_status === "Failed" && (
+                  <RetryPayment
+                    amount={order?.total_price_with_discount.toFixed(0)}
+                    buttonName={"Pay Now"}
+                    userInfo={userInfo}
+                    orderId={order._id}
+                  />
+                )}
               </div>
             </div>
           </div>

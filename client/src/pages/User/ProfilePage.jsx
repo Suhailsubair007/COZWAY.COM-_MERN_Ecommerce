@@ -6,7 +6,6 @@ import Header from "@/ReuseComponets/User/Header";
 const ProfilePage = () => {
   return (
     <>
-      <Header />
       <div className="flex h-screen">
         <div className="sticky top-0 h-screen overflow-y-auto">
           <UserProfileSidebar />

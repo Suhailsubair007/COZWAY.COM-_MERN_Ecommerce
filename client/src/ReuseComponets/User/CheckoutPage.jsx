@@ -29,69 +29,6 @@ export default function CheckoutPage() {
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState("");
   const user = useSelector((state) => state.user.userInfo);
 
-  const handlePaymentError = async (error) => {
-    // Log the error for debugging
-    console.error("Payment Error:", error);
-
-    // Define error messages for different scenarios
-    const errorMessages = {
-      BAD_REQUEST_ERROR: "Invalid payment details. Please check and try again.",
-      PAYMENT_CANCELLED: "Payment was cancelled. Please try again.",
-      NETWORK_ERROR:
-        "Network issue detected. Please check your internet connection.",
-      GATEWAY_ERROR: "Payment gateway error. Please try again later.",
-      INSUFFICIENT_FUNDS: "Insufficient funds in your account.",
-      PAYMENT_FAILED: "Payment failed. Please try another payment method.",
-      default: "An error occurred during payment. Please try again.",
-    };
-
-    // Get appropriate error message
-    let errorMessage = errorMessages.default;
-
-    if (error?.code) {
-      switch (error.code) {
-        case "BAD_REQUEST_ERROR":
-          errorMessage = errorMessages.BAD_REQUEST_ERROR;
-          break;
-        case "NETWORK_ERROR":
-          errorMessage = errorMessages.NETWORK_ERROR;
-          break;
-        case "INSUFFICIENT_FUNDS":
-          errorMessage = errorMessages.INSUFFICIENT_FUNDS;
-          break;
-        default:
-          errorMessage = error.description || errorMessages.default;
-      }
-    } else if (error?.message?.includes("cancelled")) {
-      errorMessage = errorMessages.PAYMENT_CANCELLED;
-    }
-
-    // Show toast notification
-    toast({
-      variant: "destructive",
-      title: "Payment Failed",
-      description: errorMessage,
-      duration: 5000,
-    });
-
-    // Update wallet if necessary
-    try {
-      await updateWalletAfterFailedPayment();
-    } catch (walletError) {
-      console.error("Error updating wallet:", walletError);
-    }
-
-    // Redirect to appropriate page based on error
-    if (error?.code === "PAYMENT_CANCELLED") {
-      router.push("/checkout");
-    } else if (error?.code === "INSUFFICIENT_FUNDS") {
-      router.push("/wallet");
-    }
-
-    // Return the error message for additional handling if needed
-    return { error: true, message: errorMessage };
-  };
-
   const shipping = 0;
 
   useEffect(() => {
@@ -188,7 +125,7 @@ export default function CheckoutPage() {
     toast.success("Coupon removed successfully!");
   };
 
-  const handlePlaceOrder = async () => {
+  const handlePlaceOrder = async (paymentStatus = "Pending") => {
     if (!selectedAddress || !selectedPaymentMethod) {
       toast.warning(
         "Please select both a delivery address and a payment method before placing your order."
@@ -206,6 +143,33 @@ export default function CheckoutPage() {
     }
 
     try {
+      console.log({
+        userId: user.id,
+        order_items: items.map((item) => {
+          const discountedPrice =
+            item.offerPrice -
+            (item.offerPrice *
+              (item?.productId?.offer?.offer_value
+                ? item?.productId?.offer?.offer_value
+                : 0)) /
+              100;
+
+          return {
+            ...item,
+            price: discountedPrice,
+            totalProductPrice: (discountedPrice * item.quantity).toFixed(0),
+          };
+        }),
+        address: addressToSend,
+        payment_method: selectedPaymentMethod,
+        payment_status: paymentStatus,
+        subtotal,
+        total_discount: calculateTotalDiscountPrice(),
+        coupon_discount: couponDiscount,
+        total_price_with_discount: total,
+        shipping_fee: shipping,
+        coupon: appliedCoupon?.code || null,
+      });
       const response = await axiosInstance.post(`/users/order/`, {
         userId: user.id,
         order_items: items.map((item) => {
@@ -225,6 +189,7 @@ export default function CheckoutPage() {
         }),
         address: addressToSend,
         payment_method: selectedPaymentMethod,
+        payment_status: paymentStatus,
         subtotal,
         total_discount: calculateTotalDiscountPrice(),
         coupon_discount: couponDiscount,
@@ -420,7 +385,7 @@ export default function CheckoutPage() {
             <Button
               className="w-full mb-4"
               size="lg"
-              onClick={handlePlaceOrder}
+              onClick={() => handlePlaceOrder()}
               disabled={!selectedAddress || !selectedPaymentMethod}
             >
               {getButtonText()}
@@ -434,7 +399,6 @@ export default function CheckoutPage() {
               amount={total.toFixed(0)}
               buttonName={getButtonText()}
               handlePlaceOrder={handlePlaceOrder}
-              onPaymentError={handlePaymentError}
             />
           )}
         </div>

@@ -73,6 +73,7 @@ const createOrder = async (req, res) => {
             order_items,
             address,
             payment_method,
+            payment_status,
             subtotal,
             total_discount,
             coupon_discount,
@@ -99,8 +100,15 @@ const createOrder = async (req, res) => {
             }
         }
 
+        if (payment_method === 'Cash on Delivery' && total_price_with_discount > 1200) {
+            return res.status(400).json({
+                sucess: false,
+                message: "COD is not availble for above 1200 Rs"
+            })
+        }
 
-        // Check if payment method is wallet
+
+        // Check if payment method is wallet...
         if (payment_method === 'Wallet') {
             const wallet = await Wallet.findOne({ user: userId });
             if (!wallet || wallet.balance < total_price_with_discount) {
@@ -135,6 +143,7 @@ const createOrder = async (req, res) => {
             payment_status: payment_method === "Cash on Delivery" ? "Pending" : "Paid",
             total_discount,
             coupon_discount,
+            payment_status: payment_status,
             total_price_with_discount,
             shipping_fee,
             coupon
@@ -142,63 +151,106 @@ const createOrder = async (req, res) => {
 
         // Update product stock
         for (const item of order_items) {
-            const product = await Product.findById(item.productId._id);
-            if (product) {
-                const sizeIndex = product.sizes.findIndex(s => s.size === item.size);
-                if (sizeIndex !== -1) {
-                    product.sizes[sizeIndex].stock -= item.quantity;
-                    await product.save();
+            await Product.findOneAndUpdate(
+                {
+                    _id: item.productId._id,
+                    'sizes.size': item.size
+                },
+                {
+                    $inc: {
+                        'sizes.$.stock': -item.quantity
+                    }
                 }
-            }
+            );
         }
 
         // Update cart
-        const cart = await Cart.findOne({ userId });
-        if (cart) {
-            cart.products = cart.products.filter(cartItem =>
-                !order_items.some(orderItem =>
-                    orderItem.productId._id === cartItem.productId.toString() &&
-                    orderItem.size === cartItem.size
-                )
+        await Cart.findOneAndUpdate(
+            { userId },
+            {
+                $pull: {
+                    products: {
+                        $or: order_items.map(orderItem => ({
+                            productId: orderItem.productId._id,
+                            size: orderItem.size
+                        }))
+                    }
+                }
+            }
+        );
+
+        const updatedCart = await Cart.findOne({ userId });
+        if (updatedCart) {
+            const newTotalCartPrice = updatedCart.products.reduce(
+                (total, item) => total + item.totalProductPrice,
+                0
             );
-            cart.totalCartPrice = cart.products.reduce((total, item) => total + item.totalProductPrice, 0);
-            await cart.save();
+            await Cart.findOneAndUpdate(
+                { userId },
+                { totalCartPrice: newTotalCartPrice }
+            );
+        }
+
+        if (payment_method === 'Wallet') {
+            await Wallet.findOneAndUpdate(
+                { user: userId },
+                {
+                    $inc: { balance: -total_price_with_discount },
+                    $push: {
+                        transactions: {
+                            order_id: order._id,
+                            transaction_date: new Date(),
+                            transaction_type: "debit",
+                            transaction_status: "completed",
+                            amount: total_price_with_discount
+                        }
+                    }
+                }
+            );
         }
 
         // Update wallet if payment method is wallet
-        if (payment_method === 'Wallet') {
-            const wallet = await Wallet.findOne({ user: userId });
-            wallet.balance -= total_price_with_discount;
-            wallet.transactions.push({
-                order_id: order._id,
-                transaction_date: new Date(),
-                transaction_type: "debit",
-                transaction_status: "completed",
-                amount: total_price_with_discount
-            });
-            await wallet.save();
-        }
+        // if (payment_method === 'Wallet') {
+        //     const wallet = await Wallet.findOne({ user: userId });
+        //     wallet.balance -= total_price_with_discount;
+        //     wallet.transactions.push({
+        //         order_id: order._id,
+        //         transaction_date: new Date(),
+        //         transaction_type: "debit",
+        //         transaction_status: "completed",
+        //         amount: total_price_with_discount
+        //     });
+        //     await wallet.save();
+        // }
 
         if (coupon) {
-            const existingCoupen = await Coupon.findOne({ code: coupon });
-
-            if (existingCoupen) {
-                const userUsage = existingCoupen.users_applied.find(
-                    (entry) => entry.user.toString() === userId.toString()
-                );
-                if (userUsage) {
-                    userUsage.used_count += 1;
-                } else {
-                    existingCoupen.users_applied.push({
-                        user: userId,
-                        used_count: 1
-                    });
+            await Coupon.findOneAndUpdate(
+                {
+                    code: coupon,
+                    'users_applied.user': { $ne: userId }
+                },
+                {
+                    $push: {
+                        users_applied: {
+                            user: userId,
+                            used_count: 1
+                        }
+                    }
                 }
+            );
 
-                await existingCoupen.save();
-            }
+            await Coupon.findOneAndUpdate(
+                {
+                    code: coupon,
+                    'users_applied.user': userId
+                },
+                {
+                    $inc: {
+                        'users_applied.$.used_count': 1
+                    }
+                }
+            );
         }
-
         return res.status(201).json({ order, success: true, message: "Order Placed" });
 
     } catch (error) {
@@ -278,12 +330,12 @@ const getOrderById = async (req, res) => {
         if (!order) {
             return res.status(404).json({ success: false, message: 'Order not found' });
         }
-
         res.status(200).json({
             success: true,
             message: "Order fetched successfully",
             order
         });
+
     } catch (error) {
         console.error("Error fetching order:", error);
         res.status(500).json({
@@ -452,6 +504,34 @@ const returnRequest = async (req, res) => {
 
 }
 
+const failedPaymet = async (req, res) => {
+    try {
+        const { orderId, status } = req.body;
+        console.log(orderId, status)
+        const order = await Order.findByIdAndUpdate(orderId, {
+            $set: {
+                payment_status: status,
+            }
+        },
+            {
+                new: true
+            })
+
+        res.status(200).json({
+            sucess: true,
+            message: "Orer status updated",
+            order
+        })
+    } catch (error) {
+        console.error("Error canceling order:", error);
+        res.status(500).json({
+            success: false,
+            message: "Failed to cancel order",
+            error: error.message
+        });
+    }
+}
+
 
 module.exports = {
     createOrder,
@@ -459,7 +539,8 @@ module.exports = {
     getUserOrders,
     getOrderById,
     cancelOrder,
-    returnRequest
+    returnRequest,
+    failedPaymet
 };
 
 
