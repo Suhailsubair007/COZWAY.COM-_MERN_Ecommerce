@@ -23,7 +23,7 @@ import {
 import { toast } from "sonner";
 import axiosInstance from "@/config/axiosConfig";
 
-export default function AdminOrderDetail() {
+export default function Component() {
   const { id } = useParams();
   const [orderData, setOrderData] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -34,7 +34,6 @@ export default function AdminOrderDetail() {
     fetchOrderDetail();
   }, [id]);
 
-  
   const fetchOrderDetail = async () => {
     try {
       setIsLoading(true);
@@ -97,7 +96,13 @@ export default function AdminOrderDetail() {
     });
   };
 
-  const orderStatuses = ["pending", "shipped", "delivered", "cancelled"];
+  const orderStatuses = ["pending", "shipped", "delivered", "cancelled", "returned"];
+
+  const isStatusDisabled = (currentStatus, status) => {
+    const currentIndex = orderStatuses.indexOf(currentStatus);
+    const statusIndex = orderStatuses.indexOf(status);
+    return statusIndex < currentIndex;
+  };
 
   return (
     <div className="container mx-auto py-10 px-4 sm:px-6 lg:px-8 min-h-screen">
@@ -130,7 +135,7 @@ export default function AdminOrderDetail() {
       </div>
 
       {/* Order Info */}
-      <div className="bg-muted/50 rounded-lg p-6 mb-8">
+      <div className="bg-muted/100 rounded-lg p-6 mb-8">
         <div className="flex justify-between items-center mb-4">
           <div className="space-y-1">
             <p className="text-sm text-muted-foreground">
@@ -141,11 +146,6 @@ export default function AdminOrderDetail() {
               Order {orderData.order_id}
             </p>
           </div>
-
-          <Button variant="outline" className="gap-2">
-            <FileText className="h-4 w-4" />
-            Invoice
-          </Button>
         </div>
         <Separator className="my-4" />
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -208,7 +208,7 @@ export default function AdminOrderDetail() {
       </div>
 
       <h2 className="text-2xl font-semibold mb-4">Order Items</h2>
-      <ScrollArea className="h-[400px] rounded-md border p-4">
+      <ScrollArea className="h-[400px] bg-transparent rounded-md border p-4">
         <div className="space-y-6">
           {orderData.order_items.map((item, index) => (
             <div
@@ -244,7 +244,11 @@ export default function AdminOrderDetail() {
                     </SelectTrigger>
                     <SelectContent>
                       {orderStatuses.map((status) => (
-                        <SelectItem key={status} value={status}>
+                        <SelectItem 
+                          key={status} 
+                          value={status}
+                          disabled={isStatusDisabled(item.order_status, status)}
+                        >
                           {status.charAt(0).toUpperCase() + status.slice(1)}
                         </SelectItem>
                       ))}

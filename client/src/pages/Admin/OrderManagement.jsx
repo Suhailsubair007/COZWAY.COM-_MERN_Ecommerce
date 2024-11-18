@@ -1,11 +1,32 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { ReturnRequestModal } from "@/ReuseComponets/Admin/ReturnRequestModal";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { Package, Eye, ChevronRight, Home, CheckCircle, XCircle } from 'lucide-react';
+import {
+  Package,
+  Eye,
+  ChevronRight,
+  Home,
+  CheckCircle,
+  XCircle,
+} from "lucide-react";
 import axiosInstance from "@/config/axiosConfig";
-import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from "@/components/ui/pagination";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination";
 import { toast } from "sonner";
 
 export default function OrderManagement() {
@@ -24,7 +45,9 @@ export default function OrderManagement() {
 
   const fetchOrders = async (page) => {
     try {
-      const response = await axiosInstance.get(`/admin/orders?page=${page}&limit=6`);
+      const response = await axiosInstance.get(
+        `/admin/orders?page=${page}&limit=6`
+      );
       setOrders(response.data.orders);
       setTotalPages(response.data.totalPages);
     } catch (error) {
@@ -38,11 +61,19 @@ export default function OrderManagement() {
   };
 
   const hasReturnRequest = (order) => {
-    return order.order_items.some((item) => item.return_request.is_requested);
+    return order.order_items.some(
+      (item) =>
+        item.return_request.is_requested &&
+        !item.return_request.is_response_send
+    );
   };
 
   const handleReturnRequestClick = (order) => {
-    const returnRequestItem = order.order_items.find(item => item.return_request.is_requested);
+    const returnRequestItem = order.order_items.find(
+      (item) =>
+        item.return_request.is_requested &&
+        !item.return_request.is_response_send
+    );
     if (returnRequestItem) {
       setSelectedReturnRequest(returnRequestItem.return_request);
       setSelectedOrderId(order._id);
@@ -61,13 +92,18 @@ export default function OrderManagement() {
 
   const handleReturnResponse = async (isApproved) => {
     try {
-      const response = await axiosInstance.post(`/admin/orders/${selectedOrderId}/return-response`, {
-        itemId: selectedItemId,
-        isApproved
-      });
+      const response = await axiosInstance.post(
+        `/admin/orders/${selectedOrderId}/return-response`,
+        {
+          itemId: selectedItemId,
+          isApproved,
+        }
+      );
 
       if (response.data.success) {
-        toast.success(`Return request ${isApproved ? 'approved' : 'rejected'} successfully`);
+        toast.success(
+          `Return request ${isApproved ? "approved" : "rejected"} successfully`
+        );
         setIsModalOpen(false);
         fetchOrders(currentPage);
       } else {
@@ -82,12 +118,17 @@ export default function OrderManagement() {
   return (
     <div className="container mx-auto py-10 px-4 sm:px-6 lg:px-8 h-screen">
       <nav className="flex items-center gap-2 text-sm text-gray-600 mb-4">
-        <a href="/admin/dashboard" className="flex items-center hover:text-gray-900">
+        <a
+          href="/admin/dashboard"
+          className="flex items-center hover:text-gray-900"
+        >
           <Home className="h-4 w-4" />
           <span className="ml-1">Dashboard</span>
         </a>
         <ChevronRight className="h-4 w-4" />
-        <a href="/profile" className="hover:text-gray-900">My orders</a>
+        <a href="/profile" className="hover:text-gray-900">
+          My orders
+        </a>
       </nav>
       <h1 className="text-2xl font-bold mb-6">Orders Management</h1>
 
@@ -191,7 +232,7 @@ export default function OrderManagement() {
       <ReturnRequestModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
-        returnRequest={selectedReturnRequest || { reason: '', comment: '' }}
+        returnRequest={selectedReturnRequest || { reason: "", comment: "" }}
         onApprove={handleApproveReturn}
         onReject={handleRejectReturn}
       />

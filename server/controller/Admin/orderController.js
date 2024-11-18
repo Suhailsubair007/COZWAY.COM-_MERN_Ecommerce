@@ -126,7 +126,6 @@ const responseToReturnRequest = async (req, res) => {
 
         orderItem.return_request.is_approved = isApproved;
         orderItem.return_request.is_response_send = true;
-        orderItem.return_request.is_requested = false;
 
         if (isApproved) {
             orderItem.order_status = 'returned';

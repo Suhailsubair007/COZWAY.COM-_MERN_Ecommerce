@@ -1,3 +1,5 @@
+"use client";
+
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { useSelector } from "react-redux";
@@ -39,8 +41,6 @@ export default function OrderDetail() {
   const [cancelProductId, setCancelProductId] = useState(null);
   const [returningProductId, setReturningProductId] = useState(null);
   const [isReturnModalOpen, setIsReturnModalOpen] = useState(false);
-  const [returnReason, setReturnReason] = useState("");
-  const [returnComments, setReturnComments] = useState("");
   const [error, setError] = useState(null);
 
   useEffect(() => {
@@ -51,7 +51,6 @@ export default function OrderDetail() {
     try {
       setIsLoading(true);
       const response = await axiosInstance.get(`/users/order/${id}`);
-      console.log("response data---->>>>", response.data);
       setOrderData(response.data.order);
       setError(null);
     } catch (error) {
@@ -90,10 +89,9 @@ export default function OrderDetail() {
   const handleReturn = (productId) => {
     setReturningProductId(productId);
     setIsReturnModalOpen(true);
-    console.log("item id ---->>>>", productId);
   };
 
-  const confirmReturn = async (reason , comments) => {
+  const confirmReturn = async (reason, comments) => {
     try {
       const response = await axiosInstance.post(
         `/users/order/${id}/return/${returningProductId}`,
@@ -119,29 +117,28 @@ export default function OrderDetail() {
   const handleInvoiceDownload = async () => {
     try {
       const response = await axiosInstance.post(
-        '/users/invoice',
+        "/users/invoice",
         {
           orderId: id,
-          userId: userId
+          userId: userId,
         },
         {
-          responseType: 'blob',
+          responseType: "blob",
           headers: {
-            'Accept': 'application/pdf'
-          }
+            Accept: "application/pdf",
+          },
         }
       );
-      const blob = new Blob([response.data], { type: 'application/pdf' });
+      const blob = new Blob([response.data], { type: "application/pdf" });
       const fileName = `invoice-${orderData.order_id}.pdf`;
       saveAs(blob, fileName);
-  
-      toast.success('Invoice downloaded successfully');
+
+      toast.success("Invoice downloaded successfully");
     } catch (error) {
       console.error("Error downloading invoice:", error);
       toast.error("Failed to download invoice");
     }
   };
-
 
   if (isLoading)
     return (
@@ -210,7 +207,11 @@ export default function OrderDetail() {
             </p>
             <p className="text-lg font-semibold">Order #{orderData.order_id}</p>
           </div>
-          <Button onClick={handleInvoiceDownload} variant="outline" className="gap-2">
+          <Button
+            onClick={handleInvoiceDownload}
+            variant="outline"
+            className="gap-2"
+          >
             <FileText className="h-4 w-4" />
             Invoice
           </Button>
@@ -302,33 +303,58 @@ export default function OrderDetail() {
                 <p className="text-sm text-muted-foreground mt-2">
                   Status: {item.order_status}
                 </p>
+                {item.return_request && (
+                  <Badge
+                    variant={
+                      (item.return_request.is_requested
+                        ? (!item.return_request.is_response_send
+                          ? "default" 
+                          : (item.return_request.is_approved
+                          ? "success"
+                          : "destructive" ))
+                        : null)
+                    }
+                    className="mt-2"
+                  >
+                    {(item.return_request.is_requested
+                      ?( !item.return_request.is_response_send
+                        ? "Return Request Sent"
+                        : (item.return_request.is_approved
+                        ? "Return Request Accepted"
+                        : "Return Request Rejected"))
+                      : null)}
+                  </Badge>
+                )}
               </div>
-              <div className=" text-right space-y-2">
+              <div className="text-right space-y-2">
                 <p className="font-semibold">
                   ₹{(item.price * item.quantity).toFixed(0)}
                 </p>
-                {item.order_status === "delivered" ? (
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => handleReturn(item._id)}
-                    className="w-full"
-                  >
-                    <Undo2 className="w-4 h-4 mr-2" />
-                    Return
-                  </Button>
-                ) : item.order_status !== "cancelled" &&
-                  item.order_status !== "shipped" ? (
-                  <Button
-                    variant="destructive"
-                    size="sm"
-                    onClick={() => handleCancel(item._id)}
-                    className="w-full"
-                  >
-                    <X className="w-4 h-4 mr-2" />
-                    Cancel
-                  </Button>
-                ) : null}
+                {item.order_status === "delivered" &&
+                  !item.return_request?.is_requested && (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => handleReturn(item._id)}
+                      className="w-full"
+                    >
+                      <Undo2 className="w-4 h-4 mr-2" />
+                      Return
+                    </Button>
+                  )}
+                {item.order_status !== "cancelled" &&
+                  item.order_status !== "shipped" &&
+                  !item.return_request?.is_requested && (
+                    <Button
+                      variant="destructive"
+                      size="sm"
+                      onClick={() => handleCancel(item._id)}
+                      className="w-full"
+                    >
+                      <X className="w-4 h-4 mr-2" />
+                      Cancel
+                    </Button>
+                  )}
               </div>
             </div>
           ))}
@@ -362,7 +388,6 @@ export default function OrderDetail() {
       </AlertDialog>
 
       {/* Return Modal */}
-
       <ReturnPopup
         open={isReturnModalOpen}
         onOpenChange={setIsReturnModalOpen}
