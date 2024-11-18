@@ -13,6 +13,7 @@ import AdminOrderDetail from "@/pages/Admin/AdminOrderDetail";
 import Coupon from "@/pages/Admin/Coupon";
 import Offer from "@/pages/Admin/Offer";
 import SalesReport from "@/pages/Admin/SalesReport";
+import Banner from "@/pages/Admin/Banner";
 
 // import Cookies from "js-cookie";
 
@@ -38,7 +39,7 @@ const AdminRoute = () => {
           <Route path="/coupons" element={<Coupon />} />
           <Route path="/offer" element={<Offer />} />
           <Route path="/report" element={<SalesReport />} />
-
+          <Route path="/banner" element={<Banner />} />
         </Routes>
       </main>
       <Toaster richColors position="bottom-center" />
