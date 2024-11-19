@@ -1,5 +1,3 @@
-"use client";
-
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { useSelector } from "react-redux";
@@ -14,7 +12,6 @@ import {
   Truck,
   Undo2,
   X,
-  Send,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
@@ -68,10 +65,8 @@ export default function OrderDetail() {
   const confirmCancel = async () => {
     try {
       const response = await axiosInstance.patch(
-        `/admin/order/${id}/cancel/${cancelProductId}`,
-        {
-          userId,
-        }
+        `users/order/${id}/cancel/${cancelProductId}`,
+        { userId }
       );
       if (response.status === 200) {
         fetchOrderDetail();
@@ -306,23 +301,23 @@ export default function OrderDetail() {
                 {item.return_request && (
                   <Badge
                     variant={
-                      (item.return_request.is_requested
-                        ? (!item.return_request.is_response_send
-                          ? "default" 
-                          : (item.return_request.is_approved
+                      item.return_request.is_requested
+                        ? !item.return_request.is_response_send
+                          ? "default"
+                          : item.return_request.is_approved
                           ? "success"
-                          : "destructive" ))
-                        : null)
+                          : "destructive"
+                        : null
                     }
                     className="mt-2"
                   >
-                    {(item.return_request.is_requested
-                      ?( !item.return_request.is_response_send
+                    {item.return_request.is_requested
+                      ? !item.return_request.is_response_send
                         ? "Return Request Sent"
-                        : (item.return_request.is_approved
+                        : item.return_request.is_approved
                         ? "Return Request Accepted"
-                        : "Return Request Rejected"))
-                      : null)}
+                        : "Return Request Rejected"
+                      : null}
                   </Badge>
                 )}
               </div>

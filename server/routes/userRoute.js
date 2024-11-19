@@ -11,6 +11,7 @@ const orderController = require('../controller/User/orderController')
 const wishlistController = require('../controller/User/wishlistController')
 const walletController = require('../controller/User/walletController')
 const couponController = require('../controller/User/couponController')
+const bannerController = require('../controller/User/bannerController')
 
 const verifyUser = require('../middleware/userAuth')
 
@@ -88,6 +89,9 @@ router.get('/wallet', verifyUser, walletController.getUserWallet)
 //API endpoints for coupens
 router.post('/coupon/apply', verifyUser, couponController.applyCoupon);
 router.get('/coupons', verifyUser, couponController.getCoupens);
+
+
+router.get('/banners', bannerController.getAllBanners)
 
 
 module.exports = router;

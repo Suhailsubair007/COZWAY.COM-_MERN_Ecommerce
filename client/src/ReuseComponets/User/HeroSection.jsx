@@ -1,76 +1,67 @@
-import React, { useState, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { ChevronLeft, ChevronRight, ShoppingBag } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { useNavigate } from "react-router-dom";
+'use client'
 
-const HeroSection = () => {
-  const images = [
-    {
-      src: "https://res.cloudinary.com/dupo7yv88/image/upload/v1730812184/Designer_Shirt_a6b2d60b-a84c-465a-b181-b75473b2c765_r5llks.jpg",
-      alt: "Mens Collection - Exclusive",
-      title: "Classic Exclusive",
-      subtitle: "Mens Collection",
-      offer: "UPTO 40% OFF",
-    },
-    {
-      src: "https://res.cloudinary.com/dupo7yv88/image/upload/v1730812184/cuff_Print_30ceb91e-6456-4762-b8e7-122a8081a51d_j0qjoq.jpg",
-      alt: "Summer Sale",
-      title: "Summer Sale",
-      subtitle: "Hot Deals",
-      offer: "UP TO 50% OFF",
-    },
-    {
-      src: "https://res.cloudinary.com/dupo7yv88/image/upload/v1730812281/Cuff_print_1_bkl0ws.jpg",
-      alt: "Weekend Chill",
-      title: "Weekend Chill",
-      subtitle: "Casual Collection",
-      offer: "STARTING AT $29.99",
-    },
-  ];
+import React, { useState, useEffect } from "react"
+import { motion, AnimatePresence } from "framer-motion"
+import { ChevronLeft, ChevronRight, ShoppingBag } from 'lucide-react'
+import { Button } from "@/components/ui/button"
+import { useNavigate } from "react-router-dom"
+import axiosInstance from "@/config/axiosConfig"
 
-  const navigate = useNavigate();
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const [isAutoplay, setIsAutoplay] = useState(true);
+export default function HeroSection() {
+  const navigate = useNavigate()
+  const [currentIndex, setCurrentIndex] = useState(0)
+  const [isAutoplay, setIsAutoplay] = useState(true)
+  const [banners, setBanners] = useState([])
 
   useEffect(() => {
-    let interval;
+    fetchBanners()
+    let interval
     if (isAutoplay) {
       interval = setInterval(() => {
-        setCurrentIndex((prevIndex) => (prevIndex + 1) % images.length);
-      }, 5000); 
+        setCurrentIndex((prevIndex) => (prevIndex + 1) % banners.length)
+      }, 5000)
     }
-    return () => clearInterval(interval);
-  }, [isAutoplay]);
+    return () => clearInterval(interval)
+  }, [isAutoplay, banners.length])
+
+  const fetchBanners = async () => {
+    try {
+      const response = await axiosInstance.get("/users/banners")
+      setBanners(response.data.data)
+    } catch (error) {
+      console.error("Error fetching banners:", error)
+    }
+  }
 
   const handleClick = () => {
-    navigate("/shop");
-  };
+    navigate("/shop")
+  }
+
   const goToSlide = (index) => {
-    setCurrentIndex(index);
-    setIsAutoplay(false);
-  };
+    setCurrentIndex(index)
+    setIsAutoplay(false)
+  }
 
   const goToPrevious = () => {
-    const isFirstSlide = currentIndex === 0;
-    const newIndex = isFirstSlide ? images.length - 1 : currentIndex - 1;
-    setCurrentIndex(newIndex);
-    setIsAutoplay(false);
-  };
+    const isFirstSlide = currentIndex === 0
+    const newIndex = isFirstSlide ? banners.length - 1 : currentIndex - 1
+    setCurrentIndex(newIndex)
+    setIsAutoplay(false)
+  }
 
   const goToNext = () => {
-    const isLastSlide = currentIndex === images.length - 1;
-    const newIndex = isLastSlide ? 0 : currentIndex + 1;
-    setCurrentIndex(newIndex);
-    setIsAutoplay(false);
-  };
+    const isLastSlide = currentIndex === banners.length - 1
+    const newIndex = isLastSlide ? 0 : currentIndex + 1
+    setCurrentIndex(newIndex)
+    setIsAutoplay(false)
+  }
+
+  if (banners.length === 0) {
+    return <div>Loading...</div>
+  }
 
   return (
-    <section
-    // onClick={handleClick}
-      
-      className="relative w-full h-screen overflow-hidden"
-    >
+    <section className="relative w-full h-screen overflow-hidden">
       <AnimatePresence initial={false}>
         <motion.div
           key={currentIndex}
@@ -81,10 +72,10 @@ const HeroSection = () => {
           className="absolute inset-0"
         >
           <img
-            onClick={handleClick}
-            src={images[currentIndex].src}
-            alt={images[currentIndex].alt}
+            src={banners[currentIndex].image}
+            alt={banners[currentIndex].heading}
             className="w-full h-full object-cover object-center"
+            onClick={handleClick}
           />
           <div className="absolute inset-0 bg-gradient-to-r from-black/70 to-transparent flex items-center">
             <div className="container mx-auto px-4 sm:px-6 lg:px-8 h-full flex items-end pb-24">
@@ -94,19 +85,10 @@ const HeroSection = () => {
                 transition={{ delay: 0.2, duration: 0.5 }}
                 className="max-w-lg"
               >
-                <h2 className="text-5xl font-bold text-white mb-2">
-                  {images[currentIndex].title}
-                </h2>
-                <h3 className="text-4xl font-semibold text-white mb-4">
-                  {images[currentIndex].subtitle}
-                </h3>
-                <p className="text-2xl text-white mb-6">
-                  {images[currentIndex].offer}
-                </p>
-                <Button
-                  size="lg"
-                  className="bg-white text-black hover:bg-gray-200"
-                >
+                <h2 className="text-5xl font-bold text-white mb-2">{banners[currentIndex].heading}</h2>
+                <h3 className="text-4xl font-semibold text-white mb-4">{banners[currentIndex].subHeading}</h3>
+                <p className="text-2xl text-white mb-6">{banners[currentIndex].description}</p>
+                <Button size="lg" className="bg-white text-black hover:bg-gray-200" onClick={handleClick}>
                   <ShoppingBag className="mr-2 h-5 w-5" /> SHOP NOW
                 </Button>
               </motion.div>
@@ -117,7 +99,7 @@ const HeroSection = () => {
 
       {/* Slider indicators */}
       <div className="absolute z-30 flex space-x-3 bottom-5 left-1/2 -translate-x-1/2">
-        {images.map((_, index) => (
+        {banners.map((_, index) => (
           <button
             key={index}
             type="button"
@@ -135,17 +117,17 @@ const HeroSection = () => {
         type="button"
         className="absolute top-1/2 left-4 z-30 -translate-y-1/2 bg-black/30 hover:bg-black/50 text-white p-2 rounded-full transition-all duration-300"
         onClick={goToPrevious}
+        aria-label="Previous slide"
       >
         <ChevronLeft className="w-6 h-6" />
-        <span className="sr-only">Previous</span>
       </button>
       <button
         type="button"
         className="absolute top-1/2 right-4 z-30 -translate-y-1/2 bg-black/30 hover:bg-black/50 text-white p-2 rounded-full transition-all duration-300"
         onClick={goToNext}
+        aria-label="Next slide"
       >
         <ChevronRight className="w-6 h-6" />
-        <span className="sr-only">Next</span>
       </button>
 
       {/* Autoplay toggle */}
@@ -157,7 +139,5 @@ const HeroSection = () => {
         {isAutoplay ? "Pause" : "Play"}
       </button>
     </section>
-  );
-};
-
-export default HeroSection;
+  )
+}

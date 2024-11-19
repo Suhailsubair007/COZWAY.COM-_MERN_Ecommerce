@@ -351,6 +351,7 @@ const cancelOrder = async (req, res) => {
     try {
         const { userId } = req.body;
         const { orderId, productId } = req.params;
+        console.log(orderId, productId)
         const order = await Order.findById(orderId).populate('order_items.product');
         if (!order) {
             return res.status(404).json({

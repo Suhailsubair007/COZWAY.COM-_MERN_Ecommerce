@@ -34,6 +34,7 @@ router.get('/product/edit/:id', verifyAdmin, productController.fetchProductById)
 //User related details for display the uses and block and unblock the user..
 router.get('/coustmers', verifyAdmin, userController.getCoutomers);
 router.patch('/coustmers/:id', verifyAdmin, userController.updateCoustomerStatus);
+router.get('/data', userController.getOrderStatistics);
 
 //order related routes..
 router.get('/orders', verifyAdmin, orderController.getAllOrders);

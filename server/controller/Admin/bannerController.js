@@ -5,11 +5,6 @@ const addBanner = async (req, res) => {
     try {
         const { image, heading, subHeading, description } = req.body;
 
-        console.log("1",image)
-        console.log("2",heading)    
-        console.log("3",subHeading) 
-        console.log("4",description)
-
         if (!image || !heading || !subHeading || !description) {
             return res.status(400).json({ message: 'All fields are required' });
         }
