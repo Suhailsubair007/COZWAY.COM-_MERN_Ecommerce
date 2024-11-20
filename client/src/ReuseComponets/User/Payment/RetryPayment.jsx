@@ -5,7 +5,14 @@ import React, { useState } from "react";
 import { useRazorpay } from "react-razorpay";
 import { toast } from "sonner";
 
-const RetryPayment = ({ userInfo, amount, buttonName, orderId }) => {
+const RetryPayment = ({
+  userInfo,
+  amount,
+  buttonName,
+  orderId,
+  fetchOrders,
+  currentPage,
+}) => {
   const { Razorpay } = useRazorpay();
   const [error, setError] = useState(null);
 
@@ -26,6 +33,7 @@ const RetryPayment = ({ userInfo, amount, buttonName, orderId }) => {
               orderId,
               status: "Paid",
             });
+            fetchOrders(currentPage);
 
             console.log("pay checth kazhinj dataa....---->>>>", responce.data);
           }

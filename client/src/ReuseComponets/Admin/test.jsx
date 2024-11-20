@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { NavLink, useLocation, useNavigate } from 'react-router-dom'
+import { useNavigate ,NavLink } from 'react-router-dom'
 import { toast } from 'sonner'
 import { useDispatch } from 'react-redux'
 import axiosInstance from '@/config/axiosConfig'
@@ -15,6 +15,7 @@ import {
   CirclePercent,
   FileText,
   Menu,
+  X,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet'
@@ -24,7 +25,6 @@ import { logoutAdmin } from '@/redux/AdminSlice'
 
 export default function Aside() {
   const navigate = useNavigate()
-  const location = useLocation()
   const dispatch = useDispatch()
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
 
@@ -72,11 +72,13 @@ export default function Aside() {
           {navItems.map((item, index) => (
             <li key={index}>
               <NavLink
-                to={item.path}
-                className={({ isActive }) => `
-                  w-full flex items-center justify-start p-2 rounded-lg 
-                  ${isActive ? 'bg-gray-200 text-black' : 'text-gray-600 hover:bg-gray-100'}
-                `}
+                href={item.path}
+                className={`w-full flex items-center justify-start p-2 rounded-lg 
+                ${
+                  router.pathname === item.path
+                    ? 'bg-gray-200 text-black'
+                    : 'text-gray-600 hover:bg-gray-100'
+                }`}
                 onClick={() => setIsMobileMenuOpen(false)}
               >
                 {item.icon}

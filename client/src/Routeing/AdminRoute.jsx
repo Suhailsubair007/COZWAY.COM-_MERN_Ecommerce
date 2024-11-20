@@ -19,9 +19,9 @@ import Banner from "@/pages/Admin/Banner";
 
 const AdminRoute = () => {
   return (
-    <div className="flex">
+    <div className="flex flex-col lg:flex-row min-h-screen bg-gray-100">
       <Aside />
-      <main className="flex-grow">
+      <main className="flex-grow lg:ml-64 p-4">
         <Routes>
           <Route path="/dashboard" element={<AdminDashbord />} />
           <Route path="/categories" element={<AddCategory />} />

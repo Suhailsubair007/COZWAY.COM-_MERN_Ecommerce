@@ -64,10 +64,7 @@ export default function Component() {
   };
 
   const handlePayNow = (orderId) => {
-    // Implement the payment logic here
     console.log(`Initiating payment for order: ${orderId}`);
-    // You might want to navigate to a payment page or open a payment modal
-    // navigate(`/payment/${orderId}`);
   };
 
   return (
@@ -190,7 +187,7 @@ export default function Component() {
                   Payment Status: {order?.payment_status}
                 </p>
               </div>
-              <div className="space-x-3 mt-4 sm:mt-0">
+              <div className="flex flex-wrap gap-3 mt-4 sm:mt-0">
                 <Button
                   variant="default"
                   onClick={() => navigate(`/orders/${order._id}`)}
@@ -199,8 +196,10 @@ export default function Component() {
                 </Button>
                 {order?.payment_status === "Failed" && (
                   <RetryPayment
+                    currentPage={currentPage}
+                    fetchOrders={fetchOrders}
                     amount={order?.total_price_with_discount.toFixed(0)}
-                    buttonName={"Pay Now"}
+                    buttonName="Pay Now"
                     userInfo={userInfo}
                     orderId={order._id}
                   />

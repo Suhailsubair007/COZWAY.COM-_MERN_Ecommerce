@@ -11,7 +11,10 @@ const getSalesReportDate = async (skip = 0, limit = 0, startDate, endDate, perio
     if (period === "custom" && startDate && endDate) {
         const start = new Date(startDate).setHours(0, 0, 0, 0);
         const end = new Date(endDate).setHours(23, 59, 59, 999);
-        dateSelection = { placed_at: { $gte: new Date(start), $lte: new Date(end) } };
+        dateSelection = {
+            placed_at: { $gte: new Date(start), $lte: new Date(end) },
+            "order_items.order_status": { $ne: "cancelled" }
+        };
         return await Order.find(dateSelection).populate('userId').populate('order_items.product').skip(skip).limit(limit);
     }
 
@@ -22,7 +25,8 @@ const getSalesReportDate = async (skip = 0, limit = 0, startDate, endDate, perio
                 placed_at: {
                     $gte: currentDate,
                     $lt: new Date(),
-                }
+                },
+                "order_items.order_status": { $ne: "cancelled" }
             }
             break;
         case "weekly":
@@ -30,7 +34,8 @@ const getSalesReportDate = async (skip = 0, limit = 0, startDate, endDate, perio
                 placed_at: {
                     $gte: new Date(currentDate.setDate(currentDate.getDate() - 7)),
                     $lt: new Date(),
-                }
+                },
+                "order_items.order_status": { $ne: "cancelled" }
             }
             break;
         case "monthly":
@@ -39,13 +44,15 @@ const getSalesReportDate = async (skip = 0, limit = 0, startDate, endDate, perio
                     $gte: new Date(currentDate.setMonth(currentDate.getMonth() - 1)),
                     $lt: new Date(),
                 },
+                "order_items.order_status": { $ne: "cancelled" }
             }
         case "yearly":
             dateSelection = {
                 placed_at: {
                     $gte: new Date(currentDate.setFullYear(currentDate.getFullYear() - 1)),
                     $lt: new Date(),
-                }
+                },
+                "order_items.order_status": { $ne: "cancelled" }
             }
             break;
         default:
@@ -75,7 +82,10 @@ const getSalesReport = async (req, res) => {
     if (period === "custom" && startDate && endDate) {
         const start = new Date(startDate).setHours(0, 0, 0, 0);
         const end = new Date(endDate).setHours(23, 59, 59, 999);
-        dateSelection = { placed_at: { $gte: new Date(start), $lte: new Date(end) } };
+        dateSelection = {
+            placed_at: { $gte: new Date(start), $lte: new Date(end) },
+            "order_items.order_status": { $ne: "cancelled" }
+        };
         return await Order.find(dateSelection).populate('userId').populate('order_items.product').skip(skip).limit(limit);
     }
     switch (period) {
@@ -85,7 +95,8 @@ const getSalesReport = async (req, res) => {
                 placed_at: {
                     $gte: currentDate,
                     $lt: new Date(),
-                }
+                },
+                "order_items.order_status": { $ne: "cancelled" }
             }
             break;
         case "weekly":
@@ -93,7 +104,8 @@ const getSalesReport = async (req, res) => {
                 placed_at: {
                     $gte: new Date(currentDate.setDate(currentDate.getDate() - 7)),
                     $lt: new Date(),
-                }
+                },
+                "order_items.order_status": { $ne: "cancelled" }
             }
             break;
         case "monthly":
@@ -102,13 +114,15 @@ const getSalesReport = async (req, res) => {
                     $gte: new Date(currentDate.setMonth(currentDate.getMonth() - 1)),
                     $lt: new Date(),
                 },
+                "order_items.order_status": { $ne: "cancelled" }
             }
         case "yearly":
             dateSelection = {
                 placed_at: {
                     $gte: new Date(currentDate.setFullYear(currentDate.getFullYear() - 1)),
                     $lt: new Date(),
-                }
+                },
+                "order_items.order_status": { $ne: "cancelled" }
             }
             break;
         default:
@@ -127,7 +141,7 @@ const getSalesReport = async (req, res) => {
 
 
     const totalDiscount = report.reduce((productAcc, item) => {
-        return productAcc + item.coupon_discount;
+        return productAcc + item.total_discount;
     }, 0);
 
 
@@ -155,8 +169,13 @@ const download_sales_report_pdf = async (req, res) => {
 
         pdfDoc.fontSize(20).text("Sales Report", { align: "center" }).moveDown(2);
 
+
+        let consolidatedTotal = 0;
+
         for (let index = 0; index < reports.length; index++) {
             const report = reports[index];
+
+            consolidatedTotal += report.total_price_with_discount;
 
 
             if (pdfDoc.y > 700) {
@@ -175,9 +194,10 @@ const download_sales_report_pdf = async (req, res) => {
 
             const table = {
                 title: "Product Details",
-                headers: ["Product Name", "Quantity", "Unit Price (RS)", "Total Price (RS)"],
+                headers: ["Product Name", "Order Status", "Quantity", "Unit Price (RS)", "Total Price (RS)"],
                 rows: report.order_items.map((p) => [
                     p.product.name,
+                    p.order_status,
                     p.quantity.toString(),
                     p.price.toFixed(2),
                     p.totalProductPrice.toFixed(2),
@@ -189,7 +209,7 @@ const download_sales_report_pdf = async (req, res) => {
                     prepareHeader: () => pdfDoc.font("Helvetica-Bold").fontSize(8),
                     prepareRow: (row, i) => pdfDoc.font("Helvetica").fontSize(8),
                     width: 400,
-                    columnsSize: [200, 70, 70, 70],
+                    columnsSize: [200, 70, 70, 70, 70],
                     padding: 5,
                     align: 'center',
                     borderWidth: 0.5,
@@ -211,6 +231,14 @@ const download_sales_report_pdf = async (req, res) => {
                 pdfDoc.addPage();
             }
         }
+
+        pdfDoc.moveDown(2);
+        pdfDoc.fontSize(12).font("Helvetica-Bold").text("Total Order amount:", { align: "left" }).moveDown(0.2);
+        pdfDoc.moveDown(0.2);
+        pdfDoc.lineWidth(1).strokeColor("#333333").moveTo(50, pdfDoc.y).lineTo(200, pdfDoc.y).stroke().moveDown(0.5);
+        pdfDoc.fontSize(10).font("Helvetica")
+            .text(`RS. ${consolidatedTotal.toFixed(2)}`, { align: "left" });
+
 
         pdfDoc.end();
     } catch (error) {
@@ -277,8 +305,93 @@ const download_sales_report_xl = async (req, res) => {
     }
 };
 
+
+const getTopSelling = async (req, res) => {
+    try {
+        const topProducts = await Order.aggregate([
+            { $unwind: '$order_items' },
+            {
+                $group: {
+                    _id: '$order_items.product',
+                    totalQuantity: { $sum: '$order_items.quantity' },
+                },
+            },
+            { $sort: { totalQuantity: -1 } },
+            { $limit: 10 },
+            {
+                $lookup: {
+                    from: 'products',
+                    localField: '_id',
+                    foreignField: '_id',
+                    as: 'productDetails',
+                },
+            },
+            { $unwind: '$productDetails' },
+            {
+                $project: {
+                    _id: 0,
+                    productId: '$_id',
+                    name: '$productDetails.name',
+                    totalQuantity: 1,
+                },
+            },
+        ]);
+
+        const topCategories = await Order.aggregate([
+            { $unwind: '$order_items' },
+            {
+                $lookup: {
+                    from: 'products',
+                    localField: 'order_items.product',
+                    foreignField: '_id',
+                    as: 'productDetails',
+                },
+            },
+            { $unwind: '$productDetails' },
+            {
+                $group: {
+                    _id: '$productDetails.category',
+                    totalQuantity: { $sum: '$order_items.quantity' },
+                },
+            },
+            { $sort: { totalQuantity: -1 } },
+            { $limit: 10 },
+            {
+                $lookup: {
+                    from: 'categories',
+                    localField: '_id',
+                    foreignField: '_id',
+                    as: 'categoryDetails',
+                },
+            },
+            { $unwind: '$categoryDetails' },
+            {
+                $project: {
+                    _id: 0,
+                    categoryId: '$_id',
+                    categoryName: '$categoryDetails.name',
+                    totalQuantity: 1,
+                },
+            },
+        ]);
+
+        res.status(200).json({
+            success: true,
+            topProducts,
+            topCategories,
+        });
+    } catch (error) {
+        console.error('Error fetching top-selling products and categories:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Failed to fetch data',
+        });
+    }
+};
+
 module.exports = {
     getSalesReport,
     download_sales_report_pdf,
-    download_sales_report_xl
+    download_sales_report_xl,
+    getTopSelling
 }

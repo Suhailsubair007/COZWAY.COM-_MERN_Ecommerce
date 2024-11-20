@@ -58,6 +58,7 @@ router.get('/getCoupon', verifyAdmin, couponController.getAllCoupons);
 router.get('/report', verifyAdmin, salesController.getSalesReport)
 router.get('/download/report/pdf', verifyAdmin, salesController.download_sales_report_pdf)
 router.get('/download/report/xl', verifyAdmin, salesController.download_sales_report_xl)
+router.get('/topselling', salesController.getTopSelling)
 
 
 router.post('/banner', bannerController.addBanner);

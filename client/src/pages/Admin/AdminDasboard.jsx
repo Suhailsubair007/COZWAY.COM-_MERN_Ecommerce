@@ -2,8 +2,6 @@ import { useEffect, useState } from "react";
 import {
   Bar,
   BarChart,
-  Line,
-  LineChart,
   ResponsiveContainer,
   XAxis,
   YAxis,
@@ -23,7 +21,7 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart";
-import { Users, ShoppingBag, IndianRupee, Clock } from "lucide-react";
+import { Users, ShoppingBag, IndianRupee, Clock } from 'lucide-react';
 import axiosInstance from "@/config/axiosConfig";
 
 export default function Component() {
@@ -35,20 +33,35 @@ export default function Component() {
     monthlySalesData: [],
   });
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await axiosInstance("/admin/data");
-        console.log(response.data)
-        const result = await response.data;
-        setData(result);
-      } catch (error) {
-        console.error("Failed to fetch data:", error);
-      }
-    };
+  const [bestSelling, setBestSelling] = useState({
+    topProducts: [],
+    topCategories: [],
+  });
 
+  useEffect(() => {
     fetchData();
+    fetchBestSelling();
   }, []);
+
+  const fetchData = async () => {
+    try {
+      const response = await axiosInstance("/admin/data");
+      const result = await response.data;
+      setData(result);
+    } catch (error) {
+      console.error("Failed to fetch data:", error);
+    }
+  };
+
+  const fetchBestSelling = async () => {
+    try {
+      const response = await axiosInstance("/admin/topselling");
+      const result = await response.data;
+      setBestSelling(result);
+    } catch (error) {
+      console.error("Failed to fetch best selling data:", error);
+    }
+  };
 
   return (
     <div className="w-full min-h-screen bg-gray-50 p-4">
@@ -99,7 +112,7 @@ export default function Component() {
         </Card>
       </div>
 
-      <Card className="w-full">
+      <Card className="w-full mb-6">
         <CardHeader className="flex flex-row items-center justify-between">
           <CardTitle>Sales vs Customers</CardTitle>
           <div className="flex gap-2">
@@ -202,6 +215,70 @@ export default function Component() {
           </div>
         </CardContent>
       </Card>
+
+      <div className="grid gap-6 md:grid-cols-2">
+        <Card>
+          <CardHeader>
+            <CardTitle>Best Selling Products</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <ChartContainer
+              config={{
+                totalQuantity: {
+                  label: "Quantity Sold",
+                  color: "#3B82F6",
+                },
+              }}
+              className="h-[300px] w-full"
+            >
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart
+                  data={bestSelling.topProducts}
+                  layout="vertical"
+                  margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
+                >
+                  <CartesianGrid strokeDasharray="3 3" horizontal={false} />
+                  <XAxis type="number" />
+                  <YAxis dataKey="name" type="category" width={150} />
+                  <ChartTooltip content={<ChartTooltipContent />} />
+                  <Bar dataKey="totalQuantity" fill="#3B82F6" barSize={20} />
+                </BarChart>
+              </ResponsiveContainer>
+            </ChartContainer>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Best Selling Categories</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <ChartContainer
+              config={{
+                totalQuantity: {
+                  label: "Quantity Sold",
+                  color: "#10B981",
+                },
+              }}
+              className="h-[300px] w-full"
+            >
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart
+                  data={bestSelling.topCategories}
+                  layout="vertical"
+                  margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
+                >
+                  <CartesianGrid strokeDasharray="3 3" horizontal={false} />
+                  <XAxis type="number" />
+                  <YAxis dataKey="categoryName" type="category" width={100} />
+                  <ChartTooltip content={<ChartTooltipContent />} />
+                  <Bar dataKey="totalQuantity" fill="#10B981" barSize={20} />
+                </BarChart>
+              </ResponsiveContainer>
+            </ChartContainer>
+          </CardContent>
+        </Card>
+      </div>
     </div>
   );
 }

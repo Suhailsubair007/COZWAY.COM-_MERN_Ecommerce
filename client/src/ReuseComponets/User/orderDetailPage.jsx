@@ -339,6 +339,7 @@ export default function OrderDetail() {
                   )}
                 {item.order_status !== "cancelled" &&
                   item.order_status !== "shipped" &&
+                  item.order_status !== "delivered" &&
                   !item.return_request?.is_requested && (
                     <Button
                       variant="destructive"

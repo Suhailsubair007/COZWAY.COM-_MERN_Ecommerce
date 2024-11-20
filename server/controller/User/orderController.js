@@ -82,6 +82,9 @@ const createOrder = async (req, res) => {
             coupon
         } = req.body;
 
+
+        console.log(order_items)
+
         const discountAmount = (subtotal * total_discount) / 100;
         const calculatedTotal = subtotal - discountAmount + shipping_fee;
 
@@ -163,7 +166,7 @@ const createOrder = async (req, res) => {
                 }
             );
         }
-
+        
         // Update cart
         await Cart.findOneAndUpdate(
             { userId },
