@@ -23,7 +23,11 @@ router.post('/signup', verifyOTP, userController.registerUser);
 router.post('/logout', userController.UserLogout);
 router.post('/send-otp', userController.sendOTP);
 
+
 //PROFILE BASRED ROUTES
+router.get('/refferalCode/:userId', userController.getReferralCode);
+router.post('/refferal', verifyUser, userController.applyReferralCode);
+router.get('/seen/:userId', userController.getHasSeen);
 router.patch('/profile/:id', profileController.updateProfile);
 router.get('/user/:id', profileController.getUserData);
 router.post('/update_password', profileController.changePassword)

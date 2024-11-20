@@ -1,63 +1,92 @@
-'use client'
-
-import React, { useState, useEffect } from "react"
-import { motion, AnimatePresence } from "framer-motion"
-import { ChevronLeft, ChevronRight, ShoppingBag } from 'lucide-react'
-import { Button } from "@/components/ui/button"
-import { useNavigate } from "react-router-dom"
-import axiosInstance from "@/config/axiosConfig"
+import React, { useState, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { useSelector } from "react-redux";
+import { ChevronLeft, ChevronRight, ShoppingBag } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { useNavigate } from "react-router-dom";
+import axiosInstance from "@/config/axiosConfig";
+import RefferalPopUp from "./RefferalPopUp";
 
 export default function HeroSection() {
-  const navigate = useNavigate()
-  const [currentIndex, setCurrentIndex] = useState(0)
-  const [isAutoplay, setIsAutoplay] = useState(true)
-  const [banners, setBanners] = useState([])
+  const navigate = useNavigate();
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [isAutoplay, setIsAutoplay] = useState(true);
+  const [banners, setBanners] = useState([]);
+  const [seen, setSeen] = useState(true);
+  const [showReferralPopup, setShowReferralPopup] = useState(false);
+  const userId = useSelector((state) => state.user?.userInfo?.id);
 
   useEffect(() => {
-    fetchBanners()
-    let interval
+    fetchBanners();
+    let interval;
     if (isAutoplay) {
       interval = setInterval(() => {
-        setCurrentIndex((prevIndex) => (prevIndex + 1) % banners.length)
-      }, 5000)
+        setCurrentIndex((prevIndex) => (prevIndex + 1) % banners.length);
+      }, 5000);
     }
-    return () => clearInterval(interval)
-  }, [isAutoplay, banners.length])
+    return () => clearInterval(interval);
+  }, [isAutoplay, banners.length]);
+  useEffect(() => {
+    fetchSeen();
+  }, [userId]);
 
   const fetchBanners = async () => {
     try {
-      const response = await axiosInstance.get("/users/banners")
-      setBanners(response.data.data)
+      const response = await axiosInstance.get("/users/banners");
+      setBanners(response.data.data);
     } catch (error) {
-      console.error("Error fetching banners:", error)
+      console.error("Error fetching banners:", error);
     }
-  }
+  };
+
+  console.log(seen, "kjfhaskdjfhaskdfjhasdfjk");
+  console.log(
+    showReferralPopup,
+    "dsfgsdfgsdfgsdfgsdfgsdfgsdfgdsfgsdffgsdgfsdfg"
+  );
+
+  const fetchSeen = async () => {
+    try {
+      const response = await axiosInstance.get(`/users/seen/${userId}`);
+      console.log(response.data);
+      setSeen(response.data.hasSeen);
+      setShowReferralPopup(!response.data.hasSeen);
+    } catch (error) {
+      console.error("Error fetching seen status:", error);
+    }
+  };
 
   const handleClick = () => {
-    navigate("/shop")
-  }
+    navigate("/shop");
+  };
 
   const goToSlide = (index) => {
-    setCurrentIndex(index)
-    setIsAutoplay(false)
-  }
+    setCurrentIndex(index);
+    setIsAutoplay(false);
+  };
 
   const goToPrevious = () => {
-    const isFirstSlide = currentIndex === 0
-    const newIndex = isFirstSlide ? banners.length - 1 : currentIndex - 1
-    setCurrentIndex(newIndex)
-    setIsAutoplay(false)
-  }
+    const isFirstSlide = currentIndex === 0;
+    const newIndex = isFirstSlide ? banners.length - 1 : currentIndex - 1;
+    setCurrentIndex(newIndex);
+    setIsAutoplay(false);
+  };
 
   const goToNext = () => {
-    const isLastSlide = currentIndex === banners.length - 1
-    const newIndex = isLastSlide ? 0 : currentIndex + 1
-    setCurrentIndex(newIndex)
-    setIsAutoplay(false)
-  }
+    const isLastSlide = currentIndex === banners.length - 1;
+    const newIndex = isLastSlide ? 0 : currentIndex + 1;
+    setCurrentIndex(newIndex);
+    setIsAutoplay(false);
+  };
+
+  const handleCloseReferralPopup = () => {
+    setShowReferralPopup(false);
+    setSeen(true);
+    // You might want to update the 'seen' status on the server here
+  };
 
   if (banners.length === 0) {
-    return <div>Loading...</div>
+    return <div>Loading...</div>;
   }
 
   return (
@@ -85,10 +114,20 @@ export default function HeroSection() {
                 transition={{ delay: 0.2, duration: 0.5 }}
                 className="max-w-lg"
               >
-                <h2 className="text-5xl font-bold text-white mb-2">{banners[currentIndex].heading}</h2>
-                <h3 className="text-4xl font-semibold text-white mb-4">{banners[currentIndex].subHeading}</h3>
-                <p className="text-2xl text-white mb-6">{banners[currentIndex].description}</p>
-                <Button size="lg" className="bg-white text-black hover:bg-gray-200" onClick={handleClick}>
+                <h2 className="text-5xl font-bold text-white mb-2">
+                  {banners[currentIndex].heading}
+                </h2>
+                <h3 className="text-4xl font-semibold text-white mb-4">
+                  {banners[currentIndex].subHeading}
+                </h3>
+                <p className="text-2xl text-white mb-6">
+                  {banners[currentIndex].description}
+                </p>
+                <Button
+                  size="lg"
+                  className="bg-white text-black hover:bg-gray-200"
+                  onClick={handleClick}
+                >
                   <ShoppingBag className="mr-2 h-5 w-5" /> SHOP NOW
                 </Button>
               </motion.div>
@@ -138,6 +177,12 @@ export default function HeroSection() {
       >
         {isAutoplay ? "Pause" : "Play"}
       </button>
+
+      <RefferalPopUp
+        isOpen={showReferralPopup}
+        seen={seen}
+        onClose={handleCloseReferralPopup}
+      />
     </section>
-  )
+  );
 }

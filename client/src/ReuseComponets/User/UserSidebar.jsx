@@ -1,50 +1,70 @@
-import React, { useState } from "react"
-import { NavLink, useNavigate } from "react-router-dom"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Button } from "@/components/ui/button"
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
-import axiosInstance from "@/config/axiosConfig"
-import { logoutUser } from "../../redux/UserSlice"
-import { useDispatch } from "react-redux"
-import { User, MapPin, ShoppingBag, Wallet, Ticket, Key, LogOut, Menu } from 'lucide-react'
-import { toast } from "react-hot-toast"
+import React, { useState } from "react";
+import { NavLink, useNavigate } from "react-router-dom";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Button } from "@/components/ui/button";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import axiosInstance from "@/config/axiosConfig";
+import { logoutUser } from "../../redux/UserSlice";
+import { useDispatch } from "react-redux";
+import {
+  User,
+  MapPin,
+  ShoppingBag,
+  Wallet,
+  Ticket,
+  Key,
+  LogOut,
+  Menu,
+  DollarSign,
+} from "lucide-react";
+import { toast } from "react-hot-toast";
 
 const menuItems = [
   { icon: User, label: "My Profile", path: "/profile" },
-  { icon: MapPin, label: "Delivery Address", path: "/profile/delivery-address" },
+  {
+    icon: MapPin,
+    label: "Delivery Address",
+    path: "/profile/delivery-address",
+  },
   { icon: ShoppingBag, label: "My Orders", path: "/profile/orders" },
   { icon: Wallet, label: "My Wallet", path: "/profile/wallet" },
   { icon: Ticket, label: "My Coupon", path: "/profile/coupons" },
   { icon: Key, label: "Change Password", path: "/profile/change-password" },
-]
+  { icon: DollarSign, label: "Refer a friend", path: "/profile/referal" },
+];
 
 export default function UserProfileSidebar({ userName = "Suhail Subair" }) {
-  const navigate = useNavigate()
-  const dispatch = useDispatch()
-  const [isOpen, setIsOpen] = useState(false)
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const [isOpen, setIsOpen] = useState(false);
 
   const handleLogout = async () => {
     try {
-      const response = await axiosInstance.post("/users/logout")
+      const response = await axiosInstance.post("/users/logout");
       if (response.status === 200) {
-        dispatch(logoutUser())
-        localStorage.removeItem("userInfo")
-        navigate("/")
-        toast.success("User Logged out successfully.")
+        dispatch(logoutUser());
+        localStorage.removeItem("userInfo");
+        navigate("/");
+        toast.success("User Logged out successfully.");
       } else {
-        toast.error("Failed to log out. Please try again.")
+        toast.error("Failed to log out. Please try again.");
       }
     } catch (err) {
-      console.error("Logout error:", err)
-      toast.error("An error occurred during logout.")
+      console.error("Logout error:", err);
+      toast.error("An error occurred during logout.");
     }
-  }
+  };
+
+
 
   const SidebarContent = ({ isMobile }) => (
     <div className="flex flex-col h-full">
       <div className="flex items-center space-x-4 p-4">
         <Avatar>
-          <AvatarImage src="/placeholder.svg?height=40&width=40" alt={userName} />
+          <AvatarImage
+            src="/placeholder.svg?height=40&width=40"
+            alt={userName}
+          />
           <AvatarFallback>{userName.charAt(0)}</AvatarFallback>
         </Avatar>
         <div>
@@ -61,7 +81,7 @@ export default function UserProfileSidebar({ userName = "Suhail Subair" }) {
             className={({ isActive }) =>
               `flex items-center space-x-3 px-4 py-3 text-sm transition-colors ${
                 isActive
-                  ? "bg-primary text-primary-foreground"
+                  ? "bg-gray-600 text-primary-foreground"
                   : "text-muted-foreground hover:bg-muted hover:text-foreground"
               }`
             }
@@ -73,13 +93,17 @@ export default function UserProfileSidebar({ userName = "Suhail Subair" }) {
         ))}
       </nav>
       <div className="p-4">
-        <Button variant="outline" className="w-full justify-start" onClick={handleLogout}>
+        <Button
+          variant="outline"
+          className="w-full justify-start"
+          onClick={handleLogout}
+        >
           <LogOut className="mr-2 h-4 w-4" />
           Log out
         </Button>
       </div>
     </div>
-  )
+  );
 
   return (
     <>
@@ -95,8 +119,6 @@ export default function UserProfileSidebar({ userName = "Suhail Subair" }) {
             <SidebarContent isMobile />
           </SheetContent>
         </Sheet>
-      
-     
       </div>
 
       {/* Desktop Sidebar */}
@@ -105,9 +127,7 @@ export default function UserProfileSidebar({ userName = "Suhail Subair" }) {
       </div>
 
       {/* Main Content Area */}
-      <div className="lg:pl-64">
-        {/* Add your main content here */}
-      </div>
+      <div className="lg:pl-64">{/* Add your main content here */}</div>
     </>
-  )
+  );
 }

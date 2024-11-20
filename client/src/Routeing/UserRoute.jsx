@@ -22,6 +22,7 @@ import WishlistPage from "@/pages/User/WishlistPage";
 import UserWallet from "@/pages/User/UserWallet";
 import DisplayCoupens from "@/pages/User/DisplayCoupens";
 import ChangePassword from "@/pages/User/ChangePassword";
+import ReferralCode from "@/pages/User/ReferealOffer";
 
 const UserRoute = () => {
   return (
@@ -133,6 +134,7 @@ const UserRoute = () => {
           <Route path="wallet" element={<UserWallet />} />
           <Route path="coupons" element={<DisplayCoupens />} />
           <Route path="change-password" element={<ChangePassword />} />
+          <Route path="referal" element={<ReferralCode />} />
         </Route>
       </Routes>
       <Toaster richColors position="bottom-center" />

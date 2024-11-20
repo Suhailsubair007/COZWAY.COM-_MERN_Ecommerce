@@ -23,7 +23,6 @@ import {
   User,
   LogOut,
   ShoppingBag,
-  UserCircle,
   Heart,
   ShoppingCart,
 } from "lucide-react";
@@ -300,3 +299,4 @@ export default function Header() {
     </header>
   );
 }
+              

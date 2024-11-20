@@ -18,6 +18,7 @@ const verifyUser = async (req, res, next) => {
                 }
             } else {
                 req.user = decoded.user;
+                console.log("The decoded JWT id:",decoded.user);
                 next();
             }
 
