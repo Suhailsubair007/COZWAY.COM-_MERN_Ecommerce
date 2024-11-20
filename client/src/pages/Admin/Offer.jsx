@@ -11,6 +11,15 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { Home, ChevronRight } from "lucide-react";
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from "@/components/ui/breadcrumb";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import AddOfferDialog from "@/ReuseComponets/Admin/AddOfferDialog";
 import {
@@ -77,6 +86,25 @@ export default function Component() {
 
   return (
     <div className="container mx-auto py-10 px-4 sm:px-6 lg:px-8 h-screen">
+      <Breadcrumb className="mb-6">
+        <BreadcrumbList>
+          <BreadcrumbItem>
+            <BreadcrumbLink
+              href="/admin/dashboard"
+              className="flex items-center"
+            >
+              <Home className="h-4 w-4 mr-2" />
+              Dashboard
+            </BreadcrumbLink>
+          </BreadcrumbItem>
+          <BreadcrumbSeparator>
+            <ChevronRight className="h-4 w-4" />
+          </BreadcrumbSeparator>
+          <BreadcrumbItem>
+            <BreadcrumbPage>Offer Management</BreadcrumbPage>
+          </BreadcrumbItem>
+        </BreadcrumbList>
+      </Breadcrumb>
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold">Offer Management</h1>
         <Button onClick={() => setIsOpen(true)}>

@@ -1,6 +1,6 @@
-import { useEffect, useState } from "react"
-import { Plus, Trash2 } from 'lucide-react'
-import { Button } from "@/components/ui/button"
+import { useEffect, useState } from "react";
+import { Plus, Trash2, Home, ChevronRight } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import {
   Table,
   TableBody,
@@ -8,7 +8,7 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table"
+} from "@/components/ui/table";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -18,47 +18,74 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from "@/components/ui/alert-dialog"
-import AdminCouponModal from "@/ReuseComponets/Admin/AdminCouponModal"
-import axiosInstance from "@/config/axiosConfig"
+} from "@/components/ui/alert-dialog";
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from "@/components/ui/breadcrumb";
+import AdminCouponModal from "@/ReuseComponets/Admin/AdminCouponModal";
+import axiosInstance from "@/config/axiosConfig";
 
 export default function Coupon() {
-  const [isOpen, setIsOpen] = useState(false)
-  const [coupons, setCoupons] = useState([])
-  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
-  const [couponToDelete, setCouponToDelete] = useState(null)
+  const [isOpen, setIsOpen] = useState(false);
+  const [coupons, setCoupons] = useState([]);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [couponToDelete, setCouponToDelete] = useState(null);
 
   useEffect(() => {
-    fetchCoupons()
-  }, [])
+    fetchCoupons();
+  }, []);
 
   const fetchCoupons = async () => {
     try {
-      const response = await axiosInstance.get("/admin/getCoupon")
-      console.log("dataaa--->", response.data)
-      setCoupons(response.data.coupons)
+      const response = await axiosInstance.get("/admin/getCoupon");
+      console.log("dataaa--->", response.data);
+      setCoupons(response.data.coupons);
     } catch (error) {
-      console.error(error)
+      console.error(error);
     }
-  }
+  };
 
   const handleDelete = (couponId) => {
-    setCouponToDelete(couponId)
-    setIsDeleteDialogOpen(true)
-  }
+    setCouponToDelete(couponId);
+    setIsDeleteDialogOpen(true);
+  };
 
   const confirmDelete = async () => {
     try {
-      await axiosInstance.delete(`/admin/deleteCoupon/${couponToDelete}`)
-      fetchCoupons()
-      setIsDeleteDialogOpen(false)
+      await axiosInstance.delete(`/admin/deleteCoupon/${couponToDelete}`);
+      fetchCoupons();
+      setIsDeleteDialogOpen(false);
     } catch (error) {
-      console.log(error)
+      console.log(error);
     }
-  }
+  };
 
   return (
     <div className="container mx-auto py-10 px-4 sm:px-6 lg:px-8 h-screen">
+      <Breadcrumb className="mb-6">
+        <BreadcrumbList>
+          <BreadcrumbItem>
+            <BreadcrumbLink
+              href="/admin/dashboard"
+              className="flex items-center"
+            >
+              <Home className="h-4 w-4 mr-2" />
+              Dashboard
+            </BreadcrumbLink>
+          </BreadcrumbItem>
+          <BreadcrumbSeparator>
+            <ChevronRight className="h-4 w-4" />
+          </BreadcrumbSeparator>
+          <BreadcrumbItem>
+            <BreadcrumbPage>Coupen Management</BreadcrumbPage>
+          </BreadcrumbItem>
+        </BreadcrumbList>
+      </Breadcrumb>
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold">Coupon Management</h1>
         <Button onClick={() => setIsOpen(true)}>
@@ -123,7 +150,8 @@ export default function Coupon() {
               Are you sure you want to delete this coupon?
             </AlertDialogTitle>
             <AlertDialogDescription>
-              This action cannot be undone. This coupon will be permanently deleted from the system.
+              This action cannot be undone. This coupon will be permanently
+              deleted from the system.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
@@ -137,5 +165,5 @@ export default function Coupon() {
         </AlertDialogContent>
       </AlertDialog>
     </div>
-  )
+  );
 }

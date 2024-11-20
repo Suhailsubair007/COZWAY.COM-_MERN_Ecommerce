@@ -11,11 +11,21 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import {
+  Home,
   Download,
   FileSpreadsheet,
   ChevronLeft,
   ChevronRight,
 } from "lucide-react";
+// import { Home, ChevronRight } from "lucide-react";
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from "@/components/ui/breadcrumb";
 
 export default function SalesReport() {
   const [activeTab, setActiveTab] = useState("daily");
@@ -109,6 +119,25 @@ export default function SalesReport() {
 
   return (
     <div className="container mx-auto py-10 px-4 sm:px-6 lg:px-8 h-screen">
+      <Breadcrumb className="mb-6">
+        <BreadcrumbList>
+          <BreadcrumbItem>
+            <BreadcrumbLink
+              href="/admin/dashboard"
+              className="flex items-center"
+            >
+              <Home className="h-4 w-4 mr-2" />
+              Dashboard
+            </BreadcrumbLink>
+          </BreadcrumbItem>
+          <BreadcrumbSeparator>
+            <ChevronRight className="h-4 w-4" />
+          </BreadcrumbSeparator>
+          <BreadcrumbItem>
+            <BreadcrumbPage>Sales Report</BreadcrumbPage>
+          </BreadcrumbItem>
+        </BreadcrumbList>
+      </Breadcrumb>
       <div className="bg-white p-6 rounded-lg shadow-md">
         <h1 className="text-3xl font-bold mb-6">Sales Report</h1>
 

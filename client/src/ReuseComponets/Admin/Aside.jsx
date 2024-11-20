@@ -1,3 +1,5 @@
+'use client'
+
 import { useState } from 'react'
 import { NavLink, useLocation, useNavigate } from 'react-router-dom'
 import { toast } from 'sonner'
@@ -18,15 +20,25 @@ import {
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet'
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog"
 
 // Assuming you have a logoutAdmin action in your AdminSlice
 import { logoutAdmin } from '@/redux/AdminSlice'
 
-export default function Aside() {
+export default function Component() {
   const navigate = useNavigate()
   const location = useLocation()
   const dispatch = useDispatch()
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
+  const [isLogoutDialogOpen, setIsLogoutDialogOpen] = useState(false)
 
   const handleLogout = async () => {
     try {
@@ -44,6 +56,7 @@ export default function Aside() {
       console.error('Logout error:', err)
       toast.error('An error occurred during logout.')
     }
+    setIsLogoutDialogOpen(false)
   }
 
   const navItems = [
@@ -85,13 +98,28 @@ export default function Aside() {
             </li>
           ))}
           <li>
-            <button
-              onClick={handleLogout}
-              className="w-full flex items-center justify-start p-2 rounded-lg text-gray-600 hover:bg-gray-100"
-            >
-              <LogOut size={20} />
-              <span className="ml-2">Logout</span>
-            </button>
+            <Dialog open={isLogoutDialogOpen} onOpenChange={setIsLogoutDialogOpen}>
+              <DialogTrigger asChild>
+                <button
+                  className="w-full flex items-center justify-start p-2 rounded-lg text-gray-600 hover:bg-gray-100"
+                >
+                  <LogOut size={20} />
+                  <span className="ml-2">Logout</span>
+                </button>
+              </DialogTrigger>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>Confirm Logout</DialogTitle>
+                  <DialogDescription>
+                    Are you sure you want to log out? You will be redirected to the login page.
+                  </DialogDescription>
+                </DialogHeader>
+                <DialogFooter>
+                  <Button variant="outline" onClick={() => setIsLogoutDialogOpen(false)}>Cancel</Button>
+                  <Button onClick={handleLogout}>Logout</Button>
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
           </li>
         </ul>
       </nav>

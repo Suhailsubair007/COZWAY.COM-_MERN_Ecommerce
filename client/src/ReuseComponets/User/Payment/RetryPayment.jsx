@@ -33,6 +33,7 @@ const RetryPayment = ({
               orderId,
               status: "Paid",
             });
+            toast.success("Paymet completed Sucessfully..");
             fetchOrders(currentPage);
 
             console.log("pay checth kazhinj dataa....---->>>>", responce.data);

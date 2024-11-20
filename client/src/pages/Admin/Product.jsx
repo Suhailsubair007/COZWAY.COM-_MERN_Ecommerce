@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import axiosInstance from "@/config/axiosConfig";
 import { useNavigate } from "react-router-dom";
+import { Home, ChevronRight } from "lucide-react";
 import { toast } from "sonner";
 import {
   Pagination,
@@ -18,6 +19,14 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from "@/components/ui/breadcrumb";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Edit } from "lucide-react";
@@ -36,9 +45,11 @@ export default function Component() {
   const fetchProducts = async (page) => {
     setIsLoading(true);
     try {
-      const response = await axiosInstance.get(`/admin/get_product/?page=${page}&limit=10`);
+      const response = await axiosInstance.get(
+        `/admin/get_product/?page=${page}&limit=10`
+      );
       const { products, totalPages } = response.data;
-      
+
       const formattedProducts = products.map((product) => ({
         id: product._id,
         name: product.name,
@@ -86,10 +97,14 @@ export default function Component() {
       });
       setProducts((prevProducts) =>
         prevProducts.map((product) =>
-          product.id === productId ? { ...product, isListed: updatedStatus } : product
+          product.id === productId
+            ? { ...product, isListed: updatedStatus }
+            : product
         )
       );
-      toast.success(`Product ${updatedStatus ? "listed" : "unlisted"} successfully!`);
+      toast.success(
+        `Product ${updatedStatus ? "listed" : "unlisted"} successfully!`
+      );
     } catch (error) {
       console.error("Error updating product listing:", error);
       toast.error("Failed to update product listing");
@@ -108,9 +123,27 @@ export default function Component() {
     <div className="flex h-screen bg-gray-100">
       <div className="flex-1 overflow-y-auto p-4">
         <main className="flex-1 p-6">
+          <Breadcrumb className="mb-6">
+            <BreadcrumbList>
+              <BreadcrumbItem>
+                <BreadcrumbLink
+                  href="/admin/dashboard"
+                  className="flex items-center"
+                >
+                  <Home className="h-4 w-4 mr-2" />
+                  Dashboard
+                </BreadcrumbLink>
+              </BreadcrumbItem>
+              <BreadcrumbSeparator>
+                <ChevronRight className="h-4 w-4" />
+              </BreadcrumbSeparator>
+              <BreadcrumbItem>
+                <BreadcrumbPage>Product Management</BreadcrumbPage>
+              </BreadcrumbItem>
+            </BreadcrumbList>
+          </Breadcrumb>
           <h2 className="text-xl font-semibold mb-6">Product Management</h2>
           <div className="flex items-center justify-between mb-6">
-           
             <Button
               className="ml-4 bg-black text-white font-semibold py-2 px-4 rounded-lg hover:bg-blue-700"
               onClick={handleAddNewProduct}
@@ -148,26 +181,52 @@ export default function Component() {
                   <TableCell>
                     <div className="grid grid-cols-2 gap-2 text-sm">
                       <div>
-                        <p><span className="font-semibold">Category:</span> {product.category}</p>
-                        <p><span className="font-semibold">Fit:</span> {product.fit}</p>
-                        <p><span className="font-semibold">Sleeve:</span> {product.sleeve}</p>
+                        <p>
+                          <span className="font-semibold">Category:</span>{" "}
+                          {product.category}
+                        </p>
+                        <p>
+                          <span className="font-semibold">Fit:</span>{" "}
+                          {product.fit}
+                        </p>
+                        <p>
+                          <span className="font-semibold">Sleeve:</span>{" "}
+                          {product.sleeve}
+                        </p>
                       </div>
                       <div>
-                        <p><span className="font-semibold">Price:</span> ₹{product.price.toFixed(2)}</p>
-                        <p><span className="font-semibold">Total Stock:</span> {product.totalStock}</p>
+                        <p>
+                          <span className="font-semibold">Price:</span> ₹
+                          {product.price.toFixed(2)}
+                        </p>
+                        <p>
+                          <span className="font-semibold">Total Stock:</span>{" "}
+                          {product.totalStock}
+                        </p>
                       </div>
                     </div>
                   </TableCell>
                   <TableCell className="text-right">
                     <div className="flex flex-col items-end space-y-2">
-                      <Button variant="outline" size="sm" onClick={() => handleEditProduct(product.id)}>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handleEditProduct(product.id)}
+                      >
                         <Edit className="mr-2 h-4 w-4" /> Edit Product
                       </Button>
                       <div className="flex items-center space-x-2">
-                        <span className="text-sm">{product.isListed ? "Listed" : "Unlisted"}</span>
+                        <span className="text-sm">
+                          {product.isListed ? "Listed" : "Unlisted"}
+                        </span>
                         <Switch
                           checked={product.isListed}
-                          onCheckedChange={() => handleToggleProductListing(product.id, product.isListed)}
+                          onCheckedChange={() =>
+                            handleToggleProductListing(
+                              product.id,
+                              product.isListed
+                            )
+                          }
                         />
                       </div>
                     </div>

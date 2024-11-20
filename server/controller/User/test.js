@@ -1,148 +1,3 @@
-const User = require('../../model/User')
-const bcrypt = require("bcrypt");
-const Order = require('../../model/order')
-const PdfPrinter = require("pdfmake");
-
-
-
-const securePassword = async (password) => {
-    try {
-        return await bcrypt.hash(password, 10);
-    } catch (error) {
-        console.error(error);
-    }
-};
-
-
-// controller for update frofile details in the profile page...
-const updateProfile = async (req, res) => {
-    const userId = req.params.id;
-    const { fullname, phone } = req.body;
-
-    const name = fullname;
-
-
-
-    const updateFields = {};
-
-    if (name) updateFields.name = name;
-    if (phone) updateFields.phone = phone;
-
-    try {
-        const updatedUser = await User.findByIdAndUpdate(
-            userId,
-            updateFields,
-            { new: true, runValidators: true }
-        );
-
-        if (!updatedUser) {
-            return res.status(404).json({ success: false, message: 'User not found' });
-        }
-
-        res.status(200).json({
-            success: true,
-            message: 'Profile updated successfully',
-            user: {
-                name: updatedUser.name,
-                phone: updatedUser.phone,
-            },
-        });
-    } catch (error) {
-        console.error('Error updating profile:', error);
-        res.status(500).json({ success: false, message: 'Server error' });
-    }
-};
-
-
-
-// To get data to display in the profile page...
-const getUserData = async (req, res) => {
-    const userId = req.params.id;
-
-    try {
-
-        const user = await User.findById(userId).select('-password');
-
-        if (!user) {
-            return res.status(404).json({ success: false, message: 'User not found' });
-        }
-
-        res.status(200).json({
-            success: true,
-            user: {
-                name: user.name,
-                email: user.email,
-                phone: user.phone,
-            },
-        });
-    } catch (error) {
-        console.error('Error retrieving user data:', error);
-        res.status(500).json({ success: false, message: 'Server error' });
-    }
-};
-
-
-const changePassword = async (req, res) => {
-    const { email, currentPassword, newPassword } = req.body;
-
-    try {
-
-        const user = await User.findOne({ email });
-
-        if (!user) {
-            return res.status(404).json({
-                success: false,
-                message: 'User  not found'
-            });
-        }
-
-        const isPasswordMatch = await bcrypt.compare(currentPassword, user.password);
-        if (!isPasswordMatch) {
-            return res.status(401).json({
-                success: false,
-                message: 'Current password is incorrect'
-            });
-        }
-
-        const hashedNewPassword = await securePassword(newPassword);
-        user.password = hashedNewPassword;
-
-
-        await user.save();
-
-        return res.status(200).json({
-            success: true,
-            message: 'Password updated successfully'
-        });
-    } catch (error) {
-        console.error(error);
-        return res.status(500).json({
-            success: false,
-            message: 'Server error'
-        });
-    }
-};
-
-
-
-
-const fonts = {
-    // Using more professional fonts with complete family
-    Helvetica: {
-        normal: 'Helvetica',
-        bold: 'Helvetica-Bold',
-        italics: 'Helvetica-Oblique',
-        bolditalics: 'Helvetica-BoldOblique'
-    },
-    // Adding Times for certain elements
-    Times: {
-        normal: 'Times-Roman',
-        bold: 'Times-Bold',
-        italics: 'Times-Italic',
-        bolditalics: 'Times-BoldItalic'
-    }
-};
-
 const OrderInvoice = async (req, res) => {
     try {
         const { userId, orderId } = req.body;
@@ -166,15 +21,32 @@ const OrderInvoice = async (req, res) => {
                         {
                             width: '*',
                             stack: [
-                                { text: 'COZWAY.COM', style: 'logo' },
-                                { text: 'Premium Fashion Marketplace', style: 'logoSubtext' }
+                                {
+                                    // COZWAY.COM Logo Text
+                                    text: 'COZWAY.COM',
+                                    style: 'logo',
+                                    color: '#000000',
+                                },
+                                {
+                                    text: 'Premium Fashion Marketplace',
+                                    style: 'logoSubtext',
+                                    color: '#666666',
+                                }
                             ]
                         },
                         {
                             width: 'auto',
                             stack: [
-                                { text: 'INVOICE', style: 'invoiceTitle', alignment: 'right' },
-                                { text: order.order_id, style: 'invoiceSubtitle', alignment: 'right' }
+                                {
+                                    text: 'INVOICE',
+                                    style: 'invoiceTitle',
+                                    alignment: 'right'
+                                },
+                                {
+                                    text: order.order_id,
+                                    style: 'invoiceSubtitle',
+                                    alignment: 'right'
+                                }
                             ]
                         }
                     ]
@@ -199,18 +71,18 @@ const OrderInvoice = async (req, res) => {
                             width: '*',
                             stack: [
                                 { text: 'Order Date:', style: 'labelText' },
-                                { text: order.placed_at.toLocaleDateString(), style: 'valueText', margin: [0, 10, 0, 10] },
+                                { text: order.placed_at.toLocaleDateString(), style: 'valueText', margin: [0, 0, 0, 10] },
                                 { text: 'Delivery By:', style: 'labelText' },
-                                { text: order.delivery_by.toLocaleDateString(), style: 'valueText', margin: [0, 10, 0, 10] } 
+                                { text: order.delivery_by.toLocaleDateString(), style: 'valueText' }
                             ]
                         },
                         {
                             width: '*',
                             stack: [
                                 { text: 'Payment Method:', style: 'labelText' },
-                                { text: order.payment_method, style: 'valueText', margin: [0, 10, 0, 10] },
+                                { text: order.payment_method, style: 'valueText', margin: [0, 0, 0, 10] },
                                 { text: 'Payment Status:', style: 'labelText' },
-                                { text: order.payment_status, style: 'valueText', margin: [0, 10, 0, 10] } 
+                                { text: order.payment_status, style: 'valueText' }
                             ]
                         }
                     ],
@@ -268,8 +140,8 @@ const OrderInvoice = async (req, res) => {
                                 { text: item.product.name, style: 'tableCell' },
                                 { text: item.selectedSize, style: 'tableCell' },
                                 { text: item.quantity.toString(), style: 'tableCell' },
-                                { text: `${Number(item.price.toString())}`, style: 'tableCell' },
-                                { text: `${item.totalProductPrice.toString()}`, style: 'tableCell' },
+                                { text: `₹${Number(item.price.toString())}`, style: 'tableCell' },
+                                { text: `₹${item.totalProductPrice.toString()}`, style: 'tableCell' },
                                 { text: item.order_status, style: 'tableCellBold' },
                                 {
                                     text: item.return_request.is_requested
@@ -293,23 +165,23 @@ const OrderInvoice = async (req, res) => {
                                 body: [
                                     [
                                         { text: 'Subtotal:', style: 'summaryLabel' },
-                                        { text: `${order.total_amount.toString()}`, style: 'summaryValue' }
+                                        { text: `₹${order.total_amount.toString()}`, style: 'summaryValue' }
                                     ],
                                     [
                                         { text: 'Shipping Fee:', style: 'summaryLabel' },
-                                        { text: `${order.shipping_fee.toString()}`, style: 'summaryValue' }
+                                        { text: `₹${order.shipping_fee.toString()}`, style: 'summaryValue' }
                                     ],
                                     [
                                         { text: 'Total Discount:', style: 'summaryLabel' },
-                                        { text: `${order.total_discount.toString()}`, style: 'summaryValue' }
+                                        { text: `₹${order.total_discount.toString()}`, style: 'summaryValue' }
                                     ],
                                     [
                                         { text: 'Coupon Discount:', style: 'summaryLabel' },
-                                        { text: `${order.coupon_discount.toString()}`, style: 'summaryValue' }
+                                        { text: `₹${order.coupon_discount.toString()}`, style: 'summaryValue' }
                                     ],
                                     [
                                         { text: 'Final Total:', style: 'summaryLabelBold' },
-                                        { text: `${order.total_price_with_discount.toString()}`, style: 'summaryValueBold' }
+                                        { text: `₹${order.total_price_with_discount.toString()}`, style: 'summaryValueBold' }
                                     ]
                                 ]
                             },
@@ -447,13 +319,4 @@ const OrderInvoice = async (req, res) => {
             message: 'Server error'
         });
     }
-};
-
-
-
-module.exports = {
-    updateProfile,
-    getUserData,
-    changePassword,
-    OrderInvoice
 };
