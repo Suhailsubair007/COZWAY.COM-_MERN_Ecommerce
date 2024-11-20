@@ -82,7 +82,6 @@ export default function HeroSection() {
   const handleCloseReferralPopup = () => {
     setShowReferralPopup(false);
     setSeen(true);
-    // You might want to update the 'seen' status on the server here
   };
 
   if (banners.length === 0) {

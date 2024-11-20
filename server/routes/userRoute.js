@@ -12,6 +12,7 @@ const wishlistController = require('../controller/User/wishlistController')
 const walletController = require('../controller/User/walletController')
 const couponController = require('../controller/User/couponController')
 const bannerController = require('../controller/User/bannerController')
+const offerController = require('../controller/User/offerController')
 
 //Middleware for the Authorisation...
 const verifyUser = require('../middleware/userAuth')
@@ -24,10 +25,15 @@ router.post('/logout', userController.UserLogout);
 router.post('/send-otp', userController.sendOTP);
 
 
+//REFERAL OFFER ROUTES...
+router.get('/refferalCode', verifyUser, offerController.getReferralCode);
+router.post('/refferal', verifyUser, offerController.applyReferralCode);
+router.get('/seen/:userId', offerController.getHasSeen);
+router.post('/skip', verifyUser, offerController.skipRefferalOffer);
+
+
+
 //PROFILE BASRED ROUTES
-router.get('/refferalCode/:userId', userController.getReferralCode);
-router.post('/refferal', verifyUser, userController.applyReferralCode);
-router.get('/seen/:userId', userController.getHasSeen);
 router.patch('/profile/:id', profileController.updateProfile);
 router.get('/user/:id', profileController.getUserData);
 router.post('/update_password', profileController.changePassword)

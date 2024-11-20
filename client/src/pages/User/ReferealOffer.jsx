@@ -2,11 +2,10 @@ import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Gift, Copy, CheckCircle, Shirt } from "lucide-react";
 import axiosInstance from "@/config/axiosConfig";
-import { useSelector } from "react-redux";
+
 
 export default function ReferralCode() {
   const [copied, setCopied] = useState(false);
-  const userId = useSelector((state) => state.user.userInfo.id);
   const [referralCode, setRefferalCode] = useState("");
   const referralBonus = 200;
   const quote = "Dress to impress, refer with finesse.";
@@ -20,9 +19,7 @@ export default function ReferralCode() {
   useEffect(() => {
     const fetchRefferalCode = async () => {
       try {
-        const responce = await axiosInstance.get(
-          `/users/refferalCode/${userId}`
-        );
+        const responce = await axiosInstance.get(`/users/refferalCode`);
         console.log(responce.data);
         setRefferalCode(responce.data.referralCode);
       } catch (error) {
@@ -44,7 +41,7 @@ export default function ReferralCode() {
         <div className="bg-white dark:bg-gray-800 p-8 rounded-lg shadow-lg space-y-6">
           <div className="bg-blue-100 dark:bg-blue-900 p-6 rounded-lg text-center">
             <p className="text-4xl font-mono font-bold text-blue-600 dark:text-blue-400">
-              {referralCode }
+              {referralCode}
             </p>
           </div>
           <div className="flex justify-center">
