@@ -51,6 +51,8 @@ router.post('/auth/google-login', userController.googleLoginUser);
 //PRODUCT RELAED ROUTES TO GET PRODUCTS BASED ON RELATED PRODUCT ,ACTIVE PRODUCTS...
 router.get('/advanced-search', verifyUser, productController.advancedSearch);
 router.get('/latest', productController.fetchLatestProduct);
+router.get('/casual', productController.fetchCasualProducts);
+router.get('/formal', productController.fetchFormalShirts);
 router.get('/active', verifyUser, productController.fetchActiveProduct);
 router.get('/product/:id', verifyUser, productController.fetchProductById);
 router.get('/related/:id', verifyUser, productController.fetchRelatedProducts);

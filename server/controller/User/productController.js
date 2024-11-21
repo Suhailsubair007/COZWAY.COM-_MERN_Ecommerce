@@ -14,6 +14,47 @@ const fetchLatestProduct = async (req, res) => {
     }
 };
 
+const fetchCasualProducts = async (req, res) => {
+    try {
+        const products = await Product.find({ is_active: true })
+            .populate('category', 'name');
+
+        const casualProducts = products
+            .filter(product => product.category && product.category.name === 'Casual')
+            .map(product => ({
+                name: product.name,
+                image: product.images[0],
+                id: product._id
+            }));
+
+        res.status(200).json(casualProducts);
+    } catch (error) {
+        console.error('Error fetching casual products:', error);
+        res.status(500).json({ message: 'Server error. Please try again later.' });
+    }
+};
+
+// Fetch active formal category shirts
+const fetchFormalShirts = async (req, res) => {
+    try {
+        const products = await Product.find({ is_active: true })
+            .populate('category', 'name');
+
+        const casualProducts = products
+            .filter(product => product.category && product.category.name === 'Formal')
+            .map(product => ({
+                name: product.name,
+                image: product.images[0],
+                id: product._id
+            }));
+
+        res.status(200).json(casualProducts);
+    } catch (error) {
+        console.error('Error fetching casual products:', error);
+        res.status(500).json({ message: 'Server error. Please try again later.' });
+    }
+};
+
 
 // Fetch the active products....
 const fetchActiveProduct = async (req, res) => {
@@ -111,7 +152,7 @@ const advancedSearch = async (req, res) => {
         const [totalProducts, products] = await Promise.all([
             Product.countDocuments(query),
             Product.find(query)
-                .populate('category', 'name' ).populate('offer')
+                .populate('category', 'name').populate('offer')
                 .sort(sortOption)
                 .skip((page - 1) * limit)
                 .limit(Number(limit)),
@@ -138,5 +179,7 @@ module.exports = {
     fetchActiveProduct,
     fetchProductById,
     fetchRelatedProducts,
-    advancedSearch
+    advancedSearch,
+    fetchCasualProducts,
+    fetchFormalShirts
 };

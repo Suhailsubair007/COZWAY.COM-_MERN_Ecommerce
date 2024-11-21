@@ -1,37 +1,38 @@
-import { useState, useEffect } from "react"
-import axiosInstance from "@/config/axiosConfig"
-import { useNavigate } from "react-router-dom"
+import { useState, useEffect } from "react";
+import axiosInstance from "@/config/axiosConfig";
+import { useNavigate } from "react-router-dom";
 
 const TrendingNow = () => {
-  const [trendingItems, setTrendingItems] = useState([])
-  const navigate = useNavigate()
+  const [trendingItems, setTrendingItems] = useState([]);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchTrendingItems = async () => {
       try {
-        const response = await axiosInstance.get("/users/latest")
+        const response = await axiosInstance.get("/users/casual");
+        console.log("responce data--->",response.data);
         const fetchedItems = response.data.slice(0, 4).map((item) => ({
           name: item.name,
-          image: item.images[0],
-          id: item._id,
-        }))
-        setTrendingItems(fetchedItems)
+          image: item.image,
+          id: item.id,
+        }));
+        setTrendingItems(fetchedItems);
       } catch (error) {
-        console.error("Error fetching trending items:", error)
+        console.error("Error fetching trending items:", error);
       }
-    }
-    fetchTrendingItems()
-  }, [])
+    };
+    fetchTrendingItems();
+  }, []);
 
   const handleClick = () => {
-    navigate('/shop')
-  }
+    navigate("/shop");
+  };
 
   return (
     <section className="py-16 bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <h2 className="text-3xl md:text-4xl font-bold mb-8 text-center text-gray-800 dark:text-gray-100">
-          Trending Now
+          Casual Collections
         </h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
           {trendingItems.map((item) => (
@@ -58,7 +59,7 @@ const TrendingNow = () => {
         </div>
       </div>
     </section>
-  )
-}
+  );
+};
 
-export default TrendingNow
+export default TrendingNow;

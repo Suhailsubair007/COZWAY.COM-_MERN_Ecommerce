@@ -144,8 +144,10 @@ const ProductDetail = () => {
         toast.warning("This item is already in your cart.");
       }
     } catch (error) {
+      if (error.status == 403) {
+        toast.error(error.response.data.message);
+      }
       console.error("Failed to add product to cart:", error);
-      toast.error("Failed to add the product to your cart. Please try again.");
     }
   };
 

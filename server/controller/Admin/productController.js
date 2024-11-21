@@ -112,8 +112,6 @@ const updateProductStatus = async (req, res) => {
 };
 
 
-
-
 //PUT -- Update the product....
 const updateProduct = async (req, res) => {
     try {

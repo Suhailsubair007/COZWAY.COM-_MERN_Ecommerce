@@ -1,6 +1,6 @@
 const Banner = require('../../model/Banner')
 
-
+//POST - Add new banner 
 const addBanner = async (req, res) => {
     try {
         const { image, heading, subHeading, description } = req.body;
@@ -27,6 +27,7 @@ const addBanner = async (req, res) => {
     }
 };
 
+//GET - Get all banner data for diplay in the admin side.
 const getAllBanners = async (req, res) => {
     try {
         const banners = await Banner.find({});
@@ -43,6 +44,7 @@ const getAllBanners = async (req, res) => {
 };
 
 
+//DELETE - Delete the banner from the admin side.
 const deleteBanner = async (req, res) => {
     try {
         const { id } = req.params;
@@ -60,6 +62,8 @@ const deleteBanner = async (req, res) => {
         });
     }
 };
+
+
 module.exports = {
     addBanner,
     getAllBanners,

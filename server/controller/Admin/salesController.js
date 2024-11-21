@@ -69,6 +69,8 @@ const getSalesReportDate = async (skip = 0, limit = 0, startDate, endDate, perio
     }
     return await Order.find(dateSelection).populate('userId').populate('order_items.product').skip(skip).limit(limit);
 }
+
+
 //GET--To get the sales report  for the admin...
 const getSalesReport = async (req, res) => {
     const {
@@ -174,6 +176,7 @@ const getSalesReport = async (req, res) => {
     });
 }
 
+
 // GET--To download  the sals report in pdf format.....
 const download_sales_report_pdf = async (req, res) => {
     const { startDate, endDate, period } = req.query;
@@ -265,8 +268,6 @@ const download_sales_report_pdf = async (req, res) => {
 };
 
 
-
-
 //GET---Download the sales report in the XL formt....
 const download_sales_report_xl = async (req, res) => {
     try {
@@ -322,7 +323,7 @@ const download_sales_report_xl = async (req, res) => {
     }
 };
 
-
+//GET- Top selling product and categoriers..
 const getTopSelling = async (req, res) => {
     try {
         const topProducts = await Order.aggregate([
@@ -405,6 +406,7 @@ const getTopSelling = async (req, res) => {
         });
     }
 };
+
 
 module.exports = {
     getSalesReport,

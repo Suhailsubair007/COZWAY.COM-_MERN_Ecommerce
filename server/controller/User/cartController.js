@@ -1,6 +1,7 @@
 const Cart = require('../../model/cart');
+const User = require('../../model/User')
 
-// Controller to add a product to the cart.....
+// POST - Controller to add a product to the cart.....
 const addToCart = async (req, res) => {
     try {
         const { userId, product } = req.body;
@@ -8,6 +9,11 @@ const addToCart = async (req, res) => {
             return res.status(400).json({ error: 'Invalid quantity' });
         }
 
+        const user = await User.findById({ _id: userId })
+        console.log("userrrr", user)
+        if (user.is_blocked) {
+            return res.status(403).json({ message: "User blocked" })
+        }
 
         const totalProductPrice = product.offerPrice * product.quantity;
 
@@ -48,7 +54,7 @@ const addToCart = async (req, res) => {
 
 
 
-//Getting cart detais to chek is the purticlar size of theprpduct is alredy in the cart.. Go to cart checking
+//GET - Getting cart detais to chek is the purticlar size of theprpduct is alredy in the cart.. Go to cart checking
 const getCartDetails = async (req, res) => {
     try {
         const { userId, productId, size } = req.query;
@@ -85,7 +91,7 @@ const getCartDetails = async (req, res) => {
 
 
 
-//Get the cart items details...
+//GET - Get the cart items details...
 const getAllCartItems = async (req, res) => {
     try {
         const { userId } = req.params;
@@ -146,7 +152,7 @@ const getAllCartItems = async (req, res) => {
 
 
 
-//To delete the purticukar item from the cart......
+//DELETE - To delete the purticukar item from the cart......
 const deleteItem = async (req, res) => {
     try {
 
@@ -185,7 +191,7 @@ const deleteItem = async (req, res) => {
 
 
 
-//Increse count and handle hte size - stock also incremeting the price based on the purticular quantity..
+// POST -Increse count and handle hte size - stock also incremeting the price based on the purticular quantity..
 const incrementCartItemQuantity = async (req, res) => {
     try {
         const { userId, itemId } = req.params;
@@ -238,7 +244,7 @@ const incrementCartItemQuantity = async (req, res) => {
 
 
 
-//Decrese count and handle hte size - stock also decrementing the price based on the purticular quantity..
+// POST - Decrese count and handle hte size - stock also decrementing the price based on the purticular quantity..
 const decrementCartItemQuantity = async (req, res) => {
     try {
         const { userId, itemId } = req.params;
@@ -280,7 +286,7 @@ const decrementCartItemQuantity = async (req, res) => {
 
 
 
-//Cart length display....
+//GET - Cart length display....
 const getUserCartProductCount = async (req, res) => {
     try {
         const { id } = req.params;

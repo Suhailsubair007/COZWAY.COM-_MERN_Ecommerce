@@ -1,6 +1,7 @@
 const Banner = require('../../model/Banner')
 
 
+//GET - Get all banners in the admin side...
 const getAllBanners = async (req, res) => {
     try {
         const banners = await Banner.find({});

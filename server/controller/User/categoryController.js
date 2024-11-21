@@ -1,6 +1,6 @@
 const Category = require('../../model/Category');
 
-
+// GET -  Get the active caterories
 const getActiveCategories = async (req, res) => {
     try {
         const categories = await Category.find({ is_active: true }, 'name');

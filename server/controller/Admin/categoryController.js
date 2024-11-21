@@ -34,6 +34,7 @@ const addCategory = async (req, res) => {
     }
 };
 
+
 //PUT --Update the categories in the admin...
 const updateCategory = async (req, res) => {
     try {
@@ -61,9 +62,6 @@ const updateCategory = async (req, res) => {
         });
     }
 };
-
-
-
 
 
 //GET-- get the categories for displa in the admin...
@@ -98,6 +96,8 @@ const fetchCategoryById = async (req, res) => {
         });
     }
 };
+
+
 
 //PATCH -- Update the category ststus...
 const updateCategoryStatus = async (req, res) => {

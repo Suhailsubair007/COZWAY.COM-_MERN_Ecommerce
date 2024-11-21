@@ -2,8 +2,7 @@ const { IdentityPoolClient } = require('google-auth-library');
 const Address = require('../../model/Addres')
 
 
-//adding new address in the profile page for a purticulasr user
-
+//POST-adding new address in the profile page for a purticulasr user
 const userAddAddress = async (req, res) => {
     try {
         const { name, phone, address, district, state, city, pincode, alternatePhone, landmark, user } = req.body;
@@ -40,8 +39,7 @@ const userAddAddress = async (req, res) => {
 
 
 
-// Getting user address that are avilabe to diplay in the profile and chaeckout page..
-
+//GET- Getting user address that are avilabe to diplay in the profile and chaeckout page..
 const getUserAddresses = async (req, res) => {
     try {
         const userId = req.params.userId;
@@ -69,8 +67,7 @@ const getUserAddresses = async (req, res) => {
 };
 
 
-// controller for delete the purlicular address fom the db... findbyid and delete
-
+//DELETE- controller for delete the purlicular address fom the db... findbyid and delete
 const deleteUserAddress = async (req, res) => {
     try {
         const { addressId } = req.params;
@@ -98,8 +95,7 @@ const deleteUserAddress = async (req, res) => {
 };
 
 
-//Used for fetching the details of the purticular address
-
+//GET -Used for fetching the details of the purticular address
 const getAddressById = async (req, res) => {
     try {
         const { id } = req.params;
@@ -128,8 +124,7 @@ const getAddressById = async (req, res) => {
 
 
 
-// Updating a specific address with individual fields
-
+//PUT -Updating a specific address with individual fields
 const updateUserAddress = async (req, res) => {
     try {
         const { id } = req.params;

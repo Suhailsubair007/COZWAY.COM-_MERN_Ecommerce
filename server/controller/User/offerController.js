@@ -1,6 +1,8 @@
 const User = require('../../model/User')
 const Wallet = require('../../model/Wallet')
+const mongoose = require('mongoose');
 
+//GET - ge the referal code to display it in the user side..
 const getReferralCode = async (req, res) => {
     try {
         const userId = req.user;
@@ -30,13 +32,10 @@ const getReferralCode = async (req, res) => {
 };
 
 
-const mongoose = require('mongoose');
-
 const getHasSeen = async (req, res) => {
     try {
-        console.log("has seen calling ===============================================");
+        // console.log("has seen calling ===============================================");
         const { userId } = req.params;
-
 
         if (!userId) {
             return res.status(400).json({
@@ -44,13 +43,11 @@ const getHasSeen = async (req, res) => {
             });
         }
 
-
         if (!mongoose.Types.ObjectId.isValid(userId)) {
             return res.status(400).json({
                 message: "Invalid User ID format"
             });
         }
-
         const user = await User.findById(userId);
 
         if (!user) {
@@ -59,7 +56,7 @@ const getHasSeen = async (req, res) => {
             });
         }
 
-        return res.status(200).json({ 
+        return res.status(200).json({
             hasSeen: user.hasSeen,
         });
     } catch (error) {

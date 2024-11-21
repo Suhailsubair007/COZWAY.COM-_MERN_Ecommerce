@@ -64,7 +64,6 @@ const getCheckoutCartItems = async (req, res) => {
     }
 };
 
-
 //cerate an order...
 const createOrder = async (req, res) => {
     try {
@@ -254,7 +253,6 @@ const createOrder = async (req, res) => {
     }
 };
 
-
 //get the order details in the my orders page also pagination applied here...
 const getUserOrders = async (req, res) => {
     try {
@@ -298,8 +296,6 @@ const getUserOrders = async (req, res) => {
     }
 };
 
-
-
 //Detailed display of order......
 const getOrderById = async (req, res) => {
     try {
@@ -340,7 +336,6 @@ const getOrderById = async (req, res) => {
         });
     }
 };
-
 
 const cancelOrder = async (req, res) => {
     try {
@@ -438,7 +433,6 @@ const cancelOrder = async (req, res) => {
         });
     }
 };
-
 
 const returnRequest = async (req, res) => {
 

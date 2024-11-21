@@ -6,7 +6,7 @@ const { applyCategoryOffer,
     removeProductOffer } = require('../../Helper/offerHelperFunctiions')
 
 
-// Controller for get all the offers for 
+// GET- Controller for get all the offers for 
 const getOffers = async (req, res) => {
     try {
         const offers = await Offer.find({});

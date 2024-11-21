@@ -96,7 +96,7 @@ export default function Component() {
     });
   };
 
-  const orderStatuses = ["pending", "shipped", "delivered", "cancelled", "returned"];
+  const orderStatuses = ["pending", "shipped", "delivered", "cancelled",];
 
   const isStatusDisabled = (currentStatus, status) => {
     const currentIndex = orderStatuses.indexOf(currentStatus);

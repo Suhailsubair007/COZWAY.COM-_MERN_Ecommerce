@@ -1,5 +1,6 @@
 const Coupon = require('../../model/coupun');
 
+//POST - Apply coupen controller
 const applyCoupon = async (req, res) => {
     try {
         const { code, userId, subtotal } = req.body;
@@ -56,6 +57,7 @@ const applyCoupon = async (req, res) => {
     }
 };
 
+//Get coupen controller
 const getCoupens = async (req, res) => {
     try {
         const coupens = await Coupon.find({})
