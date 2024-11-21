@@ -24,7 +24,7 @@ const applyCoupon = async (req, res) => {
                 message: `Minimum purchase amount of ${coupon.min_purchase_amount} is required to apply this coupon`
             });
         }
-
+                                                             
         const currentDate = new Date();
         if (currentDate > coupon.expiration_date) {
             return res.status(400).json({

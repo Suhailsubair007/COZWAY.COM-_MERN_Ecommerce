@@ -96,6 +96,9 @@ const responseToReturnRequest = async (req, res) => {
         const { orderId } = req.params;
         const { itemId, isApproved } = req.body;
 
+        console.log("Item id=========>", itemId)
+        console.log("IS approved=====>>>>>>", isApproved)
+
         const order = await Order.findById(orderId);
 
         if (!order) {
@@ -147,37 +150,44 @@ const responseToReturnRequest = async (req, res) => {
         await order.save();
 
 
-        const product = await Product.findById(orderItem.product);
-        if (product) {
-            const sizeIndex = product.sizes.findIndex(s => s.size === orderItem.selectedSize);
-            if (sizeIndex !== -1) {
-                product.sizes[sizeIndex].stock += orderItem.quantity;
-                product.totalStock += orderItem.quantity;
-                await product.save();
+        if (isApproved) {
+            const product = await Product.findById(orderItem.product);
+            if (product) {
+                const sizeIndex = product.sizes.findIndex(s => s.size === orderItem.selectedSize);
+                if (sizeIndex !== -1) {
+                    product.sizes[sizeIndex].stock += orderItem.quantity;
+                    product.totalStock += orderItem.quantity;
+                    await product.save();
+                }
             }
         }
 
-        if (order.payment_method === "Wallet" || order.payment_method === "RazorPay") {
-            let wallet = await Wallet.findOne({ user: order.userId });
 
-            if (!wallet) {
-                wallet = new Wallet({
-                    user: order.userId,
-                    balance: 0,
-                    transactions: []
+
+        if (isApproved) {
+            if (order.payment_method === "Wallet" || order.payment_method === "RazorPay") {
+                let wallet = await Wallet.findOne({ user: order.userId });
+
+                if (!wallet) {
+                    wallet = new Wallet({
+                        user: order.userId,
+                        balance: 0,
+                        transactions: []
+                    });
+                }
+                wallet.balance += refundAmount;
+                wallet?.transactions.push({
+                    order_id: order._id,
+                    transaction_date: new Date(),
+                    transaction_type: "credit",
+                    transaction_status: "completed",
+                    amount: refundAmount,
                 });
-            }
-            wallet.balance += refundAmount;
-            wallet?.transactions.push({
-                order_id: order._id,
-                transaction_date: new Date(),
-                transaction_type: "credit",
-                transaction_status: "completed",
-                amount: refundAmount,
-            });
 
-            await wallet.save();
+                await wallet.save();
+            }
         }
+
 
         res.status(200).json({
             success: true,

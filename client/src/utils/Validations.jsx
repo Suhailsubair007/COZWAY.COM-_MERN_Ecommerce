@@ -1,16 +1,31 @@
 import * as Yup from "yup";
 
 export const addressValidationSchema = Yup.object().shape({
-  name: Yup.string().required("Name is required"),
+  name: Yup.string()
+    .required("Name is required")
+    .trim("Name cannot include spaces")
+    .strict(true),
   phone: Yup.string()
     .matches(/^[0-9]+$/, "Must be only digits")
     .min(10, "Must be exactly 10 digits")
     .max(10, "Must be exactly 10 digits")
     .required("Phone number is required"),
-  address: Yup.string().required("Address is required"),
-  district: Yup.string().required("District is required"),
-  state: Yup.string().required("State is required"),
-  city: Yup.string().required("City is required"),
+  address: Yup.string()
+    .required("Address is required")
+    .trim("Address cannot include spaces")
+    .strict(true),
+  district: Yup.string()
+    .required("District is required")
+    .trim("district cannot include spaces")
+    .strict(true),
+  state: Yup.string()
+    .required("State is required")
+    .trim("state cannot include spaces")
+    .strict(true),
+  city: Yup.string()
+    .required("City is required")
+    .trim("city cannot include spaces")
+    .strict(true),
   pincode: Yup.string()
     .matches(/^[0-9]+$/, "Must be only digits")
     .length(6, "Must be exactly 6 digits")
@@ -25,7 +40,9 @@ export const addressValidationSchema = Yup.object().shape({
 export const SignupValidation = Yup.object({
   name: Yup.string()
     .required("Full name is required")
-    .min(2, "Full name must be at least 2 characters"),
+    .min(2, "Full name must be at least 2 characters")
+    .trim("Name cannot include spaces")
+    .strict(true),
   email: Yup.string()
     .email("Invalid email address")
     .required("Email is required"),
@@ -34,14 +51,22 @@ export const SignupValidation = Yup.object({
     .required("Mobile Number is required"),
   password: Yup.string()
     .required("Password is required")
-    .min(6, "Password must be at least 6 characters"),
+    .min(6, "Password must be at least 6 characters")
+    .trim("password cannot include spaces")
+    .strict(true),
   confirmPassword: Yup.string()
     .oneOf([Yup.ref("password"), null], "Passwords must match")
-    .required("Confirm password is required"),
+    .required("Confirm password is required")
+    .trim("password cannot include spaces")
+    .strict(true),
 });
 
 export const addOfferValidationSchema = Yup.object({
-  name: Yup.string().trim().required("Offer name is required"),
+  name: Yup.string()
+    .trim()
+    .required("Offer name is required")
+    .trim("Name cannot include spaces")
+    .strict(true),
   value: Yup.number()
     .required("Offer value is required")
     .positive("Value must be positive")
@@ -52,9 +77,12 @@ export const addOfferValidationSchema = Yup.object({
   targetId: Yup.string()
     .trim()
     .required("You must select a product or category"),
-  targetName: Yup.string().trim().required("Target name is required"),
+  targetName: Yup.string()
+    .trim()
+    .required("Target name is required")
+    .trim("target name cannot include spaces")
+    .strict(true),
 });
-
 
 export const validateCouponForm = (formData) => {
   const errors = {};

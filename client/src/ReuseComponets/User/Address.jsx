@@ -63,8 +63,8 @@ export default function Address() {
     } catch (error) {
       console.error("Error deleting address:", error);
     } finally {
-      setIsCancelDialogOpen(false); // Close the dialog
-      setAddressToDelete(null); // Clear the address to delete
+      setIsCancelDialogOpen(false);
+      setAddressToDelete(null);
     }
   };
 

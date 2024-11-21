@@ -24,7 +24,7 @@ export default function EditAddressModal({
   const user = useSelector((state) => state.user.userInfo.id);
   const [initialValues, setInitialValues] = React.useState({
     _id: "",
-    name: "",
+    name: "", 
     phone: "",
     address: "",
     district: "",

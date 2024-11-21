@@ -150,7 +150,7 @@ export default function UserWallet() {
                             </div>
                           </td>
                           <td className="py-3 px-4 font-medium text-gray-900">
-                            ${transaction.amount.toFixed(2)}
+                            ₹{transaction.amount.toFixed(2)}
                           </td>
                           <td className="py-3 px-4 text-gray-600">
                             {new Date(

@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { useSelector } from "react-redux";
-import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -18,6 +17,17 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+import {
   Menu,
   Search,
   User,
@@ -28,7 +38,6 @@ import {
 } from "lucide-react";
 
 export default function Header() {
-  const [isSearchVisible, setSearchVisible] = useState(false);
   const [count, setCount] = useState(0);
   const [wishlistCount, setWishlistCount] = useState(0);
   const userId = useSelector((state) => state.user.userInfo);
@@ -71,10 +80,6 @@ export default function Header() {
     }
   };
 
-  const toggleSearch = () => {
-    setSearchVisible(!isSearchVisible);
-  };
-
   const handleLogout = async () => {
     try {
       const response = await axiosInstance.post("/users/logout");
@@ -105,6 +110,9 @@ export default function Header() {
   };
 
   const handleWishlistClick = () => {
+    navigate("/wishlist");
+  };
+  const handleStoryClick = () => {
     navigate("/wishlist");
   };
 
@@ -138,7 +146,7 @@ export default function Header() {
               Shop
             </Link>
             <Link
-              to="/our-story"
+              to="/story"
               className="text-sm font-medium text-muted-foreground hover:text-primary"
             >
               Our Story
@@ -151,28 +159,7 @@ export default function Header() {
             </Link>
           </nav>
 
-          {/* Search Bar and Icons */}
-          <div className="flex items-center space-x-4">
-            {/* Search Icon */}
-            <button
-              onClick={toggleSearch}
-              className="text-muted-foreground hover:text-primary"
-            >
-              <Search className="h-5 w-5" />
-            </button>
-
-            {/* Search Input */}
-            {isSearchVisible && (
-              <div className="relative hidden md:block">
-                <Input
-                  className="w-[400px] max-w-xs"
-                  type="text"
-                  placeholder="Search..."
-                />
-              </div>
-            )}
-
-            {/* Cart Icon */}
+          <div className="flex items-center space-x-6">
             <div className="relative">
               <Button
                 onClick={handleCartClick}
@@ -210,18 +197,6 @@ export default function Header() {
                 </Badge>
               )}
             </div>
-
-            {/* Wishlist Icon */}
-            {/* <Button
-              onClick={handleWishlistClick}
-              variant="ghost"
-              size="icon"
-              className="text-muted-foreground hover:text-primary"
-            >
-              <Heart className="h-5 w-5" />
-            </Button> */}
-
-            {/* User Profile or Login Button */}
             {userId ? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
@@ -244,10 +219,26 @@ export default function Header() {
                     <ShoppingBag className="mr-2 h-4 w-4" />
                     <span>My Orders</span>
                   </DropdownMenuItem>
-                  <DropdownMenuItem onClick={handleLogout}>
-                    <LogOut className="mr-2 h-4 w-4" />
-                    <span>Log out</span>
-                  </DropdownMenuItem>
+                  <AlertDialog>
+                    <AlertDialogTrigger asChild>
+                      <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+                        <LogOut className="mr-2 h-4 w-4" />
+                        <span>Log out</span>
+                      </DropdownMenuItem>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent>
+                      <AlertDialogHeader>
+                        <AlertDialogTitle>Are you sure you want to log out?</AlertDialogTitle>
+                        <AlertDialogDescription>
+                          This action will end your current session. You'll need to log in again to access your account.
+                        </AlertDialogDescription>
+                      </AlertDialogHeader>
+                      <AlertDialogFooter>
+                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                        <AlertDialogAction onClick={handleLogout}>Log out</AlertDialogAction>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
                 </DropdownMenuContent>
               </DropdownMenu>
             ) : (
@@ -299,4 +290,4 @@ export default function Header() {
     </header>
   );
 }
-              
+

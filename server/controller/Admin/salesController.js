@@ -26,7 +26,9 @@ const getSalesReportDate = async (skip = 0, limit = 0, startDate, endDate, perio
                     $gte: currentDate,
                     $lt: new Date(),
                 },
-                "order_items.order_status": { $ne: "cancelled" }
+                "order_items.order_status": {
+                    $nin: ["cancelled", "returned"]
+                }
             }
             break;
         case "weekly":
@@ -35,7 +37,9 @@ const getSalesReportDate = async (skip = 0, limit = 0, startDate, endDate, perio
                     $gte: new Date(currentDate.setDate(currentDate.getDate() - 7)),
                     $lt: new Date(),
                 },
-                "order_items.order_status": { $ne: "cancelled" }
+                "order_items.order_status": {
+                    $nin: ["cancelled", "returned"]
+                }
             }
             break;
         case "monthly":
@@ -44,19 +48,24 @@ const getSalesReportDate = async (skip = 0, limit = 0, startDate, endDate, perio
                     $gte: new Date(currentDate.setMonth(currentDate.getMonth() - 1)),
                     $lt: new Date(),
                 },
-                "order_items.order_status": { $ne: "cancelled" }
+                "order_items.order_status": {
+                    $nin: ["cancelled", "returned"]
+                }
             }
+            break;
         case "yearly":
             dateSelection = {
                 placed_at: {
                     $gte: new Date(currentDate.setFullYear(currentDate.getFullYear() - 1)),
                     $lt: new Date(),
                 },
-                "order_items.order_status": { $ne: "cancelled" }
+                "order_items.order_status": {
+                    $nin: ["cancelled", "returned"]
+                }
             }
             break;
         default:
-            break
+            break;
     }
     return await Order.find(dateSelection).populate('userId').populate('order_items.product').skip(skip).limit(limit);
 }
@@ -96,7 +105,9 @@ const getSalesReport = async (req, res) => {
                     $gte: currentDate,
                     $lt: new Date(),
                 },
-                "order_items.order_status": { $ne: "cancelled" }
+                "order_items.order_status": {
+                    $nin: ["cancelled", "returned"]
+                }
             }
             break;
         case "weekly":
@@ -105,7 +116,9 @@ const getSalesReport = async (req, res) => {
                     $gte: new Date(currentDate.setDate(currentDate.getDate() - 7)),
                     $lt: new Date(),
                 },
-                "order_items.order_status": { $ne: "cancelled" }
+                "order_items.order_status": {
+                    $nin: ["cancelled", "returned"]
+                }
             }
             break;
         case "monthly":
@@ -114,19 +127,24 @@ const getSalesReport = async (req, res) => {
                     $gte: new Date(currentDate.setMonth(currentDate.getMonth() - 1)),
                     $lt: new Date(),
                 },
-                "order_items.order_status": { $ne: "cancelled" }
+                "order_items.order_status": {
+                    $nin: ["cancelled", "returned"]
+                }
             }
+            break;
         case "yearly":
             dateSelection = {
                 placed_at: {
                     $gte: new Date(currentDate.setFullYear(currentDate.getFullYear() - 1)),
                     $lt: new Date(),
                 },
-                "order_items.order_status": { $ne: "cancelled" }
+                "order_items.order_status": {
+                    $nin: ["cancelled", "returned"]
+                }
             }
             break;
         default:
-            break
+            break;
     }
 
 
@@ -190,8 +208,7 @@ const download_sales_report_pdf = async (req, res) => {
             pdfDoc.text(`Order Date: ${new Date(report.placed_at).toLocaleDateString()}`);
             pdfDoc.text(`Customer Name: ${report.userId.name}`);
             pdfDoc.text(`Payment Method: ${report.payment_method}`);
-            pdfDoc.text(`Delivery Status: ${report.order_status}`).moveDown(0.5);
-
+    
             const table = {
                 title: "Product Details",
                 headers: ["Product Name", "Order Status", "Quantity", "Unit Price (RS)", "Total Price (RS)"],

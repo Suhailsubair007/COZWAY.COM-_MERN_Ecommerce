@@ -1,8 +1,7 @@
 import React from "react";
 import AddressCard from "./AddressCard";
 
-export default function AddressList({ addresses, onDelete, onEdit }) {
-  console.log("address vannuuuuuu",addresses);
+export default function AddressList({ addresses, onDelete, onEdit }) { 
   addresses.map((x)=>{
     console.log(x);
   })

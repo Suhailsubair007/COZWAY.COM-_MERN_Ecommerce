@@ -53,7 +53,7 @@ const getOrderStatistics = async (req, res) => {
             { $group: { _id: null, totalRevenue: { $sum: "$total_price_with_discount" } } },
         ]);
 
-        // New aggregation for monthly sales and customer data
+        // Monthly sales and customer data
         const monthlySalesData = await Order.aggregate([
             {
                 $group: {
@@ -73,12 +73,33 @@ const getOrderStatistics = async (req, res) => {
             { $sort: { month: 1 } }
         ]);
 
+        // Yearly sales data
+        const yearlySalesData = await Order.aggregate([
+            {
+                $group: {
+                    _id: { $dateToString: { format: "%Y", date: "$placed_at" } },
+                    sales: { $sum: "$total_price_with_discount" },
+                    customers: { $addToSet: "$userId" }
+                }
+            },
+            {
+                $project: {
+                    _id: 0,
+                    year: "$_id",
+                    sales: 1,
+                    customers: { $size: "$customers" }
+                }
+            },
+            { $sort: { year: 1 } }
+        ]);
+
         res.status(200).json({
             totalOrders,
             totalUsers,
             totalPendingOrders: totalPendingOrders[0]?.count || 0,
             totalOrderRevenue: totalOrderRevenue[0]?.totalRevenue || 0,
-            monthlySalesData
+            monthlySalesData,
+            yearlySalesData
         });
     } catch (error) {
         console.error(error);

@@ -21,7 +21,7 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart";
-import { Users, ShoppingBag, IndianRupee, Clock } from 'lucide-react';
+import { Users, ShoppingBag, IndianRupee, Clock } from "lucide-react";
 import axiosInstance from "@/config/axiosConfig";
 
 export default function Component() {
@@ -31,6 +31,7 @@ export default function Component() {
     totalPendingOrders: 0,
     totalOrderRevenue: 0,
     monthlySalesData: [],
+    yearlySalesData: [],
   });
 
   const [bestSelling, setBestSelling] = useState({
@@ -42,6 +43,9 @@ export default function Component() {
     fetchData();
     fetchBestSelling();
   }, []);
+
+  const [selectedView, setSelectedView] = useState("monthly");
+  const [selectedPeriod, setSelectedPeriod] = useState("all");
 
   const fetchData = async () => {
     try {
@@ -62,6 +66,13 @@ export default function Component() {
       console.error("Failed to fetch best selling data:", error);
     }
   };
+
+  const filteredData = () => {
+    const sourceData = selectedView === "monthly" ? data.monthlySalesData : data.yearlySalesData;
+    if (selectedPeriod === "all") return sourceData;
+    return sourceData.filter(item => item[selectedView === "monthly" ? "month" : "year"] === selectedPeriod);
+  };
+
 
   return (
     <div className="w-full min-h-screen bg-gray-50 p-4">
@@ -116,17 +127,35 @@ export default function Component() {
         <CardHeader className="flex flex-row items-center justify-between">
           <CardTitle>Sales vs Customers</CardTitle>
           <div className="flex gap-2">
-            <Select defaultValue="all">
+            <Select value={selectedView} onValueChange={setSelectedView}>
               <SelectTrigger className="w-32">
-                <SelectValue placeholder="Month" />
+                <SelectValue placeholder="View" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">All Months</SelectItem>
-                {data.monthlySalesData.map((item) => (
-                  <SelectItem key={item.month} value={item.month}>
-                    {new Date(item.month).toLocaleString("default", {
-                      month: "long",
-                    })}
+                <SelectItem value="monthly">Monthly</SelectItem>
+                <SelectItem value="yearly">Yearly</SelectItem>
+              </SelectContent>
+            </Select>
+            <Select value={selectedPeriod} onValueChange={setSelectedPeriod}>
+              <SelectTrigger className="w-32">
+                <SelectValue placeholder="Period" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All</SelectItem>
+                {(selectedView === "monthly"
+                  ? data.monthlySalesData
+                  : data.yearlySalesData
+                ).map((item) => (
+                  <SelectItem
+                    key={selectedView === "monthly" ? item.month : item.year}
+                    value={selectedView === "monthly" ? item.month : item.year}
+                  >
+                    {selectedView === "monthly"
+                      ? new Date(item.month).toLocaleString("default", {
+                          month: "long",
+                          year: "numeric",
+                        })
+                      : item.year}
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -149,19 +178,21 @@ export default function Component() {
           >
             <ResponsiveContainer width="100%" height="100%">
               <BarChart
-                data={data.monthlySalesData}
+                data={filteredData()}
                 margin={{ top: 20, right: 30, left: 40, bottom: 20 }}
               >
                 <CartesianGrid strokeDasharray="3 3" vertical={false} />
                 <XAxis
-                  dataKey="month"
+                  dataKey={selectedView === "monthly" ? "month" : "year"}
                   axisLine={false}
                   tickLine={false}
                   tick={{ fill: "#666" }}
                   tickFormatter={(value) =>
-                    new Date(value).toLocaleString("default", {
-                      month: "short",
-                    })
+                    selectedView === "monthly"
+                      ? new Date(value).toLocaleString("default", {
+                          month: "short",
+                        })
+                      : value
                   }
                 />
                 <YAxis

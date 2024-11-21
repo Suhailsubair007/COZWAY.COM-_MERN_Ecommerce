@@ -23,6 +23,7 @@ import UserWallet from "@/pages/User/UserWallet";
 import DisplayCoupens from "@/pages/User/DisplayCoupens";
 import ChangePassword from "@/pages/User/ChangePassword";
 import ReferralCode from "@/pages/User/ReferealOffer";
+import StoryPage from "@/pages/User/HomePage/StoryPage";
 
 const UserRoute = () => {
   return (
@@ -31,6 +32,7 @@ const UserRoute = () => {
         {/* Public route */}
 
         <Route path="/" element={<Landing />} />
+        <Route path="/story" element={<StoryPage />} />
 
         {/* Login routes */}
         <Route

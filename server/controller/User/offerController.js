@@ -32,6 +32,8 @@ const getReferralCode = async (req, res) => {
 
 const getHasSeen = async (req, res) => {
     try {
+
+        console.log("has seen calling ===============================================")
         const { userId } = req.params;
 
         if (!userId) {

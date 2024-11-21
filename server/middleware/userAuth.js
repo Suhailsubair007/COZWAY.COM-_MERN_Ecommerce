@@ -18,7 +18,6 @@ const verifyUser = async (req, res, next) => {
                 }
             } else {
                 req.user = decoded.user;
-                console.log("The decoded JWT id:",decoded.user);
                 next();
             }
 
@@ -28,7 +27,7 @@ const verifyUser = async (req, res, next) => {
         handleRefreshToken(refreshToken, req, res, next);
     }
 };
-             
+
 
 //Helper function for chek refresh token and create a new asses token with refresh token
 
@@ -41,7 +40,7 @@ const handleRefreshToken = async (refreshToken, req, res, next) => {
             });
 
             res.cookie("userAccessTocken", newAccessToken, {
-                httpOnly: true,
+                httpOnly: true,                                                                          
                 secure: false,
                 sameSite: "strict",
                 maxAge: 2 * 60 * 1000,
