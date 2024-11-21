@@ -113,13 +113,13 @@ export default function HeroSection() {
                 transition={{ delay: 0.2, duration: 0.5 }}
                 className="max-w-lg"
               >
-                <h2 className="text-5xl font-bold text-white mb-2">
+                <h2 className="text-4xl font-bold text-white mb-2">
                   {banners[currentIndex].heading}
                 </h2>
-                <h3 className="text-4xl font-semibold text-white mb-4">
+                <h3 className="text-2xl font-semibold text-white mb-4">
                   {banners[currentIndex].subHeading}
                 </h3>
-                <p className="text-2xl text-white mb-6">
+                <p className="text-xl text-white mb-6">
                   {banners[currentIndex].description}
                 </p>
                 <Button
@@ -127,7 +127,7 @@ export default function HeroSection() {
                   className="bg-white text-black hover:bg-gray-200"
                   onClick={handleClick}
                 >
-                  <ShoppingBag className="mr-2 h-5 w-5" /> SHOP NOW
+                  <ShoppingBag className="mr-1 h-4 w-4" /> SHOP NOW
                 </Button>
               </motion.div>
             </div>

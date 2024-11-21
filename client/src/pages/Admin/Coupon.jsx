@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Plus, Trash2, Home, ChevronRight } from "lucide-react";
+import { Plus, Trash2, Home, ChevronRight, Edit } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Table,
@@ -28,13 +28,16 @@ import {
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
 import AdminCouponModal from "@/ReuseComponets/Admin/AdminCouponModal";
+import AdminEditCouponModal from "@/ReuseComponets/Admin/AdminEditCoupenModal";
 import axiosInstance from "@/config/axiosConfig";
 
 export default function Coupon() {
   const [isOpen, setIsOpen] = useState(false);
+  const [isEditOpen, setIsEditOpen] = useState(false);
   const [coupons, setCoupons] = useState([]);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [couponToDelete, setCouponToDelete] = useState(null);
+  const [couponToEdit, setCouponToEdit] = useState(null);
 
   useEffect(() => {
     fetchCoupons();
@@ -53,6 +56,11 @@ export default function Coupon() {
   const handleDelete = (couponId) => {
     setCouponToDelete(couponId);
     setIsDeleteDialogOpen(true);
+  };
+
+  const handleEdit = (couponId) => {
+    setCouponToEdit(couponId);
+    setIsEditOpen(true);
   };
 
   const confirmDelete = async () => {
@@ -82,7 +90,7 @@ export default function Coupon() {
             <ChevronRight className="h-4 w-4" />
           </BreadcrumbSeparator>
           <BreadcrumbItem>
-            <BreadcrumbPage>Coupen Management</BreadcrumbPage>
+            <BreadcrumbPage>Coupon Management</BreadcrumbPage>
           </BreadcrumbItem>
         </BreadcrumbList>
       </Breadcrumb>
@@ -123,6 +131,13 @@ export default function Coupon() {
                   <Button
                     variant="ghost"
                     size="icon"
+                    onClick={() => handleEdit(coupon._id)}
+                  >
+                    <Edit className="w-4 h-4 text-blue-500" />
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="icon"
                     onClick={() => handleDelete(coupon._id)}
                   >
                     <Trash2 className="w-4 h-4 text-destructive" />
@@ -138,6 +153,13 @@ export default function Coupon() {
         isOpen={isOpen}
         onClose={() => setIsOpen(false)}
         onCouponAdded={fetchCoupons}
+      />
+
+      <AdminEditCouponModal
+        isOpen={isEditOpen}
+        onClose={() => setIsEditOpen(false)}
+        onCouponEdited={fetchCoupons}
+        couponId={couponToEdit}
       />
 
       <AlertDialog

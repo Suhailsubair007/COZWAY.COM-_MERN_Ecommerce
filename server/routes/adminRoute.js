@@ -49,18 +49,20 @@ router.delete('/offer', verifyAdmin, offerController.deleteOffer);
 router.get('/products', verifyAdmin, productController.get_product_offer);
 router.get('/getCategories', verifyAdmin, offerController.getCategoriesForOffer);
 
-
+//COUPEN related routes
 router.post('/coupon', verifyAdmin, couponController.addCoupon);
 router.delete('/deleteCoupon/:id', verifyAdmin, couponController.deleteCoupon);
 router.get('/getCoupon', verifyAdmin, couponController.getAllCoupons);
+router.get('/coupen/:id', verifyAdmin, couponController.getCouponById);
+router.put('/coupen/:id', verifyAdmin, couponController.editCoupon);
 
-
+//SALES based routes
 router.get('/report', verifyAdmin, salesController.getSalesReport)
 router.get('/download/report/pdf', verifyAdmin, salesController.download_sales_report_pdf)
 router.get('/download/report/xl', verifyAdmin, salesController.download_sales_report_xl)
 router.get('/topselling', salesController.getTopSelling)
 
-
+//BANNER Related routes
 router.post('/banner', bannerController.addBanner);
 router.get('/banner', bannerController.getAllBanners);
 router.delete('/banner/:id', bannerController.deleteBanner);

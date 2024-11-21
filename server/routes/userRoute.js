@@ -77,8 +77,8 @@ router.patch('/quantity/add/:userId/:itemId', verifyUser, cartController.increme
 router.patch('/quantity/min/:userId/:itemId', verifyUser, cartController.decrementCartItemQuantity);
 
 //ORDER RELATED ROUTES
-router.get('/items/:userId', orderController.getCheckoutCartItems);
-router.post('/order', orderController.createOrder);
+router.get('/items/:userId', verifyUser, orderController.getCheckoutCartItems);
+router.post('/order', verifyUser, orderController.createOrder);
 router.get('/orders/:userId', verifyUser, orderController.getUserOrders);
 router.get('/order/:orderId', verifyUser, orderController.getOrderById);
 router.patch('/order/:orderId/cancel/:productId', verifyUser, orderController.cancelOrder);
