@@ -63,6 +63,10 @@ const ProductDetail = () => {
   }, [id]);
 
   useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
+  useEffect(() => {
     checkWishlistStatus();
   }, [userId, id]);
 

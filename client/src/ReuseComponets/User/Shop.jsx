@@ -59,6 +59,10 @@ export default function ShoppingPage() {
   }, []);
 
   useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
+  useEffect(() => {
     fetchProducts();
   }, [currentPage, sortBy, filters]);
 
@@ -86,7 +90,7 @@ export default function ShoppingPage() {
         `/users/advanced-search?${queryParams}`
       );
       setProducts(response.data.products);
-      console.log("products--->",response.data.products)
+      console.log("products--->", response.data.products);
       setTotalPages(response.data.totalPages);
     } catch (error) {
       console.error("Error fetching products:", error);

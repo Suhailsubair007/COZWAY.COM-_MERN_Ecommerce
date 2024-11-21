@@ -30,17 +30,27 @@ const getReferralCode = async (req, res) => {
 };
 
 
+const mongoose = require('mongoose');
+
 const getHasSeen = async (req, res) => {
     try {
-
-        console.log("has seen calling ===============================================")
+        console.log("has seen calling ===============================================");
         const { userId } = req.params;
+
 
         if (!userId) {
             return res.status(400).json({
                 message: "User ID is required"
             });
         }
+
+
+        if (!mongoose.Types.ObjectId.isValid(userId)) {
+            return res.status(400).json({
+                message: "Invalid User ID format"
+            });
+        }
+
         const user = await User.findById(userId);
 
         if (!user) {
@@ -48,13 +58,15 @@ const getHasSeen = async (req, res) => {
                 message: "User not found"
             });
         }
-        return res.status(200).json({
+
+        return res.status(200).json({ 
             hasSeen: user.hasSeen,
         });
     } catch (error) {
         console.error("Error fetching...:", error);
         return res.status(500).json({
-            message: "Internal Server Error"
+            message: "Internal Server Error",
+            error: error.message
         });
     }
 };

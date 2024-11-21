@@ -34,7 +34,8 @@ export const addressValidationSchema = Yup.object().shape({
     .matches(/^[0-9]+$/, "Must be only digits")
     .min(10, "Must be exactly 10 digits")
     .max(10, "Must be exactly 10 digits"),
-  landmark: Yup.string(),
+  landmark: Yup.string()
+  .required("Landmark is required"),
 });
 
 export const SignupValidation = Yup.object({

@@ -83,7 +83,8 @@ const createOrder = async (req, res) => {
         } = req.body;
 
 
-        console.log(order_items)
+        console.log("order items--->>>", order_items);
+
 
         const discountAmount = (subtotal * total_discount) / 100;
         const calculatedTotal = subtotal - discountAmount + shipping_fee;
@@ -91,15 +92,20 @@ const createOrder = async (req, res) => {
 
         for (const item of order_items) {
             const product = await Product.findById(item.productId._id);
-            if (product) {
-                const currentProduct = product.sizes.find(s => s.size === item.size);
-                if (currentProduct && currentProduct.stock < item.quantity) {
-                    return res.status(400).json({
-                        sucess: false,
-                        message: `Currently quantity of the ${product.name} for ${item.size} is stock out!!`
 
-                    })
-                }
+            if (!product || !product.is_active) {
+                return res.status(400).json({
+                    success: false,
+                    message: `The product ${item.productId.name} has been blocked by the admin.`
+                });
+            }
+
+            const currentProduct = product.sizes.find(s => s.size === item.size);
+            if (currentProduct && currentProduct.stock < item.quantity) {
+                return res.status(400).json({
+                    success: false,
+                    message: `Currently, the quantity of ${product.name} for size ${item.size} is out of stock!`
+                });
             }
         }
 
@@ -166,7 +172,7 @@ const createOrder = async (req, res) => {
                 }
             );
         }
-        
+
         // Update cart
         await Cart.findOneAndUpdate(
             { userId },
@@ -211,20 +217,6 @@ const createOrder = async (req, res) => {
                 }
             );
         }
-
-        // Update wallet if payment method is wallet
-        // if (payment_method === 'Wallet') {
-        //     const wallet = await Wallet.findOne({ user: userId });
-        //     wallet.balance -= total_price_with_discount;
-        //     wallet.transactions.push({
-        //         order_id: order._id,
-        //         transaction_date: new Date(),
-        //         transaction_type: "debit",
-        //         transaction_status: "completed",
-        //         amount: total_price_with_discount
-        //     });
-        //     await wallet.save();
-        // }
 
         if (coupon) {
             await Coupon.findOneAndUpdate(
