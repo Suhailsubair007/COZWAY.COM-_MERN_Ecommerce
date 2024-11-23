@@ -2,12 +2,12 @@ import { useState, useEffect } from "react";
 import RelatedProducts from "./RelatedProduct";
 import { useSelector } from "react-redux";
 import { Badge } from "@/components/ui/badge";
+import { Skeleton } from "@/components/ui/skeleton";
 import { ChevronRight, Home } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useParams, useNavigate } from "react-router-dom";
 import axiosInstance from "@/config/axiosConfig";
 import { motion, AnimatePresence } from "framer-motion";
@@ -16,8 +16,6 @@ import { toast } from "sonner";
 import {
   Star,
   MessageSquare,
-  ThumbsUp,
-  ThumbsDown,
   Heart,
   X,
 } from "lucide-react";
@@ -213,11 +211,39 @@ const ProductDetail = () => {
   };
 
   if (isLoading) {
-    return <div>Loading...</div>;
+    return (
+      <div className="container mx-auto px-4 py-8">
+        <div className="flex flex-col md:flex-row gap-8">
+          <div className="flex-1">
+            <Skeleton className="w-full h-[500px] rounded-lg" />
+            <div className="flex gap-2 mt-4">
+              {[...Array(4)].map((_, index) => (
+                <Skeleton key={index} className="w-20 h-24 rounded" />
+              ))}
+            </div>
+          </div>
+          <div className="flex-1 space-y-4">
+            <Skeleton className="h-8 w-3/4" />
+            <Skeleton className="h-6 w-1/4" />
+            <Skeleton className="h-4 w-1/2" />
+            <div className="space-y-2">
+              <Skeleton className="h-10 w-full" />
+              <Skeleton className="h-10 w-full" />
+              <Skeleton className="h-10 w-full" />
+            </div>
+          </div>
+        </div>
+      </div>
+    )
   }
 
   if (!productData) {
-    return <div>Product not found</div>;
+    return (
+      <div className="container mx-auto px-4 py-8 text-center">
+        <h2 className="text-2xl font-semibold mb-4">Product not found</h2>
+        <p className="text-gray-600">The requested product could not be found. It may have been removed or doesn't exist.</p>
+      </div>
+    );
   }
 
   const {

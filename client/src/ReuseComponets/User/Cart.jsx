@@ -97,7 +97,7 @@ const CartItem = ({ item, onUpdateQuantity, onRemove }) => {
   );
 };
 
-export default function ShoppingCart() {
+export default function   ShoppingCart() {
   const navigate = useNavigate();
   const [cartItems, setCartItems] = useState([]);
   const [subtotal, setSubtotal] = useState(0);

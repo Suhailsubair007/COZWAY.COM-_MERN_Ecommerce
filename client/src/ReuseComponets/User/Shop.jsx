@@ -8,12 +8,20 @@ import { FilterSidebar } from "./ShoppingPage_componets/FilterSidebar ";
 import { ProductCard } from "./ShoppingPage_componets/ProductCard ";
 import { SortDropdown } from "./ShoppingPage_componets/SortDropdown ";
 import { Pagination } from "./ShoppingPage_componets/Pagination";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
 const ProductList = ({ products, isLoading, error, onNavigate }) => {
   if (isLoading) {
     return (
-      <div className="flex justify-center items-center h-64">
-        <div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-primary"></div>
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+        {Array.from({ length: 8 }).map((_, index) => (
+          <div key={index} className="space-y-4">
+            <Skeleton className="h-48 w-full" />
+            <Skeleton className="h-4 w-3/4" />
+            <Skeleton className="h-4 w-1/2" />
+          </div>
+        ))}
       </div>
     );
   }
@@ -24,9 +32,13 @@ const ProductList = ({ products, isLoading, error, onNavigate }) => {
 
   if (products.length === 0) {
     return (
-      <div className="text-center text-gray-500 mt-8">
-        No products found matching your criteria.
-      </div>
+      <Alert>
+        <AlertCircle className="h-4 w-4" />
+        <AlertTitle>No Products Found</AlertTitle>
+        <AlertDescription>
+          We couldn't find any products matching your criteria. Try adjusting your filters or search terms.
+        </AlertDescription>
+      </Alert>
     );
   }
 
@@ -80,7 +92,7 @@ export default function ShoppingPage() {
     setIsLoading(true);
     setError(null);
     try {
-      const queryParams = new URLSearchParams({
+      const queryParams = new URLSearchParams({ 
         page: currentPage.toString(),
         limit: "8",
         sortBy,
@@ -90,7 +102,7 @@ export default function ShoppingPage() {
         `/users/advanced-search?${queryParams}`
       );
       setProducts(response.data.products);
-      console.log("products--->", response.data.products);
+      // console.log("products--->", response.data.products);
       setTotalPages(response.data.totalPages);
     } catch (error) {
       console.error("Error fetching products:", error);
@@ -164,4 +176,3 @@ export default function ShoppingPage() {
   );
 }
 
-// ShoppingPage
