@@ -4,6 +4,15 @@ const { genarateAccesTocken } = require('../../utils/genarateAccesTocken')
 const { genarateRefreshTocken } = require('../../utils/genarateRefreshTocken')
 
 
+
+const securePassword = async (password) => {
+    try {
+        return await bcrypt.hash(password, 10);
+    } catch (error) {
+        console.error(error);
+    }
+};
+
 //controller for register Admin..
 const registerAdmin = async (req, res) => {
     const { name, email, password } = req.body;

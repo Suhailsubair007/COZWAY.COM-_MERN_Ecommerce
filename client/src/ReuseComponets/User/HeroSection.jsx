@@ -39,12 +39,6 @@ export default function HeroSection() {
     }
   };
 
-  console.log(seen, "kjfhaskdjfhaskdfjhasdfjk");
-  console.log(
-    showReferralPopup,
-    "dsfgsdfgsdfgsdfgsdfgsdfgsdfgdsfgsdffgsdgfsdfg"
-  );
-
   const fetchSeen = async () => {
     try {
       const response = await axiosInstance.get(`/users/seen/${userId}`);
