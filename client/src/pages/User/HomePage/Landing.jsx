@@ -10,7 +10,6 @@ const Landing = () => {
     <div className="min-h-screen bg-white">
       <Header />
       <HeroSection />
-
       <ShopByCategories />
       <NewArrivals />
       <TopSelling />

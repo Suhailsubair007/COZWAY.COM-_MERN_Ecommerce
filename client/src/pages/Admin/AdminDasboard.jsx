@@ -24,7 +24,7 @@ import {
 import { Users, ShoppingBag, IndianRupee, Clock } from "lucide-react";
 import axiosInstance from "@/config/axiosConfig";
 
-export default function Component() {
+export default function AdminDashboard() {
   const [data, setData] = useState({
     totalOrders: 0,
     totalUsers: 0,

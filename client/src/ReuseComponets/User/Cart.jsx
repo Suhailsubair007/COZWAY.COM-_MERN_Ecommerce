@@ -5,6 +5,7 @@ import { Minus, Plus, Trash2, ChevronRight } from "lucide-react";
 import { toast } from "sonner";
 import axiosInstance from "@/config/axiosConfig";
 import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
 import {
   Card,
   CardContent,
@@ -22,6 +23,8 @@ const CartItem = ({ item, onUpdateQuantity, onRemove }) => {
   const sizeInfo = item.productId.sizes.find((size) => size.size === item.size);
   const availableStock = sizeInfo ? sizeInfo.stock : 0; 
   const isOutOfStock = availableStock === 0; 
+
+  
 
   return (
     <Card className={`mb-4 ${isOutOfStock ? "opacity-50" : ""}`}>
@@ -101,6 +104,7 @@ export default function   ShoppingCart() {
   const navigate = useNavigate();
   const [cartItems, setCartItems] = useState([]);
   const [subtotal, setSubtotal] = useState(0);
+  const [isLoading, setIsLoading] = useState(true);
   const userId = useSelector((state) => state.user.userInfo.id);
 
   useEffect(() => {
@@ -118,7 +122,9 @@ export default function   ShoppingCart() {
       if (error.response) {
         toast.error(error.response.data.message);
       }
-    }
+    }finally {
+      setIsLoading(false);
+    } 
   };
 
   const updateQuantity = async (item, action) => {
@@ -156,6 +162,53 @@ export default function   ShoppingCart() {
   };
 
   const isCheckoutDisabled = cartItems.every((item) => item.quantity === 0);
+
+  if (isLoading) {
+    return (
+      <div className="container mx-auto px-3 sm:px-6 lg:px-8 py-8">
+        <h1 className="text-3xl font-bold mb-8">Shopping Cart</h1>
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          <div className="lg:col-span-2 space-y-4">
+            {[...Array(1)].map((_, index) => (
+              <Card key={index} className="mb-4">
+                <CardContent className="p-4">
+                  <div className="flex items-center space-x-4">
+                    <Skeleton className="w-24 h-32 rounded-md" />
+                    <div className="flex-grow space-y-2">
+                      <Skeleton className="h-6 w-3/4" />
+                      <Skeleton className="h-4 w-1/2" />
+                      <Skeleton className="h-4 w-1/4" />
+                    </div>
+                    <div className="text-right space-y-2">
+                      <Skeleton className="h-6 w-20 ml-auto" />
+                      <Skeleton className="h-8 w-24 ml-auto" />
+                      <Skeleton className="h-8 w-20 ml-auto" />
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+          <div className="lg:col-span-1">
+            <Card>
+              <CardHeader>
+                <Skeleton className="h-6 w-1/2" />
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-2">
+                  <Skeleton className="h-4 w-full" />
+                  <Skeleton className="h-4 w-full" />
+                </div>
+              </CardContent>
+              <CardFooter>
+                <Skeleton className="h-10 w-full" />
+              </CardFooter>
+            </Card>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">

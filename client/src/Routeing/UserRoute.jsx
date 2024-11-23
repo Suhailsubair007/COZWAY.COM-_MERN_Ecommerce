@@ -1,33 +1,37 @@
-import React from "react";
+import React, { Suspense, lazy } from "react";
 import { Routes, Route } from "react-router-dom";
 import { Toaster } from "sonner";
-import Landing from "../pages/User/HomePage/Landing";
-import Login from "../pages/User/login/Login";
-import Signup from "../pages/User/login/Signup";
-import PurchasePage from "@/pages/User/HomePage/PurchasePage";
-import MainShoppingPage from "@/pages/User/HomePage/MainShoppingPage";
 import UserLoginProtect from "./Protected_Routing/user/UserLoginProtect";
 import UserPrivate from "./Protected_Routing/user/UserPrivate";
-import ProfilePage from "@/pages/User/ProfilePage";
-import ProfileUpdate from "@/ReuseComponets/User/ProfileUpdate";
-import Address from "@/ReuseComponets/User/Address";
-import ShoppingCart from "@/ReuseComponets/User/Cart";
-import CartPage from "@/pages/User/HomePage/CartPage";
-import Checkout from "@/pages/User/Checkout";
-import Order_details from "@/pages/User/Order_details";
-import MyOrders from "@/ReuseComponets/User/MyOrder";
-import ForgotPassword from "@/pages/User/login/ForgotPassword";
-import ResetPassword from "@/pages/User/login/ResetPassword";
-import WishlistPage from "@/pages/User/WishlistPage";
-import UserWallet from "@/pages/User/UserWallet";
-import DisplayCoupens from "@/pages/User/DisplayCoupens";
-import ChangePassword from "@/pages/User/ChangePassword";
-import ReferralCode from "@/pages/User/ReferealOffer";
-import StoryPage from "@/pages/User/HomePage/StoryPage";
+import { LoadingSpinner } from "@/ReuseComponets/User/LoadingSpinner";
+
+// Lazy load components
+const Landing = lazy(() => import("../pages/User/HomePage/Landing"));
+const Login = lazy(() => import("../pages/User/login/Login"));
+const Signup = lazy(() => import("../pages/User/login/Signup"));
+const PurchasePage = lazy(() => import("@/pages/User/HomePage/PurchasePage"));
+const MainShoppingPage = lazy(() => import("@/pages/User/HomePage/MainShoppingPage"));
+const ProfilePage = lazy(() => import("@/pages/User/ProfilePage"));
+const ProfileUpdate = lazy(() => import("@/ReuseComponets/User/ProfileUpdate"));
+const Address = lazy(() => import("@/ReuseComponets/User/Address"));
+const CartPage = lazy(() => import("@/pages/User/HomePage/CartPage"));
+const Checkout = lazy(() => import("@/pages/User/Checkout"));
+const Order_details = lazy(() => import("@/pages/User/Order_details"));
+const MyOrders = lazy(() => import("@/ReuseComponets/User/MyOrder"));
+const ForgotPassword = lazy(() => import("@/pages/User/login/ForgotPassword"));
+const ResetPassword = lazy(() => import("@/pages/User/login/ResetPassword"));
+const WishlistPage = lazy(() => import("@/pages/User/WishlistPage"));
+const UserWallet = lazy(() => import("@/pages/User/UserWallet"));
+const DisplayCoupens = lazy(() => import("@/pages/User/DisplayCoupens"));
+const ChangePassword = lazy(() => import("@/pages/User/ChangePassword"));
+const ReferralCode = lazy(() => import("@/pages/User/ReferealOffer"));
+const StoryPage = lazy(() => import("@/pages/User/HomePage/StoryPage"));
+
 
 const UserRoute = () => {
   return (
     <>
+     <Suspense fallback={<LoadingSpinner />}>
       <Routes>
         {/* Public route */}
 
@@ -139,6 +143,7 @@ const UserRoute = () => {
           <Route path="referal" element={<ReferralCode />} />
         </Route>
       </Routes>
+      </Suspense>
       <Toaster richColors position="bottom-center" />
     </>
   );

@@ -105,7 +105,7 @@ const fetchRelatedProducts = async (req, res) => {
 //The main products searching and filtering controller...
 const advancedSearch = async (req, res) => {
     try {
-        const { searchTerm, categories, fits, sleeves, page = 1, limit = 8, sortBy = 'createdAt' } = req.query;
+        const { searchTerm, categories, fits, sleeves, page = 1, limit = 10, sortBy = 'createdAt' } = req.query;
 
         let query = { is_active: true };
 

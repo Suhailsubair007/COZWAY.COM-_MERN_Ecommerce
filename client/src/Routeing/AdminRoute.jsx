@@ -1,29 +1,33 @@
+import React, { Suspense, lazy } from 'react';
 import { Routes, Route } from "react-router-dom";
 import { Toaster } from "sonner";
-import AdminDashbord from "../pages/Admin/AdminDasboard";
-import AddCategory from "../pages/Admin/AddCategory";
-import AddProduct from "../pages/Admin/AddProduct";
-import Product from "../pages/Admin/Product";
-import EditCategory from "../pages/Admin/EditCategory";
 import Aside from "@/ReuseComponets/Admin/Aside";
-import UserList from "@/pages/Admin/UserList";
-import EditProduct from "@/pages/Admin/EditProduct";
-import OrderManagement from "@/pages/Admin/OrderManagement";
-import AdminOrderDetail from "@/pages/Admin/AdminOrderDetail";
-import Coupon from "@/pages/Admin/Coupon";
-import Offer from "@/pages/Admin/Offer";
-import SalesReport from "@/pages/Admin/SalesReport";
-import Banner from "@/pages/Admin/Banner";
+import { LoadingSpinner } from "@/ReuseComponets/User/LoadingSpinner";
 
-// import Cookies from "js-cookie";
+const AdminDashboard = lazy(() => import("../pages/Admin/AdminDasboard"));
+const AddCategory = lazy(() => import("../pages/Admin/AddCategory"));
+const AddProduct = lazy(() => import("../pages/Admin/AddProduct"));
+const Product = lazy(() => import("../pages/Admin/Product"));
+const EditCategory = lazy(() => import("../pages/Admin/EditCategory"));
+const UserList = lazy(() => import("@/pages/Admin/UserList"));
+const EditProduct = lazy(() => import("@/pages/Admin/EditProduct"));
+const OrderManagement = lazy(() => import("@/pages/Admin/OrderManagement"));
+const AdminOrderDetail = lazy(() => import("@/pages/Admin/AdminOrderDetail"));
+const Coupon = lazy(() => import("@/pages/Admin/Coupon"));
+const Offer = lazy(() => import("@/pages/Admin/Offer"));
+const SalesReport = lazy(() => import("@/pages/Admin/SalesReport"));
+const Banner = lazy(() => import("@/pages/Admin/Banner"));
+
+
 
 const AdminRoute = () => {
   return (
-    <div className="flex flex-col lg:flex-row min-h-screen bg-gray-100">
+    <>
+    <Suspense fallback={<LoadingSpinner />}>
       <Aside />
       <main className="flex-grow lg:ml-64 p-4">
         <Routes>
-          <Route path="/dashboard" element={<AdminDashbord />} />
+          <Route path="/dashboard" element={<AdminDashboard />} />
           <Route path="/categories" element={<AddCategory />} />
           <Route
             path="/categories/edit/:categoryId"
@@ -43,7 +47,8 @@ const AdminRoute = () => {
         </Routes>
       </main>
       <Toaster richColors position="bottom-center" />
-    </div>
+      </Suspense>
+    </>
   );
 };
 

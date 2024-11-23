@@ -3,6 +3,7 @@ import { useParams } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { saveAs } from "file-saver";
 import ReturnPopup from "./ReturnPopup";
+import { LoadingSpinner } from "./LoadingSpinner";
 import {
   ChevronRight,
   Home,
@@ -137,9 +138,7 @@ export default function OrderDetail() {
 
   if (isLoading)
     return (
-      <div className="flex items-center justify-center h-screen">
-        Loading...
-      </div>
+     <LoadingSpinner/>
     );
   if (error)
     return (
