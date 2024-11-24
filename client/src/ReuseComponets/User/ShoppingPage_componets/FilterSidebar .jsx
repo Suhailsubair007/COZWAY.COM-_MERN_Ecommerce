@@ -3,6 +3,7 @@ import { Input } from "@/components/ui/input"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Button } from "@/components/ui/button"
 import { ChevronDown, ChevronUp } from "lucide-react"
+import { useDebounce } from "../Hooks/Debounce"
 
 export const FilterSidebar = ({ className, categories, onFilterChange }) => {
   const [selectedCategories, setSelectedCategories] = useState([])
@@ -17,6 +18,9 @@ export const FilterSidebar = ({ className, categories, onFilterChange }) => {
 
   const fits = ["Slim Fit", "Regular Fit", "Loose Fit"]
   const sleeves = ["Full Sleeve", "Half Sleeve", "Elbow Sleeve"]
+
+  //Debounce searching...
+  const debouncedSearchTerm = useDebounce(searchTerm, 1000)
 
   const handleCategoryChange = (categoryId) => {
     setSelectedCategories((prev) =>
@@ -56,7 +60,7 @@ export const FilterSidebar = ({ className, categories, onFilterChange }) => {
       sleeves: selectedSleeves.join(','),
       searchTerm,
     }) 
-  }, [selectedCategories, selectedFits, selectedSleeves, searchTerm])
+  }, [selectedCategories, selectedFits, selectedSleeves , debouncedSearchTerm])
 
   return (
     <div className={`${className} flex flex-col space-y-6 p-4 bg-background rounded-lg shadow`}>

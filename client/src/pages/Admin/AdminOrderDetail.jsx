@@ -5,11 +5,9 @@ import {
   Home,
   Package,
   CreditCard,
-  FileText,
   Truck,
   RefreshCcw,
 } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Badge } from "@/components/ui/badge";
@@ -240,18 +238,20 @@ export default function Component() {
                     disabled={updatingStatus[item._id]}
                   >
                     <SelectTrigger className="w-[180px]">
-                      <SelectValue placeholder="Select status" />
-                    </SelectTrigger>
+                      <SelectValue placeholder="Select stFatus" />
+                    </SelectTrigger> 
                     <SelectContent>
+
                       {orderStatuses.map((status) => (
-                        <SelectItem 
-                          key={status} 
+                        <SelectItem
+                          key={status}
                           value={status}
-                          disabled={isStatusDisabled(item.order_status, status)}
+                          disabled={orderData?.payment_status === 'Failed' || isStatusDisabled(item.order_status, status)}
                         >
                           {status.charAt(0).toUpperCase() + status.slice(1)}
                         </SelectItem>
                       ))}
+
                     </SelectContent>
                   </Select>
                   {updatingStatus[item._id] && (

@@ -2,6 +2,7 @@ import { useNavigate } from "react-router-dom";
 import React, { useState, useEffect } from "react";
 import axiosInstance from "@/config/axiosConfig";
 import { Skeleton } from "@/components/ui/skeleton"
+import NoOrdersFallback from "./NoOrderFallback";
 import {
   HomeIcon as House,
   ChevronRight,
@@ -52,12 +53,11 @@ export default function Component() {
       const response = await axiosInstance.get(
         `/users/orders/${user}?page=${page}&limit=2`
       );
-      console.log("dataaaa=================>", response.data);
       setOrders(response.data.orders);
       setTotalPages(response.data.totalPages);
     } catch (error) {
       console.error("Error fetching orders:", error);
-    }finally {
+    } finally {
       setLoading(false)
     }
 
@@ -117,144 +117,144 @@ export default function Component() {
 
       {/* Orders List */}
       <div className="space-y-8">
-  {loading ? (
-    Array.from({ length: 2 }).map((_, index) => (
-      <div key={index} className="bg-white rounded-lg shadow-sm max-w-100 p-6">
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4">
-          <Skeleton className="h-6 w-1/3" />
-          <Skeleton className="h-4 w-1/4 mt-1 sm:mt-0" />
-        </div>
-        <div className="space-y-4">
-          {Array.from({ length: 2 }).map((_, itemIndex) => (
-            <div key={itemIndex} className="flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-6 border-b pb-4 last:border-b-0 last:pb-0">
-              <Skeleton className="w-20 h-20 rounded-lg" />
-              <div className="flex-1 min-w-0">
-                <Skeleton className="h-4 w-2/3 mb-2" />
-                <div className="mt-1 flex flex-col sm:flex-row sm:flex-wrap sm:space-x-6">
-                  <Skeleton className="h-3 w-20" />
-                  <Skeleton className="h-3 w-20" />
-                  <Skeleton className="h-3 w-20" />
-                </div>
+        {loading ? (
+          Array.from({ length: 2 }).map((_, index) => (
+            <div key={index} className="bg-white rounded-lg shadow-sm max-w-100 p-6">
+              <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4">
+                <Skeleton className="h-6 w-1/3" />
+                <Skeleton className="h-4 w-1/4 mt-1 sm:mt-0" />
               </div>
-              <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-4 mt-2 sm:mt-0">
-                <Skeleton className="h-4 w-16" />
+              <div className="space-y-4">
+                {Array.from({ length: 2 }).map((_, itemIndex) => (
+                  <div key={itemIndex} className="flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-6 border-b pb-4 last:border-b-0 last:pb-0">
+                    <Skeleton className="w-20 h-20 rounded-lg" />
+                    <div className="flex-1 min-w-0">
+                      <Skeleton className="h-4 w-2/3 mb-2" />
+                      <div className="mt-1 flex flex-col sm:flex-row sm:flex-wrap sm:space-x-6">
+                        <Skeleton className="h-3 w-20" />
+                        <Skeleton className="h-3 w-20" />
+                        <Skeleton className="h-3 w-20" />
+                      </div>
+                    </div>
+                    <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-4 mt-2 sm:mt-0">
+                      <Skeleton className="h-4 w-16" />
+                    </div>
+                  </div>
+                ))}
+              </div>
+              <div className="mt-6 flex flex-col sm:flex-row justify-between items-start sm:items-center">
+                <div>
+                  <Skeleton className="h-6 w-32 mb-2" />
+                  <Skeleton className="h-4 w-24" />
+                  <Skeleton className="h-4 w-28 mt-1" />
+                </div>
+                <div className="flex flex-wrap gap-3 mt-4 sm:mt-0">
+                  <Skeleton className="h-9 w-24" />
+                  <Skeleton className="h-9 w-24" />
+                </div>
               </div>
             </div>
-          ))}
-        </div>
-        <div className="mt-6 flex flex-col sm:flex-row justify-between items-start sm:items-center">
-          <div>
-            <Skeleton className="h-6 w-32 mb-2" />
-            <Skeleton className="h-4 w-24" />
-            <Skeleton className="h-4 w-28 mt-1" />
-          </div>
-          <div className="flex flex-wrap gap-3 mt-4 sm:mt-0">
-            <Skeleton className="h-9 w-24" />
-            <Skeleton className="h-9 w-24" />
-          </div>
-        </div>
-      </div>
-    ))
-  ) : (
-    orders.map((order) => (
-      <div key={order._id} className="bg-white rounded-lg shadow-sm p-6">
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4">
-          <h2 className="text-lg font-semibold text-gray-900">
-            Order ID: {order.order_id}
-          </h2>
-          <p className="text-sm text-gray-600 mt-1 sm:mt-0">
-            Placed on: {new Date(order.placed_at).toLocaleDateString()}
-          </p>
-        </div>
-        <div className="space-y-4">
-          {order.order_items.map((item) => (
-            <div
-              key={item._id}
-              className="flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-6 border-b pb-4 last:border-b-0 last:pb-0"
-            >
-              <div className="shrink-0">
-                <img
-                  src={item.product.images[0]}
-                  alt={item.product.name}
-                  width={80}
-                  height={80}
-                  className="rounded-lg border object-cover"
-                />
-              </div>
-              <div className="flex-1 min-w-0">
-                <h3 className="text-sm font-medium text-gray-900">
-                  {item.product.name}
-                </h3>
-                <div className="mt-1 flex flex-col sm:flex-row sm:flex-wrap sm:space-x-6">
-                  <p className="text-sm text-gray-500">
-                    Quantity: {item.quantity}
-                  </p>
-                  <p className="text-sm text-gray-500">
-                    Price: ₹{item.price.toFixed(0)}
-                  </p>
-                  <p className="text-sm font-medium text-gray-900">
-                    Total: ₹{item.totalProductPrice.toFixed(0)}
-                  </p>
-                </div>
-              </div>
-              <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-4 mt-2 sm:mt-0">
-                <p
-                  className={`text-sm font-medium ${getStatusColor(
-                    order?.order_status
-                  )}`}
-                >
-                  {order?.order_status}
+          ))
+        ) : orders.length == 0 ? (<NoOrdersFallback />) : (
+          orders.map((order) => (
+            <div key={order._id} className="bg-white rounded-lg shadow-sm p-6">
+              <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4">
+                <h2 className="text-lg font-semibold text-gray-900">
+                  Order ID: {order.order_id}
+                </h2>
+                <p className="text-sm text-gray-600 mt-1 sm:mt-0">
+                  Placed on: {new Date(order.placed_at).toLocaleDateString()}
                 </p>
-                {order?.order_status === "delivered" && (
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => handleReturnOrder(order?._id)}
-                    className="flex items-center space-x-2"
+              </div>
+              <div className="space-y-4">
+                {order.order_items.map((item) => (
+                  <div
+                    key={item._id}
+                    className="flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-6 border-b pb-4 last:border-b-0 last:pb-0"
                   >
-                    <Undo2 className="w-4 h-4" />
-                    <span>Return Order</span>
+                    <div className="shrink-0">
+                      <img
+                        src={item.product.images[0]}
+                        alt={item.product.name}
+                        width={80}
+                        height={80}
+                        className="rounded-lg border object-cover"
+                      />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <h3 className="text-sm font-medium text-gray-900">
+                        {item.product.name}
+                      </h3>
+                      <div className="mt-1 flex flex-col sm:flex-row sm:flex-wrap sm:space-x-6">
+                        <p className="text-sm text-gray-500">
+                          Quantity: {item.quantity}
+                        </p>
+                        <p className="text-sm text-gray-500">
+                          Price: ₹{item.price.toFixed(0)}
+                        </p>
+                        <p className="text-sm font-medium text-gray-900">
+                          Total: ₹{item.totalProductPrice.toFixed(0)}
+                        </p>
+                      </div>
+                    </div>
+                    <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-4 mt-2 sm:mt-0">
+                      <p
+                        className={`text-sm font-medium ${getStatusColor(
+                          order?.order_status
+                        )}`}
+                      >
+                        {order?.order_status}
+                      </p>
+                      {order?.order_status === "delivered" && (
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => handleReturnOrder(order?._id)}
+                          className="flex items-center space-x-2"
+                        >
+                          <Undo2 className="w-4 h-4" />
+                          <span>Return Order</span>
+                        </Button>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+              <div className="mt-6 flex flex-col sm:flex-row justify-between items-start sm:items-center">
+                <div>
+                  <p className="text-lg font-medium text-gray-900">
+                    Total Amount: ₹{order.total_price_with_discount.toFixed(2)}
+                  </p>
+                  <p className="text-sm text-gray-600">
+                    Payment Method: {order?.payment_method}
+                  </p>
+                  <p className="text-sm text-gray-600">
+                    Payment Status: {order?.payment_status}
+                  </p>
+                </div>
+                <div className="flex flex-wrap gap-3 mt-4 sm:mt-0">
+                  <Button
+                    variant="default"
+                    onClick={() => navigate(`/orders/${order._id}`)}
+                  >
+                    View Details
                   </Button>
-                )}
+                  {order?.payment_status === "Failed" && (
+                    <RetryPayment
+                      currentPage={currentPage}
+                      fetchOrders={fetchOrders}
+                      amount={order?.total_price_with_discount.toFixed(0)}
+                      buttonName="Pay Now"
+                      userInfo={userInfo}
+                      orderId={order._id}
+                    />
+                  )}
+                </div>
               </div>
             </div>
-          ))}
-        </div>
-        <div className="mt-6 flex flex-col sm:flex-row justify-between items-start sm:items-center">
-          <div>
-            <p className="text-lg font-medium text-gray-900">
-              Total Amount: ₹{order.total_price_with_discount.toFixed(2)}
-            </p>
-            <p className="text-sm text-gray-600">
-              Payment Method: {order?.payment_method}
-            </p>
-            <p className="text-sm text-gray-600">
-              Payment Status: {order?.payment_status}
-            </p>
-          </div>
-          <div className="flex flex-wrap gap-3 mt-4 sm:mt-0">
-            <Button
-              variant="default"
-              onClick={() => navigate(`/orders/${order._id}`)}
-            >
-              View Details
-            </Button>
-            {order?.payment_status === "Failed" && (
-              <RetryPayment
-                currentPage={currentPage}
-                fetchOrders={fetchOrders}
-                amount={order?.total_price_with_discount.toFixed(0)}
-                buttonName="Pay Now"
-                userInfo={userInfo}
-                orderId={order._id}
-              />
-            )}
-          </div>
-        </div>
+          ))
+        )}
       </div>
-    ))
-  )}
-</div>
 
 
       <Pagination className="mt-8">

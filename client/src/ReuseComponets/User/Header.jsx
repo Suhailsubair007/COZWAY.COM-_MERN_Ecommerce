@@ -73,10 +73,12 @@ export default function Header() {
       console.log("wishlist------->", response.data);
       setWishlistCount(response.data.wishlist_length);
     } catch (error) {
-      console.error("Error fetching cart:", error);
-      if (error.response) {
-        console.log(error.response.data.message);
+      if(error.response?.status === 404){
+        setWishlistCount(0);
+      }else{
+        console.error("Error fetching cart:", error);
       }
+      
     }
   };
 

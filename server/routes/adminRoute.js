@@ -1,6 +1,5 @@
 const express = require("express");
 const router = express.Router();
-const verifyAdmin = require('../middleware/adminAuth')
 const adminController = require('../controller/Admin/adminController');
 const userController = require('../controller/Admin/userController')
 const categoryController = require('../controller/Admin/categoryController');
@@ -11,6 +10,8 @@ const couponController = require('../controller/Admin/couponController')
 const salesController = require('../controller/Admin/salesController')
 const bannerController = require('../controller/Admin/bannerController')
 
+//MIddleware for admin authorization...
+const verifyAdmin = require('../middleware/adminAuth')
 
 //Admin login and Signup route..
 router.post('/signup', adminController.registerAdmin);
@@ -31,18 +32,18 @@ router.patch('/get_product/:id', verifyAdmin, productController.updateProductSta
 router.put('/update_product/:id', verifyAdmin, productController.updateProduct);
 router.get('/product/edit/:id', verifyAdmin, productController.fetchProductById);
 
-//User related details for display the uses and block and unblock the user..
+//USER related details for display the uses and block and unblock the user..
 router.get('/coustmers', verifyAdmin, userController.getCoutomers);
 router.patch('/coustmers/:id', verifyAdmin, userController.updateCoustomerStatus);
 router.get('/data', userController.getOrderStatistics);
 
-//order related routes..
+//ORDER related routes..
 router.get('/orders', verifyAdmin, orderController.getAllOrders);
 router.patch('/orders/:orderId/status', verifyAdmin, orderController.updateOrderStatus);
 router.get('/order/:orderId', verifyAdmin, orderController.getOrderById);
 router.post('/orders/:orderId/return-response', orderController.responseToReturnRequest);
 
-//offer related API end points...
+//OFFER related API end points...
 router.get('/offers', verifyAdmin, offerController.getOffers);
 router.post('/addoffer', verifyAdmin, offerController.addOffer);
 router.delete('/offer', verifyAdmin, offerController.deleteOffer);

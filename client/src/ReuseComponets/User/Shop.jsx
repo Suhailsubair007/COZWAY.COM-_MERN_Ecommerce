@@ -9,7 +9,9 @@ import { ProductCard } from "./ShoppingPage_componets/ProductCard ";
 import { SortDropdown } from "./ShoppingPage_componets/SortDropdown ";
 import { Pagination } from "./ShoppingPage_componets/Pagination";
 import { Skeleton } from "@/components/ui/skeleton";
+import { PackageX } from 'lucide-react'
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+
 
 const ProductList = ({ products, isLoading, error, onNavigate }) => {
   if (isLoading) {
@@ -17,15 +19,15 @@ const ProductList = ({ products, isLoading, error, onNavigate }) => {
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
         {Array.from({ length: 8 }).map((_, index) => (
           <div key={index} className="space-y-4">
-            <Skeleton className="h-80 w-full" /> 
-            <Skeleton className="h-10 w-3/4" />   
-            <Skeleton className="h-10 w-1/2" />    
+            <Skeleton className="h-80 w-full" />
+            <Skeleton className="h-10 w-3/4" />
+            <Skeleton className="h-10 w-1/2" />
           </div>
         ))}
       </div>
     );
   }
-  
+
 
   if (error) {
     return <div className="text-center text-red-500">{error}</div>;
@@ -33,15 +35,18 @@ const ProductList = ({ products, isLoading, error, onNavigate }) => {
 
   if (products.length === 0) {
     return (
-      <Alert>
-        <AlertCircle className="h-4 w-4" />
-        <AlertTitle>No Products Found</AlertTitle>
-        <AlertDescription>
-          We couldn't find any products matching your criteria. Try adjusting your filters or search terms.
-        </AlertDescription>
-      </Alert>
+      <div className="h-[800px] flex items-center justify-center">
+        <Alert className="w-full max-w-md">
+          <PackageX className="h-4 w-4" />
+          <AlertTitle>No Products Found</AlertTitle>
+          <AlertDescription>
+            We couldn't find any products matching your criteria. Try adjusting your filters or search terms.
+          </AlertDescription>
+        </Alert>
+      </div>
     );
   }
+
 
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
@@ -93,7 +98,7 @@ export default function ShoppingPage() {
     setIsLoading(true);
     setError(null);
     try {
-      const queryParams = new URLSearchParams({ 
+      const queryParams = new URLSearchParams({
         page: currentPage.toString(),
         limit: "10",
         sortBy,

@@ -64,6 +64,17 @@ const getCheckoutCartItems = async (req, res) => {
     }
 };
 
+
+const checkSize = (req,res) =>{
+    try {
+        
+        
+    } catch (error) {
+        console.error("Error fetching checkout cart items:", error);
+        res.status(500).json({ message: 'Server error' });
+    }
+}
+
 //cerate an order...
 const createOrder = async (req, res) => {
     try {
@@ -82,11 +93,17 @@ const createOrder = async (req, res) => {
         } = req.body;
 
 
-        console.log("order items--->>>", order_items);
 
 
         const discountAmount = (subtotal * total_discount) / 100;
         const calculatedTotal = subtotal - discountAmount + shipping_fee;
+       
+        if(total_price_with_discount === 0){
+            return res.status(200),json({
+                sucess:false,
+                message:"Cannot place the order"
+            })
+        }
 
 
         for (const item of order_items) {
@@ -166,7 +183,8 @@ const createOrder = async (req, res) => {
                 },
                 {
                     $inc: {
-                        'sizes.$.stock': -item.quantity
+                        'sizes.$.stock': -item.quantity,
+                        'totalStock' : -item.quantity
                     }
                 }
             );
@@ -341,7 +359,6 @@ const cancelOrder = async (req, res) => {
     try {
         const { userId } = req.body;
         const { orderId, productId } = req.params;
-        console.log(orderId, productId)
         const order = await Order.findById(orderId).populate('order_items.product');
         if (!order) {
             return res.status(404).json({
@@ -497,7 +514,6 @@ const returnRequest = async (req, res) => {
 const failedPaymet = async (req, res) => {
     try {
         const { orderId, status } = req.body;
-        console.log(orderId, status)
         const order = await Order.findByIdAndUpdate(orderId, {
             $set: {
                 payment_status: status,
