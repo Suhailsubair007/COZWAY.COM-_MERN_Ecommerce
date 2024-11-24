@@ -13,6 +13,7 @@ import { Banknote, Wallet, X } from "lucide-react";
 import { toast } from "sonner";
 import OrderConfirmationModal from "./OrderConfirmModal";
 import RazorpayX from "./Payment/Razorpay";
+import { CouponDisplayAtCheckout } from './CoupenDisplayAtCheckout';
 
 export default function CheckoutPage() {
   const [addresses, setAddresses] = useState([]);
@@ -366,7 +367,8 @@ export default function CheckoutPage() {
             {total.toFixed(0)}
           </div>
 
-          <div className="flex space-x-2 mb-6">
+          <div className="space-y-2 mb-6">
+          <div className="flex space-x-2">
             <Input
               placeholder="Apply coupon code"
               className="flex-grow"
@@ -381,6 +383,8 @@ export default function CheckoutPage() {
               {appliedCoupon ? "Remove Coupon" : "Apply Coupon"}
             </Button>
           </div>
+          <CouponDisplayAtCheckout />
+        </div>
           {getButtonText() === "Place Order" ? (
             <Button
               className="w-full mb-4"

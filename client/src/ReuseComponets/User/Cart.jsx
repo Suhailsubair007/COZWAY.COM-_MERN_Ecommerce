@@ -19,12 +19,12 @@ import EmptyCart from "./EmptyCart";
 const CartItem = ({ item, onUpdateQuantity, onRemove }) => {
   const discount = Math.floor(item.discount);
 
-  
-  const sizeInfo = item.productId.sizes.find((size) => size.size === item.size);
-  const availableStock = sizeInfo ? sizeInfo.stock : 0; 
-  const isOutOfStock = availableStock === 0; 
 
-  
+  const sizeInfo = item.productId.sizes.find((size) => size.size === item.size);
+  const availableStock = sizeInfo ? sizeInfo.stock : 0;
+  const isOutOfStock = availableStock === 0;
+
+
 
   return (
     <Card className={`mb-4 ${isOutOfStock ? "opacity-50" : ""}`}>
@@ -41,9 +41,13 @@ const CartItem = ({ item, onUpdateQuantity, onRemove }) => {
               Category: {item.productId.category.name}
             </p>
             <p className="text-sm font-medium">Size: {item.size}</p>
-            <p className="text-sm text-green-600 font-medium">
-              Discount: {discount}%
-            </p>
+            {
+              discount > 2 && (
+                <p className="text-sm text-green-600 font-medium">
+                  Discount: {discount}%
+                </p>
+              )
+            }
             {isOutOfStock ? (
               <p className="text-red-500 font-bold">Out of Stock</p>
             ) : availableStock < 5 ? (
@@ -61,7 +65,7 @@ const CartItem = ({ item, onUpdateQuantity, onRemove }) => {
                     (item?.productId?.offer?.offer_value
                       ? item?.productId?.offer?.offer_value
                       : 0)) /
-                    100) *
+                  100) *
                 item.quantity
               ).toFixed()}
             </p>
@@ -100,7 +104,7 @@ const CartItem = ({ item, onUpdateQuantity, onRemove }) => {
   );
 };
 
-export default function   ShoppingCart() {
+export default function ShoppingCart() {
   const navigate = useNavigate();
   const [cartItems, setCartItems] = useState([]);
   const [subtotal, setSubtotal] = useState(0);
@@ -122,9 +126,9 @@ export default function   ShoppingCart() {
       if (error.response) {
         toast.error(error.response.data.message);
       }
-    }finally {
+    } finally {
       setIsLoading(false);
-    } 
+    }
   };
 
   const updateQuantity = async (item, action) => {

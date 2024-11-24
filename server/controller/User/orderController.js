@@ -65,15 +65,15 @@ const getCheckoutCartItems = async (req, res) => {
 };
 
 
-const checkSize = (req,res) =>{
-    try {
+// const checkSize = (req,res) =>{
+//     try {
+
         
-        
-    } catch (error) {
-        console.error("Error fetching checkout cart items:", error);
-        res.status(500).json({ message: 'Server error' });
-    }
-}
+//     } catch (error) {
+//         console.error("Error fetching checkout cart items:", error);
+//         res.status(500).json({ message: 'Server error' });
+//     }
+// }
 
 //cerate an order...
 const createOrder = async (req, res) => {
