@@ -29,12 +29,6 @@ const cartSchema = new mongoose.Schema({
             offerPrice: {
                 type: Number,
                 min: 0,
-                validate: {
-                    validator: function (value) {
-                        return value <= this.price;
-                    },
-                    message: 'Offer price should be less than or equal to the regular price'
-                }
             },
             discount: {
                 type: Number,

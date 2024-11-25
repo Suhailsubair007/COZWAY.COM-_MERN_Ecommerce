@@ -134,7 +134,7 @@ export default function AddOfferDialog({
           </div>
 
           <div>
-            <Label htmlFor="value">Offer Value</Label>
+            <Label htmlFor="value">Offer Value (%)</Label>
             <Input
               id="value"
               name="value"

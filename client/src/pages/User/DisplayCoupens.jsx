@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { LoadingSpinner } from "@/ReuseComponets/User/LoadingSpinner";
 import {
   Copy,
   CheckCircle,
@@ -63,7 +64,7 @@ export default function DisplayCoupons() {
   };
 
   if (isLoading) {
-    return <div className="text-center py-10">Loading coupons...</div>;
+    return <div className="text-center py-10"><LoadingSpinner /></div>;
   }
 
   if (error) {
@@ -116,12 +117,12 @@ export default function DisplayCoupons() {
                 <div className="space-y-3 text-sm">
                   <div className="flex items-center text-gray-600">
                     <ShoppingBag className="w-5 h-5 mr-3 text-green-500" />
-                    Min. Purchase: ${coupon.min_purchase_amount}
+                    Min. Purchase: ₹{coupon.min_purchase_amount}
                   </div>
                   {coupon.max_discount_amount && (
                     <div className="flex items-center text-gray-600">
                       <DollarSign className="w-5 h-5 mr-3 text-red-500" />
-                      Max. Discount: ${coupon.max_discount_amount}
+                      Max. Discount: ₹{coupon.max_discount_amount}
                     </div>
                   )}
                   <div className="flex items-center text-gray-600">

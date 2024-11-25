@@ -43,7 +43,7 @@ export default function CheckoutPage() {
         console.error("Error fetching data:", error)
         toast.error("Failed to load checkout data")
       } finally {
-        setIsLoading(false) 
+        setIsLoading(false)
       }
     }
 
@@ -302,9 +302,12 @@ export default function CheckoutPage() {
                   <p className="text-sm text-gray-600">
                     Quantity: {item.quantity}
                   </p>
-                  <div className="text-sm text-green-600 font-medium">
-                    {item.discount.toFixed(0)}% OFF
-                  </div>
+                  {item.discount > 2 && (
+                    <div className="text-sm text-green-600 font-medium">
+                      {item.discount.toFixed(0)}% OFF
+                    </div>
+                  )}
+
                 </div>
                 <div className="text-right">
                   <p className="line-through text-gray-500">₹{item.price}</p>

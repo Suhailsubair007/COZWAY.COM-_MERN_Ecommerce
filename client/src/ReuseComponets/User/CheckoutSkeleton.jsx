@@ -3,7 +3,7 @@ import { Card, CardContent } from "@/components/ui/card"
 
 export function CheckoutSkeleton() {
   return (
-    <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 max-w-7xl">
+    <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-20 max-w-7xl">
       <Skeleton className="h-10 w-48 mb-8" />
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         <div className="space-y-8">

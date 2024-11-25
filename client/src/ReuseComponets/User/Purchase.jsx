@@ -320,9 +320,9 @@ const ProductDetail = () => {
                 ? offerPrice - (offerPrice * offer?.offer_value) / 100
                 : offerPrice}
             </p>
-            <p className="text-[16px] font-thin line-through text-gray-500">
+            {/* <p className="text-[16px] font-thin line-through text-gray-500">
               ₹{price}
-            </p>
+            </p> */}
           </div>
           {productData.totalStock === 0 ? (
             <p className="text-red-500 font-semibold">Out of stock!</p>

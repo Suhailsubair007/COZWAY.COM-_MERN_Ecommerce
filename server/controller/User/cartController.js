@@ -10,7 +10,7 @@ const addToCart = async (req, res) => {
         }
 
         const user = await User.findById({ _id: userId })
-        console.log("userrrr", user)
+
         if (user.is_blocked) {
             return res.status(403).json({ message: "User blocked" })
         }

@@ -25,10 +25,6 @@ export default function Component({ order, onClose }) {
   const [isVisible, setIsVisible] = useState(true);
   const navigate = useNavigate();
 
-  // useEffect(() => {
-  //   const timer = setTimeout(() => setIsVisible(false), 5000)
-  //   return () => clearTimeout(timer)
-  // }, [])
 
 
   if (!isVisible) return null;
@@ -42,7 +38,7 @@ export default function Component({ order, onClose }) {
           exit={{ opacity: 0, scale: 0.95 }}
           transition={{ duration: 0.2 }}
         >
-          <Card className="w-[600px] max-h-[850vh] flex flex-col">
+          <Card className="w-[600px] max-h-[900vh] flex flex-col">
             <CardHeader className="text-center py-4 space-y-2">
               <motion.div
                 initial={{ scale: 0 }}
@@ -65,7 +61,13 @@ export default function Component({ order, onClose }) {
               <p className="text-sm text-muted-foreground">
                 Thank you for your purchase
               </p>
+              {order?.payment_status === "Failed" && (
+                <p className="text-lg text-red-400">
+                  Payment failed, please complete from My Orders
+                </p>
+              )}
             </CardHeader>
+
             <CardContent className="flex-1 overflow-y-auto space-y-4 px-6">
               <motion.div
                 initial={{ opacity: 0, y: 20 }}

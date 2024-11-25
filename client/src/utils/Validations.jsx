@@ -71,7 +71,7 @@ export const addOfferValidationSchema = Yup.object({
   value: Yup.number()
     .required("Offer value is required")
     .positive("Value must be positive")
-    .max(100, "Offer value cannot be more than 100"),
+    .max(80, "Offer value cannot be more than 80%"),
   endDate: Yup.date()
     .required("End date is required")
     .min(new Date(), "End date must be in the future"),
@@ -85,47 +85,118 @@ export const addOfferValidationSchema = Yup.object({
     .strict(true),
 });
 
-export const validateCouponForm = (formData) => {
+// export const validateCouponForm = (formData) => {
+//   const errors = {};
+
+//   if (!formData.code.trim()) {
+//     errors.code = "Coupon code is required";
+//   }
+
+//   if (!formData.description.trim()) {
+//     errors.description = "Description is required";
+//   }
+
+//   if (!formData.discount_value) {
+//     errors.discount_value = "Discount value is required";
+//   } else if (
+//     formData.discount_type === "percentage" &&
+//     (formData.discount_value < 0 || formData.discount_value > 100)
+//   ) {
+//     errors.discount_value = "Percentage must be between 0 and 100";
+//   }
+
+//   if (!formData.min_purchase_amount) {
+//     errors.min_purchase_amount = "Minimum purchase amount is required";
+//   }
+
+//   if (!formData.max_discount_amount) {
+//     errors.max_discount_amount = "Maximum discount amount is required";
+//   }
+
+//   if (!formData.expiration_date) {
+//     errors.expiration_date = "Expiration date is required";
+//   } else {
+//     const expirationDate = new Date(formData.expiration_date);
+//     const currentDate = new Date();
+//     if (expirationDate <= currentDate) {
+//       errors.expiration_date = "Expiration date must be in the future";
+//     }
+//   }
+
+//   if (!formData.usage_limit) {
+//     errors.usage_limit = "Usage limit is required";
+//   }
+
+//   return errors;
+// };
+
+
+
+const validateCouponForm = (formData) => {
   const errors = {};
-
-  if (!formData.code.trim()) {
+  
+  // Validate coupon code (uppercase letters and numbers only)
+  if (!formData.code?.trim()) {
     errors.code = "Coupon code is required";
+  } else if (!/^[A-Z0-9]+$/.test(formData.code)) {
+    errors.code = "Coupon code must be in capital letters and numbers only";
   }
-
-  if (!formData.description.trim()) {
+  
+  // Validate description
+  if (!formData.description?.trim()) {
     errors.description = "Description is required";
   }
-
-  if (!formData.discount_value) {
+  
+  // Validate discount value
+  const discountValue = Number(formData.discount_value);
+  if (!discountValue && discountValue !== 0) {
     errors.discount_value = "Discount value is required";
   } else if (
     formData.discount_type === "percentage" &&
-    (formData.discount_value < 0 || formData.discount_value > 100)
+    (discountValue < 0 || discountValue > 80)
   ) {
-    errors.discount_value = "Percentage must be between 0 and 100";
+    errors.discount_value = "Percentage must be between 0 and 80";
+  } else if (discountValue < 0) {
+    errors.discount_value = "Discount value cannot be negative";
   }
-
-  if (!formData.min_purchase_amount) {
+  
+  // Validate minimum purchase amount
+  const minPurchaseAmount = Number(formData.min_purchase_amount);
+  if (!minPurchaseAmount && minPurchaseAmount !== 0) {
     errors.min_purchase_amount = "Minimum purchase amount is required";
+  } else if (minPurchaseAmount <= 0) {
+    errors.min_purchase_amount = "Minimum purchase amount must be greater than zero";
   }
-
-  if (!formData.max_discount_amount) {
+  
+  // Validate maximum discount amount
+  const maxDiscountAmount = Number(formData.max_discount_amount);
+  if (!maxDiscountAmount && maxDiscountAmount !== 0) {
     errors.max_discount_amount = "Maximum discount amount is required";
+  } else if (maxDiscountAmount <= 0) {
+    errors.max_discount_amount = "Maximum discount amount must be greater than zero";
+  } else if (maxDiscountAmount > minPurchaseAmount) {
+    errors.max_discount_amount = "Maximum discount amount cannot exceed minimum purchase amount";
   }
-
+  
+  // Validate expiration date
   if (!formData.expiration_date) {
     errors.expiration_date = "Expiration date is required";
   } else {
     const expirationDate = new Date(formData.expiration_date);
     const currentDate = new Date();
-    if (expirationDate <= currentDate) {
+    currentDate.setHours(0, 0, 0, 0); // Reset time to start of day for fair comparison
+    if (expirationDate < currentDate) {
       errors.expiration_date = "Expiration date must be in the future";
     }
   }
-
-  if (!formData.usage_limit) {
+  
+  // Validate usage limit
+  const usageLimit = Number(formData.usage_limit);
+  if (!usageLimit && usageLimit !== 0) {
     errors.usage_limit = "Usage limit is required";
+  } else if (usageLimit <= 0) {
+    errors.usage_limit = "Usage limit must be greater than zero";
   }
-
+  
   return errors;
 };
