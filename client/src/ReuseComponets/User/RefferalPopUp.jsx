@@ -14,19 +14,15 @@ export default function RefferalPopUp({ seen, isOpen, onClose }) {
   const [referralCode, setReferralCode] = useState("");
 
   const handleApplyCode = async () => {
-    console.log("Apply coupen.....");
     const responce = await axiosInstance.post("/users/refferal", {
       code: referralCode,
       seen: seen,
     });
-    console.log(responce.data);
     onClose();
   };
 
   const handleSkip = async () => {
-    console.log("In skipp fuction");
     const responce = await axiosInstance.post("/users/skip");
-    console.log("Skip responce", responce.data);
     onClose();
   };
 

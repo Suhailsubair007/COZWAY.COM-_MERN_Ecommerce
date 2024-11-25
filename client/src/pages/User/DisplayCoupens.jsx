@@ -42,7 +42,6 @@ export default function DisplayCoupons() {
     try {
       setIsLoading(true);
       const response = await axiosInstance.get("/users/coupons");
-      console.log("response---------->", response.data.coupens);
       setCoupons(response.data.coupens);
     } catch (error) {
       console.error("Error fetching coupons:", error);

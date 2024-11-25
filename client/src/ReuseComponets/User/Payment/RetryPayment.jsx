@@ -25,7 +25,6 @@ const RetryPayment = ({
       description: "",
       order_id: "",
       handler: async (response) => {
-        console.log(response);
         try {
           if (response.razorpay_payment_id) {
             setError(null);
@@ -36,7 +35,6 @@ const RetryPayment = ({
             toast.success("Paymet completed Sucessfully..");
             fetchOrders(currentPage);
 
-            console.log("pay checth kazhinj dataa....---->>>>", responce.data);
           }
         } catch (err) {
           setError("Failed to process payment response");

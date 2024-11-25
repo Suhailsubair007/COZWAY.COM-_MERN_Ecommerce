@@ -65,16 +65,42 @@ const getCheckoutCartItems = async (req, res) => {
 };
 
 
-// const checkSize = (req,res) =>{
-//     try {
+const checkStockAvailability = async (req, res) => {
+    try {
+        const { order_items } = req.body;
 
-        
-//     } catch (error) {
-//         console.error("Error fetching checkout cart items:", error);
-//         res.status(500).json({ message: 'Server error' });
-//     }
-// }
+        for (const item of order_items) {
+            const product = await Product.findById(item.productId._id);
 
+            if (!product || !product.is_active) {
+                return res.status(400).json({
+                    success: false,
+                    message: `The product ${item.productId.name} has been blocked by the admin.`
+                });
+            }
+
+            const currentProduct = product.sizes.find(s => s.size === item.size);
+            if (!currentProduct || currentProduct.stock < item.quantity) {
+                return res.status(400).json({
+                    success: false,
+                    message: `Currently, the quantity of ${product.name} for size ${item.size} is out of stock!`
+                });
+            }
+        }
+
+        return res.status(200).json({
+            success: true,
+            message: "All items are in stock"
+        });
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({
+            success: false,
+            message: "Error checking stock availability",
+            error: error.message
+        });
+    }
+};
 //cerate an order...
 const createOrder = async (req, res) => {
     try {
@@ -97,11 +123,11 @@ const createOrder = async (req, res) => {
 
         const discountAmount = (subtotal * total_discount) / 100;
         const calculatedTotal = subtotal - discountAmount + shipping_fee;
-       
-        if(total_price_with_discount === 0){
-            return res.status(200),json({
-                sucess:false,
-                message:"Cannot place the order"
+
+        if (total_price_with_discount === 0) {
+            return res.status(200), json({
+                sucess: false,
+                message: "Cannot place the order"
             })
         }
 
@@ -184,7 +210,7 @@ const createOrder = async (req, res) => {
                 {
                     $inc: {
                         'sizes.$.stock': -item.quantity,
-                        'totalStock' : -item.quantity
+                        'totalStock': -item.quantity
                     }
                 }
             );
@@ -389,6 +415,12 @@ const cancelOrder = async (req, res) => {
                 message: "Cannot cancel shipped or delivered products"
             });
         }
+        if (order.payment_status === "Failed") {
+            return res.status(400).json({
+                success: false,
+                message: "Cannot cancel the order because the payment has failed."
+            });
+        }
 
         let refundAmount = orderItem.totalProductPrice;
         if (order.coupon_discount > 0) {
@@ -397,11 +429,6 @@ const cancelOrder = async (req, res) => {
             const itemCouponDiscount = order.coupon_discount * itemProportion;
             refundAmount -= itemCouponDiscount;
         }
-
-
-
-        orderItem.order_status = 'cancelled';
-        await order.save();
 
 
 
@@ -415,27 +442,32 @@ const cancelOrder = async (req, res) => {
             }
         }
 
-        if (order.payment_method === "Wallet" || order.payment_method === "RazorPay") {
-            let wallet = await Wallet.findOne({ user: userId });
+        if (order.payment_status === "Paid") {
+            if (order.payment_method === "Wallet" || order.payment_method === "RazorPay") {
+                let wallet = await Wallet.findOne({ user: userId });
 
-            if (!wallet) {
-                wallet = new Wallet({
-                    user: userId,
-                    balance: 0,
-                    transactions: []
+                if (!wallet) {
+                    wallet = new Wallet({
+                        user: userId,
+                        balance: 0,
+                        transactions: []
+                    });
+                }
+                wallet.balance += refundAmount;
+                wallet?.transactions.push({
+                    order_id: order._id,
+                    transaction_date: new Date(),
+                    transaction_type: "credit",
+                    transaction_status: "completed",
+                    amount: refundAmount,
                 });
-            }
-            wallet.balance += refundAmount;
-            wallet?.transactions.push({
-                order_id: order._id,
-                transaction_date: new Date(),
-                transaction_type: "credit",
-                transaction_status: "completed",
-                amount: refundAmount,
-            });
 
-            await wallet.save();
-        }
+                await wallet.save();
+            }
+        } 
+
+        orderItem.order_status = 'cancelled';
+        await order.save();
 
         res.status(200).json({
             success: true,
@@ -546,7 +578,8 @@ module.exports = {
     getOrderById,
     cancelOrder,
     returnRequest,
-    failedPaymet
+    failedPaymet,
+    checkStockAvailability
 };
 
 

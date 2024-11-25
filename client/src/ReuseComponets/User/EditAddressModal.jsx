@@ -41,7 +41,6 @@ export default function EditAddressModal({
       if (isOpen && addressId) {
         try {
           const response = await axiosInstance.get(`/users/address/${addressId}`);
-          console.log("Selected Address data:", response.data.address);
           setInitialValues({ ...response.data.address, user });
         } catch (error) {
           console.error("Error fetching address:", error);
@@ -57,7 +56,6 @@ export default function EditAddressModal({
         `/users/addresses/${addressId}`,
         values
       );
-      console.log("Address updated successfully:", response.data);
       onUpdate(response.data.address);
       onClose();
     } catch (error) {

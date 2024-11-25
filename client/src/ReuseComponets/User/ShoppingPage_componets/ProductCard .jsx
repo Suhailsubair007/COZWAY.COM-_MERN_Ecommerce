@@ -3,7 +3,6 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 
 export const ProductCard = ({ product, onNavigate }) => {
-  // console.log(product?.offer?.offer_value) 
 
   return(
   <Card

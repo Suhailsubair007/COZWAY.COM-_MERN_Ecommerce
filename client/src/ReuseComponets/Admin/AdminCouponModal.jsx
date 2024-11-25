@@ -55,11 +55,10 @@ export default function AdminCouponModal({ isOpen, onClose, onCouponAdded }) {
     if (Object.keys(validationErrors).length === 0) {
       try {
         const response = await axiosInstance.post("/admin/coupon", formData);
-        console.log(response.data);
         onCouponAdded();
         onClose();
       } catch (error) {
-        console.log(error.response?.data?.message || "An error occurred");
+        console.error(error.response?.data?.message || "An error occurred");
       }
     }
   };

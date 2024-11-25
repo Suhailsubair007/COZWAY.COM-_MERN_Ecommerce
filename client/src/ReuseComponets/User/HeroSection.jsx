@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import axiosInstance from "@/config/axiosConfig";
 import RefferalPopUp from "./RefferalPopUp";
+import { LoadingSpinner } from "./LoadingSpinner";
 
 export default function HeroSection() {
   const navigate = useNavigate();
@@ -42,7 +43,6 @@ export default function HeroSection() {
   const fetchSeen = async () => {
     try {
       const response = await axiosInstance.get(`/users/seen/${userId}`);
-      console.log(response.data);
       setSeen(response.data.hasSeen);
       setShowReferralPopup(!response.data.hasSeen);
     } catch (error) {
@@ -79,7 +79,9 @@ export default function HeroSection() {
   };
 
   if (banners.length === 0) {
-    return <div>Loading...</div>;
+    return <div className="relative w-full h-screen overflow-hidden">
+      <LoadingSpinner/>
+    </div>
   }
 
   return (

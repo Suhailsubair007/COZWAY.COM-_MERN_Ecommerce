@@ -60,7 +60,7 @@ export default function Header() {
     } catch (error) {
       console.error("Error fetching cart:", error);
       if (error.response) {
-        console.log(error.response.data.message);
+        console.error(error.response.data.message);
       }
     }
   };
@@ -70,7 +70,6 @@ export default function Header() {
       const response = await axiosInstance.get(
         `/users/wishlist/length/${userId.id}`
       );
-      console.log("wishlist------->", response.data);
       setWishlistCount(response.data.wishlist_length);
     } catch (error) {
       if(error.response?.status === 404){
@@ -154,7 +153,7 @@ export default function Header() {
               Our Story
             </Link>
             <Link
-              to="/contact-us"
+              to="/contact"
               className="text-sm font-medium text-muted-foreground hover:text-primary"
             >
               Contact Us

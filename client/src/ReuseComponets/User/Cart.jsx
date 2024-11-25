@@ -118,7 +118,6 @@ export default function ShoppingCart() {
   const fetchCart = async () => {
     try {
       const response = await axiosInstance.get(`/users/cart/${userId}`);
-      console.log("cart products=====>", response.data.cartItems.products);
       setCartItems(response.data.cartItems.products);
       setSubtotal(response.data.cartItems.totalCartPrice);
     } catch (error) {

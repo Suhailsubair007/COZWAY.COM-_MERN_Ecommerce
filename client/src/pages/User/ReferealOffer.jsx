@@ -20,10 +20,9 @@ export default function ReferralCode() {
     const fetchRefferalCode = async () => {
       try {
         const responce = await axiosInstance.get(`/users/refferalCode`);
-        console.log(responce.data);
         setRefferalCode(responce.data.referralCode);
       } catch (error) {
-        console.log(error);
+        console.error(error);
       }
     };
     fetchRefferalCode();

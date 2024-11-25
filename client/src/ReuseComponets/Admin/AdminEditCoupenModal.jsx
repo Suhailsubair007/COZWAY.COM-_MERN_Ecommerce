@@ -79,7 +79,6 @@ export default function AdminEditCouponModal({
           `/admin/coupen/${couponId}`,
           formData
         );
-        console.log(response.data);
         onCouponEdited();
         onClose();
       } catch (error) {

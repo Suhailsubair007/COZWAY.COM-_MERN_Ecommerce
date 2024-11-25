@@ -46,7 +46,6 @@ export default function Coupon() {
   const fetchCoupons = async () => {
     try {
       const response = await axiosInstance.get("/admin/getCoupon");
-      console.log("dataaa--->", response.data);
       setCoupons(response.data.coupons);
     } catch (error) {
       console.error(error);
@@ -69,7 +68,7 @@ export default function Coupon() {
       fetchCoupons();
       setIsDeleteDialogOpen(false);
     } catch (error) {
-      console.log(error);
+      console.error(error);
     }
   };
 

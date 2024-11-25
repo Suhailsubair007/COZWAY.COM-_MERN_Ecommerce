@@ -60,7 +60,6 @@ export default function Component() {
     fetchOffers();
   };
 
-  console.log("offer to delete----------->", offerToDelete);
   const handleDeleteClick = (offer) => {
     setOfferToDelete(offer);
     setDeleteConfirmOpen(true);

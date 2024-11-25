@@ -50,7 +50,6 @@ const EditProduct = () => {
           `/admin/product/edit/${productId}`
         );
         const productData = response.data;
-        console.log("udesshichathh vannuuu :", productData);
         setProduct({
           name: productData.name || "",
           description: productData.description || "",

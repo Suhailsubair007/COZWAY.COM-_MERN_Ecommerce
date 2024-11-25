@@ -30,16 +30,13 @@ const AdminLogin = () => {
         withCredentials: true,
       });
 
-      console.log("Login response:", response);
       toast.success('Login sucess');
 
       if (response.status === 200) {
-        console.log(response.data);
         dispatch(setAdminDetails(response.data.admin));
         toast("Login success ✔");
         navigate("/admin/dashboard");
       } else {
-        console.log("Unexpected response:", response);
         toast("Failed to login.");
       }
     } catch (err) {

@@ -84,6 +84,7 @@ router.get('/order/:orderId', verifyUser, orderController.getOrderById);
 router.patch('/order/:orderId/cancel/:productId', verifyUser, orderController.cancelOrder);
 router.post('/order/:orderId/return/:productId', verifyUser, orderController.returnRequest)
 router.post('/order/retry', orderController.failedPaymet)
+router.post('/check-stock',orderController.checkStockAvailability);
 
 //WISHLIST RELATED ROUTES
 router.post('/wishlist/add', verifyUser, wishlistController.AddItemToWishlist);

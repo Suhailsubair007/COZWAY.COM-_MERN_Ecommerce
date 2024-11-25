@@ -14,6 +14,7 @@ import { toast } from "sonner";
 import OrderConfirmationModal from "./OrderConfirmModal";
 import RazorpayX from "./Payment/Razorpay";
 import { CouponDisplayAtCheckout } from './CoupenDisplayAtCheckout';
+import { CheckoutSkeleton } from "./CheckoutSkeleton";
 
 export default function CheckoutPage() {
   const [addresses, setAddresses] = useState([]);
@@ -21,6 +22,7 @@ export default function CheckoutPage() {
   const [total, setTotal] = useState(0);
   const [showConfirmation, setShowConfirmation] = useState(false);
   const [placedOrder, setPlacedOrder] = useState(null);
+  const [isLoading, setIsLoading] = useState(true)
   const [items, setItems] = useState([]);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [selectedAddress, setSelectedAddress] = useState("");
@@ -33,11 +35,21 @@ export default function CheckoutPage() {
   const shipping = 0;
 
   useEffect(() => {
-    fetchAddresses();
-    fetchItems();
-  }, [user]);
+    const fetchData = async () => {
+      setIsLoading(true)
+      try {
+        await Promise.all([fetchAddresses(), fetchItems()])
+      } catch (error) {
+        console.error("Error fetching data:", error)
+        toast.error("Failed to load checkout data")
+      } finally {
+        setIsLoading(false) 
+      }
+    }
 
-  console.log("items------->>>>", items);
+    fetchData()
+  }, [user])
+
 
   useEffect(() => {
     setTotal(subtotal - couponDiscount + shipping);
@@ -63,7 +75,6 @@ export default function CheckoutPage() {
       toast.error("Failed to fetch cart items");
     }
   };
-  // console.log("items-------------------->", items);
   const handleAddAddress = (newAddress) => {
     setAddresses([...addresses, newAddress]);
     setIsAddModalOpen(false);
@@ -82,8 +93,8 @@ export default function CheckoutPage() {
             (item?.productId?.offer?.offer_value
               ? item?.productId?.offer?.offer_value
               : 0)) /
-            100) *
-          item.quantity,
+          100) *
+        item.quantity,
       0
     );
     return totalOriginalPrice - totalDiscountedPrice + couponDiscount;
@@ -97,7 +108,7 @@ export default function CheckoutPage() {
             (item?.productId?.offer?.offer_value
               ? item?.productId?.offer?.offer_value
               : 0)) /
-            100) *
+          100) *
         item.quantity;
       return acc + (originalTotal - discountedTotal);
     }, 0);
@@ -144,33 +155,6 @@ export default function CheckoutPage() {
     }
 
     try {
-      console.log({
-        userId: user.id,
-        order_items: items.map((item) => {
-          const discountedPrice =
-            item.offerPrice -
-            (item.offerPrice *
-              (item?.productId?.offer?.offer_value
-                ? item?.productId?.offer?.offer_value
-                : 0)) /
-              100;
-
-          return {
-            ...item,
-            price: discountedPrice,
-            totalProductPrice: (discountedPrice * item.quantity).toFixed(0),
-          };
-        }),
-        address: addressToSend,
-        payment_method: selectedPaymentMethod,
-        payment_status: paymentStatus,
-        subtotal,
-        total_discount: calculateTotalDiscountPrice(),
-        coupon_discount: couponDiscount,
-        total_price_with_discount: total,
-        shipping_fee: shipping,
-        coupon: appliedCoupon?.code || null,
-      });
       const response = await axiosInstance.post(`/users/order/`, {
         userId: user.id,
         order_items: items.map((item) => {
@@ -180,7 +164,7 @@ export default function CheckoutPage() {
               (item?.productId?.offer?.offer_value
                 ? item?.productId?.offer?.offer_value
                 : 0)) /
-              100;
+            100;
 
           return {
             ...item,
@@ -220,6 +204,10 @@ export default function CheckoutPage() {
     }
   };
 
+
+  if (isLoading) {
+    return <CheckoutSkeleton />
+  }
   return (
     <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 max-w-7xl">
       <h1 className="text-3xl font-bold mb-8 text-center sm:text-left">
@@ -328,7 +316,7 @@ export default function CheckoutPage() {
                           (item?.productId?.offer?.offer_value
                             ? item?.productId?.offer?.offer_value
                             : 0)) /
-                          100) *
+                        100) *
                       item.quantity
                     ).toFixed(0)}
                   </p>
@@ -368,23 +356,23 @@ export default function CheckoutPage() {
           </div>
 
           <div className="space-y-2 mb-6">
-          <div className="flex space-x-2">
-            <Input
-              placeholder="Apply coupon code"
-              className="flex-grow"
-              value={couponCode}
-              onChange={(e) => setCouponCode(e.target.value)}
-              disabled={appliedCoupon !== null}
-            />
-            <Button
-              variant="outline"
-              onClick={appliedCoupon ? removeCoupon : applyCoupon}
-            >
-              {appliedCoupon ? "Remove Coupon" : "Apply Coupon"}
-            </Button>
+            <div className="flex space-x-2">
+              <Input
+                placeholder="Apply coupon code"
+                className="flex-grow"
+                value={couponCode}
+                onChange={(e) => setCouponCode(e.target.value)}
+                disabled={appliedCoupon !== null}
+              />
+              <Button
+                variant="outline"
+                onClick={appliedCoupon ? removeCoupon : applyCoupon}
+              >
+                {appliedCoupon ? "Remove Coupon" : "Apply Coupon"}
+              </Button>
+            </div>
+            <CouponDisplayAtCheckout />
           </div>
-          <CouponDisplayAtCheckout />
-        </div>
           {getButtonText() === "Place Order" ? (
             <Button
               className="w-full mb-4"
@@ -403,6 +391,7 @@ export default function CheckoutPage() {
               amount={total.toFixed(0)}
               buttonName={getButtonText()}
               handlePlaceOrder={handlePlaceOrder}
+              items={items}
             />
           )}
         </div>

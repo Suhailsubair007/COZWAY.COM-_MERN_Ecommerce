@@ -1,24 +1,28 @@
 import { useState, useEffect } from "react";
 import axiosInstance from "@/config/axiosConfig";
+import { Skeleton } from "@/components/ui/skeleton";
 import { useNavigate } from "react-router-dom";
 
 const TrendingNow = () => {
   const [trendingItems, setTrendingItems] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+
   const navigate = useNavigate();
 
   useEffect(() => {
     const fetchTrendingItems = async () => {
       try {
         const response = await axiosInstance.get("/users/casual");
-        console.log("responce data--->",response.data);
         const fetchedItems = response.data.slice(0, 4).map((item) => ({
           name: item.name,
           image: item.image,
           id: item.id,
         }));
         setTrendingItems(fetchedItems);
+        setIsLoading(false);
       } catch (error) {
         console.error("Error fetching trending items:", error);
+        setIsLoading(false);
       }
     };
     fetchTrendingItems();
@@ -35,27 +39,32 @@ const TrendingNow = () => {
           Casual Collections
         </h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          {trendingItems.map((item) => (
-            <div
-              key={item.id}
-              onClick={handleClick}
-              className="relative bg-white dark:bg-gray-800 shadow-xl rounded-lg overflow-hidden cursor-pointer group"
-            >
-              <div className="aspect-w-3 aspect-h-4">
-                <img
-                  src={item.image}
-                  alt={item.name}
-                  className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
-                />
-              </div>
-              <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-              <div className="absolute bottom-0 left-0 right-0 p-4 transform translate-y-full group-hover:translate-y-0 transition-transform duration-300">
-                <h3 className="text-white text-lg font-semibold text-center">
-                  {item.name}
-                </h3>
-              </div>
-            </div>
-          ))}
+          {isLoading
+            ? Array(4).fill(0).map((_, index) => (
+                <Skeleton key={index} className="w-full h-[440px] rounded-lg" />
+              ))
+            : trendingItems.map((item) => (
+                <div
+                  key={item.id}
+                  onClick={handleClick}
+                  className="relative bg-white dark:bg-gray-800 shadow-xl rounded-lg overflow-hidden cursor-pointer group"
+                >
+                  <div className="aspect-w-3 aspect-h-4">
+                    <img
+                      src={item.image}
+                      alt={item.name}
+                      className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
+                    />
+                  </div>
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                  <div className="absolute bottom-0 left-0 right-0 p-4 transform translate-y-full group-hover:translate-y-0 transition-transform duration-300">
+                    <h3 className="text-white text-lg font-semibold text-center">
+                      {item.name}
+                    </h3>
+                  </div>
+                </div>
+              ))
+          }
         </div>
       </div>
     </section>
@@ -63,3 +72,4 @@ const TrendingNow = () => {
 };
 
 export default TrendingNow;
+

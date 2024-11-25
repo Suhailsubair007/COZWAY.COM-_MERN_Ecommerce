@@ -26,6 +26,7 @@ const DisplayCoupens = lazy(() => import("@/pages/User/DisplayCoupens"));
 const ChangePassword = lazy(() => import("@/pages/User/ChangePassword"));
 const ReferralCode = lazy(() => import("@/pages/User/ReferealOffer"));
 const StoryPage = lazy(() => import("@/pages/User/HomePage/StoryPage"));
+const ContactUsPage = lazy(() => import("@/pages/User/HomePage/ContactUsPage"));
 
 
 const UserRoute = () => {
@@ -37,6 +38,8 @@ const UserRoute = () => {
 
         <Route path="/" element={<Landing />} />
         <Route path="/story" element={<StoryPage />} />
+        <Route path="/contact" element={<ContactUsPage/>} />
+
 
         {/* Login routes */}
         <Route

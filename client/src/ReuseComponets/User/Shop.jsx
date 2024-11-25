@@ -108,7 +108,6 @@ export default function ShoppingPage() {
         `/users/advanced-search?${queryParams}`
       );
       setProducts(response.data.products);
-      // console.log("products--->", response.data.products);
       setTotalPages(response.data.totalPages);
     } catch (error) {
       console.error("Error fetching products:", error);

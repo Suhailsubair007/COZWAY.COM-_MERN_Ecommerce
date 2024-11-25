@@ -15,7 +15,6 @@ export default function EditCategory() {
   });
   const navigate = useNavigate();
   const { categoryId } = useParams();
-  console.log(categoryId)
 
   useEffect(() => {
     const fetchCategory = async () => {

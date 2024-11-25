@@ -22,7 +22,6 @@ import { Separator } from "@/components/ui/separator";
 
 export default function Component({ order, onClose }) {
 
-  console.log("order--------------->>>>>>>",order)
   const [isVisible, setIsVisible] = useState(true);
   const navigate = useNavigate();
 

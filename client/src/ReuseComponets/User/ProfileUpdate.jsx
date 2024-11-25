@@ -53,14 +53,11 @@ export default function ProfileUpdate() {
           initialValues={initialUserData}
           validationSchema={validationSchema}
           onSubmit={async (values, { setSubmitting }) => {
-            console.log(values);
             try {
               const response = await axiosInstance.patch(
                 `/users/profile/${user}`,
                 values
               );
-              console.log("Request Payload:", values);
-              console.log("Response:", response);
               if (response.status === 200) {
                 toast.success("Profile updated successfully");
               } else {

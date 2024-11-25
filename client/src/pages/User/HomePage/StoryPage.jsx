@@ -8,7 +8,6 @@ const StoryPage = () => {
     <div>
       <Header />
       <OurStory />
-      <Footer />
     </div>
   );
 };

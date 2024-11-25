@@ -34,7 +34,6 @@ function AddAddressModal({ isOpen, onClose, onAdd }) {
   const handleSubmit = async (values, { setSubmitting }) => {
     try {
       const response = await axiosInstance.post("/users/addresses", values);
-      console.log("Address added successfully:", response.data);
       onAdd({
         _id: response.data.address._id,
         name: response.data.address.name,

@@ -67,11 +67,6 @@ export default function Component() {
     setCurrentPage(newPage);
   };
 
-  const handlePayNow = (orderId) => {
-    console.log(`Initiating payment for order: ${orderId}`);
-  };
-
-
 
   return (
     <div className="button-0 max-w-100 mx-auto p-8 bg-gray-50  ">

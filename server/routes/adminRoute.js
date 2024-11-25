@@ -64,9 +64,9 @@ router.get('/download/report/xl', verifyAdmin, salesController.download_sales_re
 router.get('/topselling', salesController.getTopSelling)
 
 //BANNER Related routes
-router.post('/banner', bannerController.addBanner);
-router.get('/banner', bannerController.getAllBanners);
-router.delete('/banner/:id', bannerController.deleteBanner);
+router.post('/banner', verifyAdmin, bannerController.addBanner);
+router.get('/banner', verifyAdmin, bannerController.getAllBanners);
+router.delete('/banner/:id', verifyAdmin, bannerController.deleteBanner);
 
 
 

@@ -103,7 +103,6 @@ const ProductDetail = () => {
     }
   };
 
-  console.log("in wishlist varable----------->>>>>>>>", inWishList);
 
   const handleAddToCart = async () => {
     if (!selectedSize) {
@@ -133,7 +132,6 @@ const ProductDetail = () => {
         },
       });
 
-      console.log(response);
       if (response.status === 200) {
         setIsInCart(true);
         toast.success("The product has been added to your cart.");
@@ -191,10 +189,6 @@ const ProductDetail = () => {
 
   const handleSubmitReview = (e) => {
     e.preventDefault();
-    console.log("Submitted review:", {
-      rating: userRating,
-      content: reviewContent,
-    });
     setUserRating(0);
     setReviewContent("");
   };

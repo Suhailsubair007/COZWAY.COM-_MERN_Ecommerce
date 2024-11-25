@@ -3,7 +3,6 @@ import axiosInstance from "@/config/axiosConfig";
 import { useParams } from "react-router-dom";
 
 export default function RelatedProducts({ id }) {
-  console.log("category id :", id);
   const [relatedProducts, setRelatedProducts] = useState([]);
 
   useEffect(() => {
@@ -12,7 +11,6 @@ export default function RelatedProducts({ id }) {
         const response = await axiosInstance.get(
           `/users/related/${id}`
         );
-        console.log(response.data);
         setRelatedProducts(response.data);
       } catch (error) {
         console.error("Failed to fetch related products:", error);

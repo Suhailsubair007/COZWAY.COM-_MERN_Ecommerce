@@ -53,7 +53,6 @@ export default function ChangePassword() {
       });
 
       const data = await response.data;
-      console.log(data);
       if (response.status === 200) {
         setFormData({ current: "", new: "", confirm: "" });
         toast.success("Password updated successfully");

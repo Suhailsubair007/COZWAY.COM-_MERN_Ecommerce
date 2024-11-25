@@ -42,7 +42,6 @@ export default function Banner() {
     fetchBanners();
   }, []);
 
-  console.log("banneerrr---->>", banners);
   const fetchBanners = async () => {
     try {
       const response = await axiosInstance.get("/admin/banner");

@@ -77,8 +77,11 @@ export default function OrderDetail() {
         toast.error("Failed to cancel product");
       }
     } catch (error) {
+      if(error.response.status === 400){
+        toast.error(error.response.data.message ||"Error in cancelling producty");
+      }
       console.error("Error cancelling product:", error);
-      toast.error("Error cancelling product");
+      
     }
   };
 
@@ -340,7 +343,7 @@ export default function OrderDetail() {
                   item.order_status !== "shipped" &&
                   item.order_status !== "delivered" &&
                   !item.return_request?.is_requested && 
-                  orderData?.payment_status !== "Failed" &&(
+                  (
                     <Button
                       variant="destructive"
                       size="sm"

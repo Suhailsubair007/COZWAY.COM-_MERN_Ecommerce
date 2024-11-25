@@ -40,7 +40,6 @@ export default function ImageCropUpload() {
         'https://api.cloudinary.com/v1_1/dupo7yv88/image/upload',
         formData
       )
-      console.log('Cropped Image uploaded successfully:', response.data.secure_url)
       toast('Cropped image uploaded successfully!')
     } catch (error) {
       console.error('Error uploading cropped image:', error)
